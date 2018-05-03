@@ -3,12 +3,11 @@ node_js:
   - '8'
 env:
   global:
-    # kosssi GITHUB_TOKEN
+    # cozy-bot GITHUB_TOKEN
     # to generate yours : travis encrypt GITHUB_TOKEN=<your_GITHUB_TOKEN>
-    - secure: "vw+BSo/iU2IpteuzjqdCJsgS6VrlHNc531V51Rqm0AjtZa7LoMn+1xNXL790vs5/LGoXr6TZqZhRuR777V2ASOmyPW5n4ZSPrPzu6e6A4e57brDUuBL/hz5EBXyfyQU/41hU0c8dWJzinEYSDQurt4zQaSlP61nChipuNsx6aXLXQHIQNngCdBUpm4c2KJ7UJy9LpoEVtnxnPt18EvKUsENs3kZraP/twSM2j+n2hKt1In8MRoSZNyNvAwGSI5U+2H3SltKJxn/u0IoPFPoqrbKjbwAhhRAw4xv9X4flSIoxflOZurEUkbKcdLlGPPmRJBLTODq3I9q5yiS5eXcWTfCeniaTHv8KYRrjLuwEb2ZpwRfBgcHqyY4I29yoKNqrfbN5YOgCTLru9tJRT7IvfACRCzK9ToyP3QtUTAqSUfS5CeaWHVmTsWejh072V2kJQRczqhCcS+gCyGVoNU4TY6AysOUP/nZh8H7sQr/mfO/MemufPMtbsmxRH3oY4u4gXLqX0dKcfTimmdcwmLwSPBbUgN80YPR3GVR0zLWltf35Q65P7r3HLkHCfKoO8pGverNkG/izlQYn1muSai9TG0MgaX5eeemwbe5tHmZmXhT1heDFFvzeVAPDeU5OBFG0VjCh6DJcjWDmeVK6HaupEHA06edu4/n2W/uH962cWXk="
+    - secure: "YBO5Z+JofCiQImewsWM58lcFRLba2OQ231bOtJptKkENaRQ5gbCPcbKjhHGkWaExhkde+UU6PMuhlPnxpIrRQkNnlBoiWY9mHtE2Qnnr6rsrgvJdJwu4mCk2tPJTQsa0fu1CNLwJ+kgWHvbHyBtDXpgmMEyoDPnql3x16ZjIAvML82dduM+CybOGPEAUpgljjVKiDgGRiEAndT9ge1r5DSjIjiEpN5ljoXYk4uMDAJnJEMZbpNygtDsgdgw6vk1Rgk173s0vSV21CjyseVpsQ5rTG4SjLZnpgX+LIN4TUpawOh1RW09k6uHMvEd3OZwLKa49ljFiUKGDhQJCVMG4lAFc9BfrR2l+/8xPIdPjEMxHAUx49qlX3hRDQbEm8cLKL7jTiLF5YSQK+RmA2yI4d2/tJOBE8RF//jXlG2FCOTjXqTuJyKC8BWr4aqg6ltpjxT/DxLBimCocwiqhGlukDMh5glbFPiQ1gjJj5D4Oeeu/ch4iPCUpBu91/eUz3vJwY8xNHjGvkDStvfxVgn8Gsz9R//zxb6Nwfkq41+gtj9Wjujqjpj+e3/qlgbk1Du6SS+8dBPXmRmvJ3leqf3JcYzZ83r2ptOjPBQcJEjfgONz+tkW+/iF5zkS2lhnlubCCHaZUVMLgBBPTfWW+imedSrwjECdKj2v69Eayj8vN9ps="
     # Cozy REGISTRY_TOKEN
-    - secure: "CQ44ZVjPAIVRvGgMcduSAX4VmaOrzF3nrJXPFUsNQ2tMVVdaAlI1zTNkdfntqigZgz6Mpk9x+2FcA8qrkNzQ4cW0lPP9f5dBtSH1xetfpXDFKprW4bqzmhgXSXJFTOYxkChOBPmCYJr+Vv4XqDkv/dBEPdfRSgvVyd5YxHSd5HBU91rKyR+Hox7LTnhmlXleLIs11EQgp7RK+L28MBCtCqAa2niFlKKRlqupm2FSpZzxCh9qeY0wKCQzPE+QZUm4waJ1SUGKQwbzAfyOxu2O6rwzaTSknfdJoSX6AMxjRTWBC9c3VfUGM3wjVJIqMhiUj2FQhVIjiDyX/W60/q3UMC5WYzSvEDDfhnKCPwiUKSU7HvSxx9q2YP34evxKo7KPahz9zLlQZvW+GBMyI9hbMDBTALuQVVzhftsvqfrogyYhkEPviiYiVADWNxhacsbUjRA5svXnZvtmCPo7fLFwel/krgC5Z8AwAY0YxWjSHNVScUkieSDCrlxrC09vTtG60unt9gtXbD5ruUkDLWSUwHBv2p0WY1TdP+2Vlf3yYfBvEVbqi59AxG+T17bq7Xv3QZnkrwC+UOCNCeg+gHPv+fRpUaYWzCO4uaoY/nlJa7RulQFhGca3A//6xRo/KgWw9JJnOXJelNjE9oHCUu9xShotUZKOF+O93V/BRqs9ITo="
-
+    - secure: "u+9++HdT0dffp686y4rEg0q3MH2TEv3+2tUoxX+6QbobkYPseVeXhoiupSmVIDbfS+nJWYwqe0KRSCa8bKTUCY13a7JCWIivtYF1o9PgG9qtmGZi1/w7zcNCNRTe8/9r50aflXs5iTXsljPujA1+T8bPQiVWskmHstuCRvV7tvtObLoA7e7XThSBHa9THR7M7z9SerGMSF6gjyL/TkvyuefnwU09GAPHCgf96CyZpq1QoaJ6n2Lb0odhkpVq2/MsxrUQKFbDC3PjN+QdIkpWTRTmxnf90OVdiRR6Jig62FuSpDRFx/DCwr4IJ3UQHBGFXWzplOqLkyvfukGv97FLX4lLEzIhwf8OdY11+JhAG8PHBoV81z+1xe6xGutXCwIlasWERpunIW4IpTaFvvzRpLTBwcIyJVjK2Lk0m0uaXFvPrcW5vi9ElnX6C0mAS/cw6wQ19GuVQ7uGHk8yFVWPTd2QAdkqAtJw6y9EJW1Lmgkr4YeVxGjzMNMk9TzGU4UqzwXbGwvZIunIWXU+LUGeIx+I5GqFFlgukC/m/6qWI6J2Mh4cSrUaUDw3cB1txWRBT6y5RSrY5v0dPwYR1aQAT4EPRqfnA6erZ4+PXy9H0fsR2vqKfeA5Cirn3dQE+Fnuw/5PfuH8xf/+hfoSb8pbCxXJ4Hxao0n/e2LIcx/w1w8="
 cache:
   yarn: true
   directories:
@@ -19,21 +18,21 @@ script:
 deploy:
   # publish dev versions
   - provider: script
-    repo: konnectors/cozy-konnector-template
+    repo: konnectors/easyjet
     skip-cleanup: true
     script: DEPLOY_BRANCH=build yarn deploy && yarn cozyPublish
     on:
       branch: master
   # publish on latest branch (will be removed when collect will use only the registry
   - provider: script
-    repo: konnectors/cozy-konnector-template
+    repo: konnectors/easyjet
     skip-cleanup: true
     script: DEPLOY_BRANCH=latest yarn deploy
     on:
       branch: prod
   # publish stable versions and beta versions based on tags
   - provider: script
-    repo: konnectors/cozy-konnector-template
+    repo: konnectors/easyjet
     skip-cleanup: true
     script: DEPLOY_BRANCH=build yarn deploy && yarn cozyPublish
     on:
