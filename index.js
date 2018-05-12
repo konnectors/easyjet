@@ -76,7 +76,9 @@
 const request = __webpack_require__(1)
 const baseUrl = 'https://www.easyjet.com'
 
-request(`${baseUrl}/fr`).then(body => console.log(body))
+console.log('before request')
+request(`${baseUrl}/fr`)
+console.log('after')
 
 
 /***/ }),
