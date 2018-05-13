@@ -77,6646 +77,15 @@ const request = __webpack_require__(1)
 const baseUrl = 'https://www.easyjet.com'
 
 console.log('before request')
-request(`${baseUrl}/fr`)
+request(`${baseUrl}/fr`, (err, body) => {
+  console.log(err, 'there was an error')
+  console.log(body, 'body')
+})
 console.log('after')
 
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(module) {
-
-var Bluebird = __webpack_require__(3).getNewLibraryCopy(),
-    configure = __webpack_require__(39),
-    stealthyRequire = __webpack_require__(54);
-
-try {
-
-    // Load Request freshly - so that users can require an unaltered request instance!
-    var request = stealthyRequire(__webpack_require__.c, function () {
-        return __webpack_require__(55);
-    },
-    function () {
-        __webpack_require__(58);
-    }, module);
-
-} catch (err) {
-    /* istanbul ignore next */
-    var EOL = __webpack_require__(260).EOL;
-    /* istanbul ignore next */
-    console.error(EOL + '###' + EOL + '### The "request" library is not installed automatically anymore.' + EOL + '### But required by "request-promise".' + EOL + '###' + EOL + '### npm install request --save' + EOL + '###' + EOL);
-    /* istanbul ignore next */
-    throw err;
-}
-
-Bluebird.config({cancellation: true});
-
-configure({
-    request: request,
-    PromiseImpl: Bluebird,
-    expose: [
-        'then',
-        'catch',
-        'finally',
-        'cancel',
-        'promise'
-        // Would you like to expose more Bluebird methods? Try e.g. `rp(...).promise().tap(...)` first. `.promise()` returns the full-fledged Bluebird promise.
-    ],
-    constructorMixin: function (resolve, reject, onCancel) {
-        var self = this;
-        onCancel(function () {
-            self.abort();
-        });
-    }
-});
-
-request.bindCLS = function RP$bindCLS() {
-    throw new Error('CLS support was dropped. To get it back read: https://github.com/request/request-promise/wiki/Getting-Back-Support-for-Continuation-Local-Storage');
-};
-
-
-module.exports = request;
-
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(2)(module)))
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if (!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if (!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var old;
-if (typeof Promise !== "undefined") old = Promise;
-function noConflict() {
-    try { if (Promise === bluebird) Promise = old; }
-    catch (e) {}
-    return bluebird;
-}
-var bluebird = __webpack_require__(4)();
-bluebird.noConflict = noConflict;
-module.exports = bluebird;
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function() {
-var makeSelfResolutionError = function () {
-    return new TypeError("circular promise resolution chain\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-};
-var reflectHandler = function() {
-    return new Promise.PromiseInspection(this._target());
-};
-var apiRejection = function(msg) {
-    return Promise.reject(new TypeError(msg));
-};
-function Proxyable() {}
-var UNDEFINED_BINDING = {};
-var util = __webpack_require__(5);
-
-var getDomain;
-if (util.isNode) {
-    getDomain = function() {
-        var ret = process.domain;
-        if (ret === undefined) ret = null;
-        return ret;
-    };
-} else {
-    getDomain = function() {
-        return null;
-    };
-}
-util.notEnumerableProp(Promise, "_getDomain", getDomain);
-
-var es5 = __webpack_require__(6);
-var Async = __webpack_require__(7);
-var async = new Async();
-es5.defineProperty(Promise, "_async", {value: async});
-var errors = __webpack_require__(10);
-var TypeError = Promise.TypeError = errors.TypeError;
-Promise.RangeError = errors.RangeError;
-var CancellationError = Promise.CancellationError = errors.CancellationError;
-Promise.TimeoutError = errors.TimeoutError;
-Promise.OperationalError = errors.OperationalError;
-Promise.RejectionError = errors.OperationalError;
-Promise.AggregateError = errors.AggregateError;
-var INTERNAL = function(){};
-var APPLY = {};
-var NEXT_FILTER = {};
-var tryConvertToPromise = __webpack_require__(11)(Promise, INTERNAL);
-var PromiseArray =
-    __webpack_require__(12)(Promise, INTERNAL,
-                               tryConvertToPromise, apiRejection, Proxyable);
-var Context = __webpack_require__(13)(Promise);
- /*jshint unused:false*/
-var createContext = Context.create;
-var debug = __webpack_require__(14)(Promise, Context);
-var CapturedTrace = debug.CapturedTrace;
-var PassThroughHandlerContext =
-    __webpack_require__(15)(Promise, tryConvertToPromise, NEXT_FILTER);
-var catchFilter = __webpack_require__(16)(NEXT_FILTER);
-var nodebackForPromise = __webpack_require__(17);
-var errorObj = util.errorObj;
-var tryCatch = util.tryCatch;
-function check(self, executor) {
-    if (self == null || self.constructor !== Promise) {
-        throw new TypeError("the promise constructor cannot be invoked directly\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    }
-    if (typeof executor !== "function") {
-        throw new TypeError("expecting a function but got " + util.classString(executor));
-    }
-
-}
-
-function Promise(executor) {
-    if (executor !== INTERNAL) {
-        check(this, executor);
-    }
-    this._bitField = 0;
-    this._fulfillmentHandler0 = undefined;
-    this._rejectionHandler0 = undefined;
-    this._promise0 = undefined;
-    this._receiver0 = undefined;
-    this._resolveFromExecutor(executor);
-    this._promiseCreated();
-    this._fireEvent("promiseCreated", this);
-}
-
-Promise.prototype.toString = function () {
-    return "[object Promise]";
-};
-
-Promise.prototype.caught = Promise.prototype["catch"] = function (fn) {
-    var len = arguments.length;
-    if (len > 1) {
-        var catchInstances = new Array(len - 1),
-            j = 0, i;
-        for (i = 0; i < len - 1; ++i) {
-            var item = arguments[i];
-            if (util.isObject(item)) {
-                catchInstances[j++] = item;
-            } else {
-                return apiRejection("Catch statement predicate: " +
-                    "expecting an object but got " + util.classString(item));
-            }
-        }
-        catchInstances.length = j;
-        fn = arguments[i];
-        return this.then(undefined, catchFilter(catchInstances, fn, this));
-    }
-    return this.then(undefined, fn);
-};
-
-Promise.prototype.reflect = function () {
-    return this._then(reflectHandler,
-        reflectHandler, undefined, this, undefined);
-};
-
-Promise.prototype.then = function (didFulfill, didReject) {
-    if (debug.warnings() && arguments.length > 0 &&
-        typeof didFulfill !== "function" &&
-        typeof didReject !== "function") {
-        var msg = ".then() only accepts functions but was passed: " +
-                util.classString(didFulfill);
-        if (arguments.length > 1) {
-            msg += ", " + util.classString(didReject);
-        }
-        this._warn(msg);
-    }
-    return this._then(didFulfill, didReject, undefined, undefined, undefined);
-};
-
-Promise.prototype.done = function (didFulfill, didReject) {
-    var promise =
-        this._then(didFulfill, didReject, undefined, undefined, undefined);
-    promise._setIsFinal();
-};
-
-Promise.prototype.spread = function (fn) {
-    if (typeof fn !== "function") {
-        return apiRejection("expecting a function but got " + util.classString(fn));
-    }
-    return this.all()._then(fn, undefined, undefined, APPLY, undefined);
-};
-
-Promise.prototype.toJSON = function () {
-    var ret = {
-        isFulfilled: false,
-        isRejected: false,
-        fulfillmentValue: undefined,
-        rejectionReason: undefined
-    };
-    if (this.isFulfilled()) {
-        ret.fulfillmentValue = this.value();
-        ret.isFulfilled = true;
-    } else if (this.isRejected()) {
-        ret.rejectionReason = this.reason();
-        ret.isRejected = true;
-    }
-    return ret;
-};
-
-Promise.prototype.all = function () {
-    if (arguments.length > 0) {
-        this._warn(".all() was passed arguments but it does not take any");
-    }
-    return new PromiseArray(this).promise();
-};
-
-Promise.prototype.error = function (fn) {
-    return this.caught(util.originatesFromRejection, fn);
-};
-
-Promise.getNewLibraryCopy = module.exports;
-
-Promise.is = function (val) {
-    return val instanceof Promise;
-};
-
-Promise.fromNode = Promise.fromCallback = function(fn) {
-    var ret = new Promise(INTERNAL);
-    ret._captureStackTrace();
-    var multiArgs = arguments.length > 1 ? !!Object(arguments[1]).multiArgs
-                                         : false;
-    var result = tryCatch(fn)(nodebackForPromise(ret, multiArgs));
-    if (result === errorObj) {
-        ret._rejectCallback(result.e, true);
-    }
-    if (!ret._isFateSealed()) ret._setAsyncGuaranteed();
-    return ret;
-};
-
-Promise.all = function (promises) {
-    return new PromiseArray(promises).promise();
-};
-
-Promise.cast = function (obj) {
-    var ret = tryConvertToPromise(obj);
-    if (!(ret instanceof Promise)) {
-        ret = new Promise(INTERNAL);
-        ret._captureStackTrace();
-        ret._setFulfilled();
-        ret._rejectionHandler0 = obj;
-    }
-    return ret;
-};
-
-Promise.resolve = Promise.fulfilled = Promise.cast;
-
-Promise.reject = Promise.rejected = function (reason) {
-    var ret = new Promise(INTERNAL);
-    ret._captureStackTrace();
-    ret._rejectCallback(reason, true);
-    return ret;
-};
-
-Promise.setScheduler = function(fn) {
-    if (typeof fn !== "function") {
-        throw new TypeError("expecting a function but got " + util.classString(fn));
-    }
-    return async.setScheduler(fn);
-};
-
-Promise.prototype._then = function (
-    didFulfill,
-    didReject,
-    _,    receiver,
-    internalData
-) {
-    var haveInternalData = internalData !== undefined;
-    var promise = haveInternalData ? internalData : new Promise(INTERNAL);
-    var target = this._target();
-    var bitField = target._bitField;
-
-    if (!haveInternalData) {
-        promise._propagateFrom(this, 3);
-        promise._captureStackTrace();
-        if (receiver === undefined &&
-            ((this._bitField & 2097152) !== 0)) {
-            if (!((bitField & 50397184) === 0)) {
-                receiver = this._boundValue();
-            } else {
-                receiver = target === this ? undefined : this._boundTo;
-            }
-        }
-        this._fireEvent("promiseChained", this, promise);
-    }
-
-    var domain = getDomain();
-    if (!((bitField & 50397184) === 0)) {
-        var handler, value, settler = target._settlePromiseCtx;
-        if (((bitField & 33554432) !== 0)) {
-            value = target._rejectionHandler0;
-            handler = didFulfill;
-        } else if (((bitField & 16777216) !== 0)) {
-            value = target._fulfillmentHandler0;
-            handler = didReject;
-            target._unsetRejectionIsUnhandled();
-        } else {
-            settler = target._settlePromiseLateCancellationObserver;
-            value = new CancellationError("late cancellation observer");
-            target._attachExtraTrace(value);
-            handler = didReject;
-        }
-
-        async.invoke(settler, target, {
-            handler: domain === null ? handler
-                : (typeof handler === "function" &&
-                    util.domainBind(domain, handler)),
-            promise: promise,
-            receiver: receiver,
-            value: value
-        });
-    } else {
-        target._addCallbacks(didFulfill, didReject, promise, receiver, domain);
-    }
-
-    return promise;
-};
-
-Promise.prototype._length = function () {
-    return this._bitField & 65535;
-};
-
-Promise.prototype._isFateSealed = function () {
-    return (this._bitField & 117506048) !== 0;
-};
-
-Promise.prototype._isFollowing = function () {
-    return (this._bitField & 67108864) === 67108864;
-};
-
-Promise.prototype._setLength = function (len) {
-    this._bitField = (this._bitField & -65536) |
-        (len & 65535);
-};
-
-Promise.prototype._setFulfilled = function () {
-    this._bitField = this._bitField | 33554432;
-    this._fireEvent("promiseFulfilled", this);
-};
-
-Promise.prototype._setRejected = function () {
-    this._bitField = this._bitField | 16777216;
-    this._fireEvent("promiseRejected", this);
-};
-
-Promise.prototype._setFollowing = function () {
-    this._bitField = this._bitField | 67108864;
-    this._fireEvent("promiseResolved", this);
-};
-
-Promise.prototype._setIsFinal = function () {
-    this._bitField = this._bitField | 4194304;
-};
-
-Promise.prototype._isFinal = function () {
-    return (this._bitField & 4194304) > 0;
-};
-
-Promise.prototype._unsetCancelled = function() {
-    this._bitField = this._bitField & (~65536);
-};
-
-Promise.prototype._setCancelled = function() {
-    this._bitField = this._bitField | 65536;
-    this._fireEvent("promiseCancelled", this);
-};
-
-Promise.prototype._setWillBeCancelled = function() {
-    this._bitField = this._bitField | 8388608;
-};
-
-Promise.prototype._setAsyncGuaranteed = function() {
-    if (async.hasCustomScheduler()) return;
-    this._bitField = this._bitField | 134217728;
-};
-
-Promise.prototype._receiverAt = function (index) {
-    var ret = index === 0 ? this._receiver0 : this[
-            index * 4 - 4 + 3];
-    if (ret === UNDEFINED_BINDING) {
-        return undefined;
-    } else if (ret === undefined && this._isBound()) {
-        return this._boundValue();
-    }
-    return ret;
-};
-
-Promise.prototype._promiseAt = function (index) {
-    return this[
-            index * 4 - 4 + 2];
-};
-
-Promise.prototype._fulfillmentHandlerAt = function (index) {
-    return this[
-            index * 4 - 4 + 0];
-};
-
-Promise.prototype._rejectionHandlerAt = function (index) {
-    return this[
-            index * 4 - 4 + 1];
-};
-
-Promise.prototype._boundValue = function() {};
-
-Promise.prototype._migrateCallback0 = function (follower) {
-    var bitField = follower._bitField;
-    var fulfill = follower._fulfillmentHandler0;
-    var reject = follower._rejectionHandler0;
-    var promise = follower._promise0;
-    var receiver = follower._receiverAt(0);
-    if (receiver === undefined) receiver = UNDEFINED_BINDING;
-    this._addCallbacks(fulfill, reject, promise, receiver, null);
-};
-
-Promise.prototype._migrateCallbackAt = function (follower, index) {
-    var fulfill = follower._fulfillmentHandlerAt(index);
-    var reject = follower._rejectionHandlerAt(index);
-    var promise = follower._promiseAt(index);
-    var receiver = follower._receiverAt(index);
-    if (receiver === undefined) receiver = UNDEFINED_BINDING;
-    this._addCallbacks(fulfill, reject, promise, receiver, null);
-};
-
-Promise.prototype._addCallbacks = function (
-    fulfill,
-    reject,
-    promise,
-    receiver,
-    domain
-) {
-    var index = this._length();
-
-    if (index >= 65535 - 4) {
-        index = 0;
-        this._setLength(0);
-    }
-
-    if (index === 0) {
-        this._promise0 = promise;
-        this._receiver0 = receiver;
-        if (typeof fulfill === "function") {
-            this._fulfillmentHandler0 =
-                domain === null ? fulfill : util.domainBind(domain, fulfill);
-        }
-        if (typeof reject === "function") {
-            this._rejectionHandler0 =
-                domain === null ? reject : util.domainBind(domain, reject);
-        }
-    } else {
-        var base = index * 4 - 4;
-        this[base + 2] = promise;
-        this[base + 3] = receiver;
-        if (typeof fulfill === "function") {
-            this[base + 0] =
-                domain === null ? fulfill : util.domainBind(domain, fulfill);
-        }
-        if (typeof reject === "function") {
-            this[base + 1] =
-                domain === null ? reject : util.domainBind(domain, reject);
-        }
-    }
-    this._setLength(index + 1);
-    return index;
-};
-
-Promise.prototype._proxy = function (proxyable, arg) {
-    this._addCallbacks(undefined, undefined, arg, proxyable, null);
-};
-
-Promise.prototype._resolveCallback = function(value, shouldBind) {
-    if (((this._bitField & 117506048) !== 0)) return;
-    if (value === this)
-        return this._rejectCallback(makeSelfResolutionError(), false);
-    var maybePromise = tryConvertToPromise(value, this);
-    if (!(maybePromise instanceof Promise)) return this._fulfill(value);
-
-    if (shouldBind) this._propagateFrom(maybePromise, 2);
-
-    var promise = maybePromise._target();
-
-    if (promise === this) {
-        this._reject(makeSelfResolutionError());
-        return;
-    }
-
-    var bitField = promise._bitField;
-    if (((bitField & 50397184) === 0)) {
-        var len = this._length();
-        if (len > 0) promise._migrateCallback0(this);
-        for (var i = 1; i < len; ++i) {
-            promise._migrateCallbackAt(this, i);
-        }
-        this._setFollowing();
-        this._setLength(0);
-        this._setFollowee(promise);
-    } else if (((bitField & 33554432) !== 0)) {
-        this._fulfill(promise._value());
-    } else if (((bitField & 16777216) !== 0)) {
-        this._reject(promise._reason());
-    } else {
-        var reason = new CancellationError("late cancellation observer");
-        promise._attachExtraTrace(reason);
-        this._reject(reason);
-    }
-};
-
-Promise.prototype._rejectCallback =
-function(reason, synchronous, ignoreNonErrorWarnings) {
-    var trace = util.ensureErrorObject(reason);
-    var hasStack = trace === reason;
-    if (!hasStack && !ignoreNonErrorWarnings && debug.warnings()) {
-        var message = "a promise was rejected with a non-error: " +
-            util.classString(reason);
-        this._warn(message, true);
-    }
-    this._attachExtraTrace(trace, synchronous ? hasStack : false);
-    this._reject(reason);
-};
-
-Promise.prototype._resolveFromExecutor = function (executor) {
-    if (executor === INTERNAL) return;
-    var promise = this;
-    this._captureStackTrace();
-    this._pushContext();
-    var synchronous = true;
-    var r = this._execute(executor, function(value) {
-        promise._resolveCallback(value);
-    }, function (reason) {
-        promise._rejectCallback(reason, synchronous);
-    });
-    synchronous = false;
-    this._popContext();
-
-    if (r !== undefined) {
-        promise._rejectCallback(r, true);
-    }
-};
-
-Promise.prototype._settlePromiseFromHandler = function (
-    handler, receiver, value, promise
-) {
-    var bitField = promise._bitField;
-    if (((bitField & 65536) !== 0)) return;
-    promise._pushContext();
-    var x;
-    if (receiver === APPLY) {
-        if (!value || typeof value.length !== "number") {
-            x = errorObj;
-            x.e = new TypeError("cannot .spread() a non-array: " +
-                                    util.classString(value));
-        } else {
-            x = tryCatch(handler).apply(this._boundValue(), value);
-        }
-    } else {
-        x = tryCatch(handler).call(receiver, value);
-    }
-    var promiseCreated = promise._popContext();
-    bitField = promise._bitField;
-    if (((bitField & 65536) !== 0)) return;
-
-    if (x === NEXT_FILTER) {
-        promise._reject(value);
-    } else if (x === errorObj) {
-        promise._rejectCallback(x.e, false);
-    } else {
-        debug.checkForgottenReturns(x, promiseCreated, "",  promise, this);
-        promise._resolveCallback(x);
-    }
-};
-
-Promise.prototype._target = function() {
-    var ret = this;
-    while (ret._isFollowing()) ret = ret._followee();
-    return ret;
-};
-
-Promise.prototype._followee = function() {
-    return this._rejectionHandler0;
-};
-
-Promise.prototype._setFollowee = function(promise) {
-    this._rejectionHandler0 = promise;
-};
-
-Promise.prototype._settlePromise = function(promise, handler, receiver, value) {
-    var isPromise = promise instanceof Promise;
-    var bitField = this._bitField;
-    var asyncGuaranteed = ((bitField & 134217728) !== 0);
-    if (((bitField & 65536) !== 0)) {
-        if (isPromise) promise._invokeInternalOnCancel();
-
-        if (receiver instanceof PassThroughHandlerContext &&
-            receiver.isFinallyHandler()) {
-            receiver.cancelPromise = promise;
-            if (tryCatch(handler).call(receiver, value) === errorObj) {
-                promise._reject(errorObj.e);
-            }
-        } else if (handler === reflectHandler) {
-            promise._fulfill(reflectHandler.call(receiver));
-        } else if (receiver instanceof Proxyable) {
-            receiver._promiseCancelled(promise);
-        } else if (isPromise || promise instanceof PromiseArray) {
-            promise._cancel();
-        } else {
-            receiver.cancel();
-        }
-    } else if (typeof handler === "function") {
-        if (!isPromise) {
-            handler.call(receiver, value, promise);
-        } else {
-            if (asyncGuaranteed) promise._setAsyncGuaranteed();
-            this._settlePromiseFromHandler(handler, receiver, value, promise);
-        }
-    } else if (receiver instanceof Proxyable) {
-        if (!receiver._isResolved()) {
-            if (((bitField & 33554432) !== 0)) {
-                receiver._promiseFulfilled(value, promise);
-            } else {
-                receiver._promiseRejected(value, promise);
-            }
-        }
-    } else if (isPromise) {
-        if (asyncGuaranteed) promise._setAsyncGuaranteed();
-        if (((bitField & 33554432) !== 0)) {
-            promise._fulfill(value);
-        } else {
-            promise._reject(value);
-        }
-    }
-};
-
-Promise.prototype._settlePromiseLateCancellationObserver = function(ctx) {
-    var handler = ctx.handler;
-    var promise = ctx.promise;
-    var receiver = ctx.receiver;
-    var value = ctx.value;
-    if (typeof handler === "function") {
-        if (!(promise instanceof Promise)) {
-            handler.call(receiver, value, promise);
-        } else {
-            this._settlePromiseFromHandler(handler, receiver, value, promise);
-        }
-    } else if (promise instanceof Promise) {
-        promise._reject(value);
-    }
-};
-
-Promise.prototype._settlePromiseCtx = function(ctx) {
-    this._settlePromise(ctx.promise, ctx.handler, ctx.receiver, ctx.value);
-};
-
-Promise.prototype._settlePromise0 = function(handler, value, bitField) {
-    var promise = this._promise0;
-    var receiver = this._receiverAt(0);
-    this._promise0 = undefined;
-    this._receiver0 = undefined;
-    this._settlePromise(promise, handler, receiver, value);
-};
-
-Promise.prototype._clearCallbackDataAtIndex = function(index) {
-    var base = index * 4 - 4;
-    this[base + 2] =
-    this[base + 3] =
-    this[base + 0] =
-    this[base + 1] = undefined;
-};
-
-Promise.prototype._fulfill = function (value) {
-    var bitField = this._bitField;
-    if (((bitField & 117506048) >>> 16)) return;
-    if (value === this) {
-        var err = makeSelfResolutionError();
-        this._attachExtraTrace(err);
-        return this._reject(err);
-    }
-    this._setFulfilled();
-    this._rejectionHandler0 = value;
-
-    if ((bitField & 65535) > 0) {
-        if (((bitField & 134217728) !== 0)) {
-            this._settlePromises();
-        } else {
-            async.settlePromises(this);
-        }
-    }
-};
-
-Promise.prototype._reject = function (reason) {
-    var bitField = this._bitField;
-    if (((bitField & 117506048) >>> 16)) return;
-    this._setRejected();
-    this._fulfillmentHandler0 = reason;
-
-    if (this._isFinal()) {
-        return async.fatalError(reason, util.isNode);
-    }
-
-    if ((bitField & 65535) > 0) {
-        async.settlePromises(this);
-    } else {
-        this._ensurePossibleRejectionHandled();
-    }
-};
-
-Promise.prototype._fulfillPromises = function (len, value) {
-    for (var i = 1; i < len; i++) {
-        var handler = this._fulfillmentHandlerAt(i);
-        var promise = this._promiseAt(i);
-        var receiver = this._receiverAt(i);
-        this._clearCallbackDataAtIndex(i);
-        this._settlePromise(promise, handler, receiver, value);
-    }
-};
-
-Promise.prototype._rejectPromises = function (len, reason) {
-    for (var i = 1; i < len; i++) {
-        var handler = this._rejectionHandlerAt(i);
-        var promise = this._promiseAt(i);
-        var receiver = this._receiverAt(i);
-        this._clearCallbackDataAtIndex(i);
-        this._settlePromise(promise, handler, receiver, reason);
-    }
-};
-
-Promise.prototype._settlePromises = function () {
-    var bitField = this._bitField;
-    var len = (bitField & 65535);
-
-    if (len > 0) {
-        if (((bitField & 16842752) !== 0)) {
-            var reason = this._fulfillmentHandler0;
-            this._settlePromise0(this._rejectionHandler0, reason, bitField);
-            this._rejectPromises(len, reason);
-        } else {
-            var value = this._rejectionHandler0;
-            this._settlePromise0(this._fulfillmentHandler0, value, bitField);
-            this._fulfillPromises(len, value);
-        }
-        this._setLength(0);
-    }
-    this._clearCancellationData();
-};
-
-Promise.prototype._settledValue = function() {
-    var bitField = this._bitField;
-    if (((bitField & 33554432) !== 0)) {
-        return this._rejectionHandler0;
-    } else if (((bitField & 16777216) !== 0)) {
-        return this._fulfillmentHandler0;
-    }
-};
-
-function deferResolve(v) {this.promise._resolveCallback(v);}
-function deferReject(v) {this.promise._rejectCallback(v, false);}
-
-Promise.defer = Promise.pending = function() {
-    debug.deprecated("Promise.defer", "new Promise");
-    var promise = new Promise(INTERNAL);
-    return {
-        promise: promise,
-        resolve: deferResolve,
-        reject: deferReject
-    };
-};
-
-util.notEnumerableProp(Promise,
-                       "_makeSelfResolutionError",
-                       makeSelfResolutionError);
-
-__webpack_require__(18)(Promise, INTERNAL, tryConvertToPromise, apiRejection,
-    debug);
-__webpack_require__(19)(Promise, INTERNAL, tryConvertToPromise, debug);
-__webpack_require__(20)(Promise, PromiseArray, apiRejection, debug);
-__webpack_require__(21)(Promise);
-__webpack_require__(22)(Promise);
-__webpack_require__(23)(
-    Promise, PromiseArray, tryConvertToPromise, INTERNAL, async, getDomain);
-Promise.Promise = Promise;
-Promise.version = "3.5.1";
-__webpack_require__(24)(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
-__webpack_require__(25)(Promise);
-__webpack_require__(26)(Promise, apiRejection, tryConvertToPromise, createContext, INTERNAL, debug);
-__webpack_require__(27)(Promise, INTERNAL, debug);
-__webpack_require__(28)(Promise, apiRejection, INTERNAL, tryConvertToPromise, Proxyable, debug);
-__webpack_require__(29)(Promise);
-__webpack_require__(30)(Promise, INTERNAL);
-__webpack_require__(31)(Promise, PromiseArray, tryConvertToPromise, apiRejection);
-__webpack_require__(32)(Promise, INTERNAL, tryConvertToPromise, apiRejection);
-__webpack_require__(33)(Promise, PromiseArray, apiRejection, tryConvertToPromise, INTERNAL, debug);
-__webpack_require__(34)(Promise, PromiseArray, debug);
-__webpack_require__(35)(Promise, PromiseArray, apiRejection);
-__webpack_require__(36)(Promise, INTERNAL);
-__webpack_require__(37)(Promise, INTERNAL);
-__webpack_require__(38)(Promise);
-                                                         
-    util.toFastProperties(Promise);                                          
-    util.toFastProperties(Promise.prototype);                                
-    function fillTypes(value) {                                              
-        var p = new Promise(INTERNAL);                                       
-        p._fulfillmentHandler0 = value;                                      
-        p._rejectionHandler0 = value;                                        
-        p._promise0 = value;                                                 
-        p._receiver0 = value;                                                
-    }                                                                        
-    // Complete slack tracking, opt out of field-type tracking and           
-    // stabilize map                                                         
-    fillTypes({a: 1});                                                       
-    fillTypes({b: 2});                                                       
-    fillTypes({c: 3});                                                       
-    fillTypes(1);                                                            
-    fillTypes(function(){});                                                 
-    fillTypes(undefined);                                                    
-    fillTypes(false);                                                        
-    fillTypes(new Promise(INTERNAL));                                        
-    debug.setBounds(Async.firstLineError, util.lastLineError);               
-    return Promise;                                                          
-
-};
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var es5 = __webpack_require__(6);
-var canEvaluate = typeof navigator == "undefined";
-
-var errorObj = {e: {}};
-var tryCatchTarget;
-var globalObject = typeof self !== "undefined" ? self :
-    typeof window !== "undefined" ? window :
-    typeof global !== "undefined" ? global :
-    this !== undefined ? this : null;
-
-function tryCatcher() {
-    try {
-        var target = tryCatchTarget;
-        tryCatchTarget = null;
-        return target.apply(this, arguments);
-    } catch (e) {
-        errorObj.e = e;
-        return errorObj;
-    }
-}
-function tryCatch(fn) {
-    tryCatchTarget = fn;
-    return tryCatcher;
-}
-
-var inherits = function(Child, Parent) {
-    var hasProp = {}.hasOwnProperty;
-
-    function T() {
-        this.constructor = Child;
-        this.constructor$ = Parent;
-        for (var propertyName in Parent.prototype) {
-            if (hasProp.call(Parent.prototype, propertyName) &&
-                propertyName.charAt(propertyName.length-1) !== "$"
-           ) {
-                this[propertyName + "$"] = Parent.prototype[propertyName];
-            }
-        }
-    }
-    T.prototype = Parent.prototype;
-    Child.prototype = new T();
-    return Child.prototype;
-};
-
-
-function isPrimitive(val) {
-    return val == null || val === true || val === false ||
-        typeof val === "string" || typeof val === "number";
-
-}
-
-function isObject(value) {
-    return typeof value === "function" ||
-           typeof value === "object" && value !== null;
-}
-
-function maybeWrapAsError(maybeError) {
-    if (!isPrimitive(maybeError)) return maybeError;
-
-    return new Error(safeToString(maybeError));
-}
-
-function withAppended(target, appendee) {
-    var len = target.length;
-    var ret = new Array(len + 1);
-    var i;
-    for (i = 0; i < len; ++i) {
-        ret[i] = target[i];
-    }
-    ret[i] = appendee;
-    return ret;
-}
-
-function getDataPropertyOrDefault(obj, key, defaultValue) {
-    if (es5.isES5) {
-        var desc = Object.getOwnPropertyDescriptor(obj, key);
-
-        if (desc != null) {
-            return desc.get == null && desc.set == null
-                    ? desc.value
-                    : defaultValue;
-        }
-    } else {
-        return {}.hasOwnProperty.call(obj, key) ? obj[key] : undefined;
-    }
-}
-
-function notEnumerableProp(obj, name, value) {
-    if (isPrimitive(obj)) return obj;
-    var descriptor = {
-        value: value,
-        configurable: true,
-        enumerable: false,
-        writable: true
-    };
-    es5.defineProperty(obj, name, descriptor);
-    return obj;
-}
-
-function thrower(r) {
-    throw r;
-}
-
-var inheritedDataKeys = (function() {
-    var excludedPrototypes = [
-        Array.prototype,
-        Object.prototype,
-        Function.prototype
-    ];
-
-    var isExcludedProto = function(val) {
-        for (var i = 0; i < excludedPrototypes.length; ++i) {
-            if (excludedPrototypes[i] === val) {
-                return true;
-            }
-        }
-        return false;
-    };
-
-    if (es5.isES5) {
-        var getKeys = Object.getOwnPropertyNames;
-        return function(obj) {
-            var ret = [];
-            var visitedKeys = Object.create(null);
-            while (obj != null && !isExcludedProto(obj)) {
-                var keys;
-                try {
-                    keys = getKeys(obj);
-                } catch (e) {
-                    return ret;
-                }
-                for (var i = 0; i < keys.length; ++i) {
-                    var key = keys[i];
-                    if (visitedKeys[key]) continue;
-                    visitedKeys[key] = true;
-                    var desc = Object.getOwnPropertyDescriptor(obj, key);
-                    if (desc != null && desc.get == null && desc.set == null) {
-                        ret.push(key);
-                    }
-                }
-                obj = es5.getPrototypeOf(obj);
-            }
-            return ret;
-        };
-    } else {
-        var hasProp = {}.hasOwnProperty;
-        return function(obj) {
-            if (isExcludedProto(obj)) return [];
-            var ret = [];
-
-            /*jshint forin:false */
-            enumeration: for (var key in obj) {
-                if (hasProp.call(obj, key)) {
-                    ret.push(key);
-                } else {
-                    for (var i = 0; i < excludedPrototypes.length; ++i) {
-                        if (hasProp.call(excludedPrototypes[i], key)) {
-                            continue enumeration;
-                        }
-                    }
-                    ret.push(key);
-                }
-            }
-            return ret;
-        };
-    }
-
-})();
-
-var thisAssignmentPattern = /this\s*\.\s*\S+\s*=/;
-function isClass(fn) {
-    try {
-        if (typeof fn === "function") {
-            var keys = es5.names(fn.prototype);
-
-            var hasMethods = es5.isES5 && keys.length > 1;
-            var hasMethodsOtherThanConstructor = keys.length > 0 &&
-                !(keys.length === 1 && keys[0] === "constructor");
-            var hasThisAssignmentAndStaticMethods =
-                thisAssignmentPattern.test(fn + "") && es5.names(fn).length > 0;
-
-            if (hasMethods || hasMethodsOtherThanConstructor ||
-                hasThisAssignmentAndStaticMethods) {
-                return true;
-            }
-        }
-        return false;
-    } catch (e) {
-        return false;
-    }
-}
-
-function toFastProperties(obj) {
-    /*jshint -W027,-W055,-W031*/
-    function FakeConstructor() {}
-    FakeConstructor.prototype = obj;
-    var l = 8;
-    while (l--) new FakeConstructor();
-    return obj;
-    eval(obj);
-}
-
-var rident = /^[a-z$_][a-z$_0-9]*$/i;
-function isIdentifier(str) {
-    return rident.test(str);
-}
-
-function filledRange(count, prefix, suffix) {
-    var ret = new Array(count);
-    for(var i = 0; i < count; ++i) {
-        ret[i] = prefix + i + suffix;
-    }
-    return ret;
-}
-
-function safeToString(obj) {
-    try {
-        return obj + "";
-    } catch (e) {
-        return "[no string representation]";
-    }
-}
-
-function isError(obj) {
-    return obj instanceof Error ||
-        (obj !== null &&
-           typeof obj === "object" &&
-           typeof obj.message === "string" &&
-           typeof obj.name === "string");
-}
-
-function markAsOriginatingFromRejection(e) {
-    try {
-        notEnumerableProp(e, "isOperational", true);
-    }
-    catch(ignore) {}
-}
-
-function originatesFromRejection(e) {
-    if (e == null) return false;
-    return ((e instanceof Error["__BluebirdErrorTypes__"].OperationalError) ||
-        e["isOperational"] === true);
-}
-
-function canAttachTrace(obj) {
-    return isError(obj) && es5.propertyIsWritable(obj, "stack");
-}
-
-var ensureErrorObject = (function() {
-    if (!("stack" in new Error())) {
-        return function(value) {
-            if (canAttachTrace(value)) return value;
-            try {throw new Error(safeToString(value));}
-            catch(err) {return err;}
-        };
-    } else {
-        return function(value) {
-            if (canAttachTrace(value)) return value;
-            return new Error(safeToString(value));
-        };
-    }
-})();
-
-function classString(obj) {
-    return {}.toString.call(obj);
-}
-
-function copyDescriptors(from, to, filter) {
-    var keys = es5.names(from);
-    for (var i = 0; i < keys.length; ++i) {
-        var key = keys[i];
-        if (filter(key)) {
-            try {
-                es5.defineProperty(to, key, es5.getDescriptor(from, key));
-            } catch (ignore) {}
-        }
-    }
-}
-
-var asArray = function(v) {
-    if (es5.isArray(v)) {
-        return v;
-    }
-    return null;
-};
-
-if (typeof Symbol !== "undefined" && Symbol.iterator) {
-    var ArrayFrom = typeof Array.from === "function" ? function(v) {
-        return Array.from(v);
-    } : function(v) {
-        var ret = [];
-        var it = v[Symbol.iterator]();
-        var itResult;
-        while (!((itResult = it.next()).done)) {
-            ret.push(itResult.value);
-        }
-        return ret;
-    };
-
-    asArray = function(v) {
-        if (es5.isArray(v)) {
-            return v;
-        } else if (v != null && typeof v[Symbol.iterator] === "function") {
-            return ArrayFrom(v);
-        }
-        return null;
-    };
-}
-
-var isNode = typeof process !== "undefined" &&
-        classString(process).toLowerCase() === "[object process]";
-
-var hasEnvVariables = typeof process !== "undefined" &&
-    typeof process.env !== "undefined";
-
-function env(key) {
-    return hasEnvVariables ? process.env[key] : undefined;
-}
-
-function getNativePromise() {
-    if (typeof Promise === "function") {
-        try {
-            var promise = new Promise(function(){});
-            if ({}.toString.call(promise) === "[object Promise]") {
-                return Promise;
-            }
-        } catch (e) {}
-    }
-}
-
-function domainBind(self, cb) {
-    return self.bind(cb);
-}
-
-var ret = {
-    isClass: isClass,
-    isIdentifier: isIdentifier,
-    inheritedDataKeys: inheritedDataKeys,
-    getDataPropertyOrDefault: getDataPropertyOrDefault,
-    thrower: thrower,
-    isArray: es5.isArray,
-    asArray: asArray,
-    notEnumerableProp: notEnumerableProp,
-    isPrimitive: isPrimitive,
-    isObject: isObject,
-    isError: isError,
-    canEvaluate: canEvaluate,
-    errorObj: errorObj,
-    tryCatch: tryCatch,
-    inherits: inherits,
-    withAppended: withAppended,
-    maybeWrapAsError: maybeWrapAsError,
-    toFastProperties: toFastProperties,
-    filledRange: filledRange,
-    toString: safeToString,
-    canAttachTrace: canAttachTrace,
-    ensureErrorObject: ensureErrorObject,
-    originatesFromRejection: originatesFromRejection,
-    markAsOriginatingFromRejection: markAsOriginatingFromRejection,
-    classString: classString,
-    copyDescriptors: copyDescriptors,
-    hasDevTools: typeof chrome !== "undefined" && chrome &&
-                 typeof chrome.loadTimes === "function",
-    isNode: isNode,
-    hasEnvVariables: hasEnvVariables,
-    env: env,
-    global: globalObject,
-    getNativePromise: getNativePromise,
-    domainBind: domainBind
-};
-ret.isRecentNode = ret.isNode && (function() {
-    var version = process.versions.node.split(".").map(Number);
-    return (version[0] === 0 && version[1] > 10) || (version[0] > 0);
-})();
-
-if (ret.isNode) ret.toFastProperties(process);
-
-try {throw new Error(); } catch (e) {ret.lastLineError = e;}
-module.exports = ret;
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-var isES5 = (function(){
-    "use strict";
-    return this === undefined;
-})();
-
-if (isES5) {
-    module.exports = {
-        freeze: Object.freeze,
-        defineProperty: Object.defineProperty,
-        getDescriptor: Object.getOwnPropertyDescriptor,
-        keys: Object.keys,
-        names: Object.getOwnPropertyNames,
-        getPrototypeOf: Object.getPrototypeOf,
-        isArray: Array.isArray,
-        isES5: isES5,
-        propertyIsWritable: function(obj, prop) {
-            var descriptor = Object.getOwnPropertyDescriptor(obj, prop);
-            return !!(!descriptor || descriptor.writable || descriptor.set);
-        }
-    };
-} else {
-    var has = {}.hasOwnProperty;
-    var str = {}.toString;
-    var proto = {}.constructor.prototype;
-
-    var ObjectKeys = function (o) {
-        var ret = [];
-        for (var key in o) {
-            if (has.call(o, key)) {
-                ret.push(key);
-            }
-        }
-        return ret;
-    };
-
-    var ObjectGetDescriptor = function(o, key) {
-        return {value: o[key]};
-    };
-
-    var ObjectDefineProperty = function (o, key, desc) {
-        o[key] = desc.value;
-        return o;
-    };
-
-    var ObjectFreeze = function (obj) {
-        return obj;
-    };
-
-    var ObjectGetPrototypeOf = function (obj) {
-        try {
-            return Object(obj).constructor.prototype;
-        }
-        catch (e) {
-            return proto;
-        }
-    };
-
-    var ArrayIsArray = function (obj) {
-        try {
-            return str.call(obj) === "[object Array]";
-        }
-        catch(e) {
-            return false;
-        }
-    };
-
-    module.exports = {
-        isArray: ArrayIsArray,
-        keys: ObjectKeys,
-        names: ObjectKeys,
-        defineProperty: ObjectDefineProperty,
-        getDescriptor: ObjectGetDescriptor,
-        freeze: ObjectFreeze,
-        getPrototypeOf: ObjectGetPrototypeOf,
-        isES5: isES5,
-        propertyIsWritable: function() {
-            return true;
-        }
-    };
-}
-
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var firstLineError;
-try {throw new Error(); } catch (e) {firstLineError = e;}
-var schedule = __webpack_require__(8);
-var Queue = __webpack_require__(9);
-var util = __webpack_require__(5);
-
-function Async() {
-    this._customScheduler = false;
-    this._isTickUsed = false;
-    this._lateQueue = new Queue(16);
-    this._normalQueue = new Queue(16);
-    this._haveDrainedQueues = false;
-    this._trampolineEnabled = true;
-    var self = this;
-    this.drainQueues = function () {
-        self._drainQueues();
-    };
-    this._schedule = schedule;
-}
-
-Async.prototype.setScheduler = function(fn) {
-    var prev = this._schedule;
-    this._schedule = fn;
-    this._customScheduler = true;
-    return prev;
-};
-
-Async.prototype.hasCustomScheduler = function() {
-    return this._customScheduler;
-};
-
-Async.prototype.enableTrampoline = function() {
-    this._trampolineEnabled = true;
-};
-
-Async.prototype.disableTrampolineIfNecessary = function() {
-    if (util.hasDevTools) {
-        this._trampolineEnabled = false;
-    }
-};
-
-Async.prototype.haveItemsQueued = function () {
-    return this._isTickUsed || this._haveDrainedQueues;
-};
-
-
-Async.prototype.fatalError = function(e, isNode) {
-    if (isNode) {
-        process.stderr.write("Fatal " + (e instanceof Error ? e.stack : e) +
-            "\n");
-        process.exit(2);
-    } else {
-        this.throwLater(e);
-    }
-};
-
-Async.prototype.throwLater = function(fn, arg) {
-    if (arguments.length === 1) {
-        arg = fn;
-        fn = function () { throw arg; };
-    }
-    if (typeof setTimeout !== "undefined") {
-        setTimeout(function() {
-            fn(arg);
-        }, 0);
-    } else try {
-        this._schedule(function() {
-            fn(arg);
-        });
-    } catch (e) {
-        throw new Error("No async scheduler available\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    }
-};
-
-function AsyncInvokeLater(fn, receiver, arg) {
-    this._lateQueue.push(fn, receiver, arg);
-    this._queueTick();
-}
-
-function AsyncInvoke(fn, receiver, arg) {
-    this._normalQueue.push(fn, receiver, arg);
-    this._queueTick();
-}
-
-function AsyncSettlePromises(promise) {
-    this._normalQueue._pushOne(promise);
-    this._queueTick();
-}
-
-if (!util.hasDevTools) {
-    Async.prototype.invokeLater = AsyncInvokeLater;
-    Async.prototype.invoke = AsyncInvoke;
-    Async.prototype.settlePromises = AsyncSettlePromises;
-} else {
-    Async.prototype.invokeLater = function (fn, receiver, arg) {
-        if (this._trampolineEnabled) {
-            AsyncInvokeLater.call(this, fn, receiver, arg);
-        } else {
-            this._schedule(function() {
-                setTimeout(function() {
-                    fn.call(receiver, arg);
-                }, 100);
-            });
-        }
-    };
-
-    Async.prototype.invoke = function (fn, receiver, arg) {
-        if (this._trampolineEnabled) {
-            AsyncInvoke.call(this, fn, receiver, arg);
-        } else {
-            this._schedule(function() {
-                fn.call(receiver, arg);
-            });
-        }
-    };
-
-    Async.prototype.settlePromises = function(promise) {
-        if (this._trampolineEnabled) {
-            AsyncSettlePromises.call(this, promise);
-        } else {
-            this._schedule(function() {
-                promise._settlePromises();
-            });
-        }
-    };
-}
-
-Async.prototype._drainQueue = function(queue) {
-    while (queue.length() > 0) {
-        var fn = queue.shift();
-        if (typeof fn !== "function") {
-            fn._settlePromises();
-            continue;
-        }
-        var receiver = queue.shift();
-        var arg = queue.shift();
-        fn.call(receiver, arg);
-    }
-};
-
-Async.prototype._drainQueues = function () {
-    this._drainQueue(this._normalQueue);
-    this._reset();
-    this._haveDrainedQueues = true;
-    this._drainQueue(this._lateQueue);
-};
-
-Async.prototype._queueTick = function () {
-    if (!this._isTickUsed) {
-        this._isTickUsed = true;
-        this._schedule(this.drainQueues);
-    }
-};
-
-Async.prototype._reset = function () {
-    this._isTickUsed = false;
-};
-
-module.exports = Async;
-module.exports.firstLineError = firstLineError;
-
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var util = __webpack_require__(5);
-var schedule;
-var noAsyncScheduler = function() {
-    throw new Error("No async scheduler available\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-};
-var NativePromise = util.getNativePromise();
-if (util.isNode && typeof MutationObserver === "undefined") {
-    var GlobalSetImmediate = global.setImmediate;
-    var ProcessNextTick = process.nextTick;
-    schedule = util.isRecentNode
-                ? function(fn) { GlobalSetImmediate.call(global, fn); }
-                : function(fn) { ProcessNextTick.call(process, fn); };
-} else if (typeof NativePromise === "function" &&
-           typeof NativePromise.resolve === "function") {
-    var nativePromise = NativePromise.resolve();
-    schedule = function(fn) {
-        nativePromise.then(fn);
-    };
-} else if ((typeof MutationObserver !== "undefined") &&
-          !(typeof window !== "undefined" &&
-            window.navigator &&
-            (window.navigator.standalone || window.cordova))) {
-    schedule = (function() {
-        var div = document.createElement("div");
-        var opts = {attributes: true};
-        var toggleScheduled = false;
-        var div2 = document.createElement("div");
-        var o2 = new MutationObserver(function() {
-            div.classList.toggle("foo");
-            toggleScheduled = false;
-        });
-        o2.observe(div2, opts);
-
-        var scheduleToggle = function() {
-            if (toggleScheduled) return;
-            toggleScheduled = true;
-            div2.classList.toggle("foo");
-        };
-
-        return function schedule(fn) {
-            var o = new MutationObserver(function() {
-                o.disconnect();
-                fn();
-            });
-            o.observe(div, opts);
-            scheduleToggle();
-        };
-    })();
-} else if (typeof setImmediate !== "undefined") {
-    schedule = function (fn) {
-        setImmediate(fn);
-    };
-} else if (typeof setTimeout !== "undefined") {
-    schedule = function (fn) {
-        setTimeout(fn, 0);
-    };
-} else {
-    schedule = noAsyncScheduler;
-}
-module.exports = schedule;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-function arrayMove(src, srcIndex, dst, dstIndex, len) {
-    for (var j = 0; j < len; ++j) {
-        dst[j + dstIndex] = src[j + srcIndex];
-        src[j + srcIndex] = void 0;
-    }
-}
-
-function Queue(capacity) {
-    this._capacity = capacity;
-    this._length = 0;
-    this._front = 0;
-}
-
-Queue.prototype._willBeOverCapacity = function (size) {
-    return this._capacity < size;
-};
-
-Queue.prototype._pushOne = function (arg) {
-    var length = this.length();
-    this._checkCapacity(length + 1);
-    var i = (this._front + length) & (this._capacity - 1);
-    this[i] = arg;
-    this._length = length + 1;
-};
-
-Queue.prototype.push = function (fn, receiver, arg) {
-    var length = this.length() + 3;
-    if (this._willBeOverCapacity(length)) {
-        this._pushOne(fn);
-        this._pushOne(receiver);
-        this._pushOne(arg);
-        return;
-    }
-    var j = this._front + length - 3;
-    this._checkCapacity(length);
-    var wrapMask = this._capacity - 1;
-    this[(j + 0) & wrapMask] = fn;
-    this[(j + 1) & wrapMask] = receiver;
-    this[(j + 2) & wrapMask] = arg;
-    this._length = length;
-};
-
-Queue.prototype.shift = function () {
-    var front = this._front,
-        ret = this[front];
-
-    this[front] = undefined;
-    this._front = (front + 1) & (this._capacity - 1);
-    this._length--;
-    return ret;
-};
-
-Queue.prototype.length = function () {
-    return this._length;
-};
-
-Queue.prototype._checkCapacity = function (size) {
-    if (this._capacity < size) {
-        this._resizeTo(this._capacity << 1);
-    }
-};
-
-Queue.prototype._resizeTo = function (capacity) {
-    var oldCapacity = this._capacity;
-    this._capacity = capacity;
-    var front = this._front;
-    var length = this._length;
-    var moveItemsCount = (front + length) & (oldCapacity - 1);
-    arrayMove(this, 0, this, oldCapacity, moveItemsCount);
-};
-
-module.exports = Queue;
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var es5 = __webpack_require__(6);
-var Objectfreeze = es5.freeze;
-var util = __webpack_require__(5);
-var inherits = util.inherits;
-var notEnumerableProp = util.notEnumerableProp;
-
-function subError(nameProperty, defaultMessage) {
-    function SubError(message) {
-        if (!(this instanceof SubError)) return new SubError(message);
-        notEnumerableProp(this, "message",
-            typeof message === "string" ? message : defaultMessage);
-        notEnumerableProp(this, "name", nameProperty);
-        if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, this.constructor);
-        } else {
-            Error.call(this);
-        }
-    }
-    inherits(SubError, Error);
-    return SubError;
-}
-
-var _TypeError, _RangeError;
-var Warning = subError("Warning", "warning");
-var CancellationError = subError("CancellationError", "cancellation error");
-var TimeoutError = subError("TimeoutError", "timeout error");
-var AggregateError = subError("AggregateError", "aggregate error");
-try {
-    _TypeError = TypeError;
-    _RangeError = RangeError;
-} catch(e) {
-    _TypeError = subError("TypeError", "type error");
-    _RangeError = subError("RangeError", "range error");
-}
-
-var methods = ("join pop push shift unshift slice filter forEach some " +
-    "every map indexOf lastIndexOf reduce reduceRight sort reverse").split(" ");
-
-for (var i = 0; i < methods.length; ++i) {
-    if (typeof Array.prototype[methods[i]] === "function") {
-        AggregateError.prototype[methods[i]] = Array.prototype[methods[i]];
-    }
-}
-
-es5.defineProperty(AggregateError.prototype, "length", {
-    value: 0,
-    configurable: false,
-    writable: true,
-    enumerable: true
-});
-AggregateError.prototype["isOperational"] = true;
-var level = 0;
-AggregateError.prototype.toString = function() {
-    var indent = Array(level * 4 + 1).join(" ");
-    var ret = "\n" + indent + "AggregateError of:" + "\n";
-    level++;
-    indent = Array(level * 4 + 1).join(" ");
-    for (var i = 0; i < this.length; ++i) {
-        var str = this[i] === this ? "[Circular AggregateError]" : this[i] + "";
-        var lines = str.split("\n");
-        for (var j = 0; j < lines.length; ++j) {
-            lines[j] = indent + lines[j];
-        }
-        str = lines.join("\n");
-        ret += str + "\n";
-    }
-    level--;
-    return ret;
-};
-
-function OperationalError(message) {
-    if (!(this instanceof OperationalError))
-        return new OperationalError(message);
-    notEnumerableProp(this, "name", "OperationalError");
-    notEnumerableProp(this, "message", message);
-    this.cause = message;
-    this["isOperational"] = true;
-
-    if (message instanceof Error) {
-        notEnumerableProp(this, "message", message.message);
-        notEnumerableProp(this, "stack", message.stack);
-    } else if (Error.captureStackTrace) {
-        Error.captureStackTrace(this, this.constructor);
-    }
-
-}
-inherits(OperationalError, Error);
-
-var errorTypes = Error["__BluebirdErrorTypes__"];
-if (!errorTypes) {
-    errorTypes = Objectfreeze({
-        CancellationError: CancellationError,
-        TimeoutError: TimeoutError,
-        OperationalError: OperationalError,
-        RejectionError: OperationalError,
-        AggregateError: AggregateError
-    });
-    es5.defineProperty(Error, "__BluebirdErrorTypes__", {
-        value: errorTypes,
-        writable: false,
-        enumerable: false,
-        configurable: false
-    });
-}
-
-module.exports = {
-    Error: Error,
-    TypeError: _TypeError,
-    RangeError: _RangeError,
-    CancellationError: errorTypes.CancellationError,
-    OperationalError: errorTypes.OperationalError,
-    TimeoutError: errorTypes.TimeoutError,
-    AggregateError: errorTypes.AggregateError,
-    Warning: Warning
-};
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise, INTERNAL) {
-var util = __webpack_require__(5);
-var errorObj = util.errorObj;
-var isObject = util.isObject;
-
-function tryConvertToPromise(obj, context) {
-    if (isObject(obj)) {
-        if (obj instanceof Promise) return obj;
-        var then = getThen(obj);
-        if (then === errorObj) {
-            if (context) context._pushContext();
-            var ret = Promise.reject(then.e);
-            if (context) context._popContext();
-            return ret;
-        } else if (typeof then === "function") {
-            if (isAnyBluebirdPromise(obj)) {
-                var ret = new Promise(INTERNAL);
-                obj._then(
-                    ret._fulfill,
-                    ret._reject,
-                    undefined,
-                    ret,
-                    null
-                );
-                return ret;
-            }
-            return doThenable(obj, then, context);
-        }
-    }
-    return obj;
-}
-
-function doGetThen(obj) {
-    return obj.then;
-}
-
-function getThen(obj) {
-    try {
-        return doGetThen(obj);
-    } catch (e) {
-        errorObj.e = e;
-        return errorObj;
-    }
-}
-
-var hasProp = {}.hasOwnProperty;
-function isAnyBluebirdPromise(obj) {
-    try {
-        return hasProp.call(obj, "_promise0");
-    } catch (e) {
-        return false;
-    }
-}
-
-function doThenable(x, then, context) {
-    var promise = new Promise(INTERNAL);
-    var ret = promise;
-    if (context) context._pushContext();
-    promise._captureStackTrace();
-    if (context) context._popContext();
-    var synchronous = true;
-    var result = util.tryCatch(then).call(x, resolve, reject);
-    synchronous = false;
-
-    if (promise && result === errorObj) {
-        promise._rejectCallback(result.e, true, true);
-        promise = null;
-    }
-
-    function resolve(value) {
-        if (!promise) return;
-        promise._resolveCallback(value);
-        promise = null;
-    }
-
-    function reject(reason) {
-        if (!promise) return;
-        promise._rejectCallback(reason, synchronous, true);
-        promise = null;
-    }
-    return ret;
-}
-
-return tryConvertToPromise;
-};
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise, INTERNAL, tryConvertToPromise,
-    apiRejection, Proxyable) {
-var util = __webpack_require__(5);
-var isArray = util.isArray;
-
-function toResolutionValue(val) {
-    switch(val) {
-    case -2: return [];
-    case -3: return {};
-    case -6: return new Map();
-    }
-}
-
-function PromiseArray(values) {
-    var promise = this._promise = new Promise(INTERNAL);
-    if (values instanceof Promise) {
-        promise._propagateFrom(values, 3);
-    }
-    promise._setOnCancel(this);
-    this._values = values;
-    this._length = 0;
-    this._totalResolved = 0;
-    this._init(undefined, -2);
-}
-util.inherits(PromiseArray, Proxyable);
-
-PromiseArray.prototype.length = function () {
-    return this._length;
-};
-
-PromiseArray.prototype.promise = function () {
-    return this._promise;
-};
-
-PromiseArray.prototype._init = function init(_, resolveValueIfEmpty) {
-    var values = tryConvertToPromise(this._values, this._promise);
-    if (values instanceof Promise) {
-        values = values._target();
-        var bitField = values._bitField;
-        ;
-        this._values = values;
-
-        if (((bitField & 50397184) === 0)) {
-            this._promise._setAsyncGuaranteed();
-            return values._then(
-                init,
-                this._reject,
-                undefined,
-                this,
-                resolveValueIfEmpty
-           );
-        } else if (((bitField & 33554432) !== 0)) {
-            values = values._value();
-        } else if (((bitField & 16777216) !== 0)) {
-            return this._reject(values._reason());
-        } else {
-            return this._cancel();
-        }
-    }
-    values = util.asArray(values);
-    if (values === null) {
-        var err = apiRejection(
-            "expecting an array or an iterable object but got " + util.classString(values)).reason();
-        this._promise._rejectCallback(err, false);
-        return;
-    }
-
-    if (values.length === 0) {
-        if (resolveValueIfEmpty === -5) {
-            this._resolveEmptyArray();
-        }
-        else {
-            this._resolve(toResolutionValue(resolveValueIfEmpty));
-        }
-        return;
-    }
-    this._iterate(values);
-};
-
-PromiseArray.prototype._iterate = function(values) {
-    var len = this.getActualLength(values.length);
-    this._length = len;
-    this._values = this.shouldCopyValues() ? new Array(len) : this._values;
-    var result = this._promise;
-    var isResolved = false;
-    var bitField = null;
-    for (var i = 0; i < len; ++i) {
-        var maybePromise = tryConvertToPromise(values[i], result);
-
-        if (maybePromise instanceof Promise) {
-            maybePromise = maybePromise._target();
-            bitField = maybePromise._bitField;
-        } else {
-            bitField = null;
-        }
-
-        if (isResolved) {
-            if (bitField !== null) {
-                maybePromise.suppressUnhandledRejections();
-            }
-        } else if (bitField !== null) {
-            if (((bitField & 50397184) === 0)) {
-                maybePromise._proxy(this, i);
-                this._values[i] = maybePromise;
-            } else if (((bitField & 33554432) !== 0)) {
-                isResolved = this._promiseFulfilled(maybePromise._value(), i);
-            } else if (((bitField & 16777216) !== 0)) {
-                isResolved = this._promiseRejected(maybePromise._reason(), i);
-            } else {
-                isResolved = this._promiseCancelled(i);
-            }
-        } else {
-            isResolved = this._promiseFulfilled(maybePromise, i);
-        }
-    }
-    if (!isResolved) result._setAsyncGuaranteed();
-};
-
-PromiseArray.prototype._isResolved = function () {
-    return this._values === null;
-};
-
-PromiseArray.prototype._resolve = function (value) {
-    this._values = null;
-    this._promise._fulfill(value);
-};
-
-PromiseArray.prototype._cancel = function() {
-    if (this._isResolved() || !this._promise._isCancellable()) return;
-    this._values = null;
-    this._promise._cancel();
-};
-
-PromiseArray.prototype._reject = function (reason) {
-    this._values = null;
-    this._promise._rejectCallback(reason, false);
-};
-
-PromiseArray.prototype._promiseFulfilled = function (value, index) {
-    this._values[index] = value;
-    var totalResolved = ++this._totalResolved;
-    if (totalResolved >= this._length) {
-        this._resolve(this._values);
-        return true;
-    }
-    return false;
-};
-
-PromiseArray.prototype._promiseCancelled = function() {
-    this._cancel();
-    return true;
-};
-
-PromiseArray.prototype._promiseRejected = function (reason) {
-    this._totalResolved++;
-    this._reject(reason);
-    return true;
-};
-
-PromiseArray.prototype._resultCancelled = function() {
-    if (this._isResolved()) return;
-    var values = this._values;
-    this._cancel();
-    if (values instanceof Promise) {
-        values.cancel();
-    } else {
-        for (var i = 0; i < values.length; ++i) {
-            if (values[i] instanceof Promise) {
-                values[i].cancel();
-            }
-        }
-    }
-};
-
-PromiseArray.prototype.shouldCopyValues = function () {
-    return true;
-};
-
-PromiseArray.prototype.getActualLength = function (len) {
-    return len;
-};
-
-return PromiseArray;
-};
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise) {
-var longStackTraces = false;
-var contextStack = [];
-
-Promise.prototype._promiseCreated = function() {};
-Promise.prototype._pushContext = function() {};
-Promise.prototype._popContext = function() {return null;};
-Promise._peekContext = Promise.prototype._peekContext = function() {};
-
-function Context() {
-    this._trace = new Context.CapturedTrace(peekContext());
-}
-Context.prototype._pushContext = function () {
-    if (this._trace !== undefined) {
-        this._trace._promiseCreated = null;
-        contextStack.push(this._trace);
-    }
-};
-
-Context.prototype._popContext = function () {
-    if (this._trace !== undefined) {
-        var trace = contextStack.pop();
-        var ret = trace._promiseCreated;
-        trace._promiseCreated = null;
-        return ret;
-    }
-    return null;
-};
-
-function createContext() {
-    if (longStackTraces) return new Context();
-}
-
-function peekContext() {
-    var lastIndex = contextStack.length - 1;
-    if (lastIndex >= 0) {
-        return contextStack[lastIndex];
-    }
-    return undefined;
-}
-Context.CapturedTrace = null;
-Context.create = createContext;
-Context.deactivateLongStackTraces = function() {};
-Context.activateLongStackTraces = function() {
-    var Promise_pushContext = Promise.prototype._pushContext;
-    var Promise_popContext = Promise.prototype._popContext;
-    var Promise_PeekContext = Promise._peekContext;
-    var Promise_peekContext = Promise.prototype._peekContext;
-    var Promise_promiseCreated = Promise.prototype._promiseCreated;
-    Context.deactivateLongStackTraces = function() {
-        Promise.prototype._pushContext = Promise_pushContext;
-        Promise.prototype._popContext = Promise_popContext;
-        Promise._peekContext = Promise_PeekContext;
-        Promise.prototype._peekContext = Promise_peekContext;
-        Promise.prototype._promiseCreated = Promise_promiseCreated;
-        longStackTraces = false;
-    };
-    longStackTraces = true;
-    Promise.prototype._pushContext = Context.prototype._pushContext;
-    Promise.prototype._popContext = Context.prototype._popContext;
-    Promise._peekContext = Promise.prototype._peekContext = peekContext;
-    Promise.prototype._promiseCreated = function() {
-        var ctx = this._peekContext();
-        if (ctx && ctx._promiseCreated == null) ctx._promiseCreated = this;
-    };
-};
-return Context;
-};
-
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise, Context) {
-var getDomain = Promise._getDomain;
-var async = Promise._async;
-var Warning = __webpack_require__(10).Warning;
-var util = __webpack_require__(5);
-var canAttachTrace = util.canAttachTrace;
-var unhandledRejectionHandled;
-var possiblyUnhandledRejection;
-var bluebirdFramePattern =
-    /[\\\/]bluebird[\\\/]js[\\\/](release|debug|instrumented)/;
-var nodeFramePattern = /\((?:timers\.js):\d+:\d+\)/;
-var parseLinePattern = /[\/<\(](.+?):(\d+):(\d+)\)?\s*$/;
-var stackFramePattern = null;
-var formatStack = null;
-var indentStackFrames = false;
-var printWarning;
-var debugging = !!(util.env("BLUEBIRD_DEBUG") != 0 &&
-                        (false ||
-                         util.env("BLUEBIRD_DEBUG") ||
-                         util.env("NODE_ENV") === "development"));
-
-var warnings = !!(util.env("BLUEBIRD_WARNINGS") != 0 &&
-    (debugging || util.env("BLUEBIRD_WARNINGS")));
-
-var longStackTraces = !!(util.env("BLUEBIRD_LONG_STACK_TRACES") != 0 &&
-    (debugging || util.env("BLUEBIRD_LONG_STACK_TRACES")));
-
-var wForgottenReturn = util.env("BLUEBIRD_W_FORGOTTEN_RETURN") != 0 &&
-    (warnings || !!util.env("BLUEBIRD_W_FORGOTTEN_RETURN"));
-
-Promise.prototype.suppressUnhandledRejections = function() {
-    var target = this._target();
-    target._bitField = ((target._bitField & (~1048576)) |
-                      524288);
-};
-
-Promise.prototype._ensurePossibleRejectionHandled = function () {
-    if ((this._bitField & 524288) !== 0) return;
-    this._setRejectionIsUnhandled();
-    var self = this;
-    setTimeout(function() {
-        self._notifyUnhandledRejection();
-    }, 1);
-};
-
-Promise.prototype._notifyUnhandledRejectionIsHandled = function () {
-    fireRejectionEvent("rejectionHandled",
-                                  unhandledRejectionHandled, undefined, this);
-};
-
-Promise.prototype._setReturnedNonUndefined = function() {
-    this._bitField = this._bitField | 268435456;
-};
-
-Promise.prototype._returnedNonUndefined = function() {
-    return (this._bitField & 268435456) !== 0;
-};
-
-Promise.prototype._notifyUnhandledRejection = function () {
-    if (this._isRejectionUnhandled()) {
-        var reason = this._settledValue();
-        this._setUnhandledRejectionIsNotified();
-        fireRejectionEvent("unhandledRejection",
-                                      possiblyUnhandledRejection, reason, this);
-    }
-};
-
-Promise.prototype._setUnhandledRejectionIsNotified = function () {
-    this._bitField = this._bitField | 262144;
-};
-
-Promise.prototype._unsetUnhandledRejectionIsNotified = function () {
-    this._bitField = this._bitField & (~262144);
-};
-
-Promise.prototype._isUnhandledRejectionNotified = function () {
-    return (this._bitField & 262144) > 0;
-};
-
-Promise.prototype._setRejectionIsUnhandled = function () {
-    this._bitField = this._bitField | 1048576;
-};
-
-Promise.prototype._unsetRejectionIsUnhandled = function () {
-    this._bitField = this._bitField & (~1048576);
-    if (this._isUnhandledRejectionNotified()) {
-        this._unsetUnhandledRejectionIsNotified();
-        this._notifyUnhandledRejectionIsHandled();
-    }
-};
-
-Promise.prototype._isRejectionUnhandled = function () {
-    return (this._bitField & 1048576) > 0;
-};
-
-Promise.prototype._warn = function(message, shouldUseOwnTrace, promise) {
-    return warn(message, shouldUseOwnTrace, promise || this);
-};
-
-Promise.onPossiblyUnhandledRejection = function (fn) {
-    var domain = getDomain();
-    possiblyUnhandledRejection =
-        typeof fn === "function" ? (domain === null ?
-                                            fn : util.domainBind(domain, fn))
-                                 : undefined;
-};
-
-Promise.onUnhandledRejectionHandled = function (fn) {
-    var domain = getDomain();
-    unhandledRejectionHandled =
-        typeof fn === "function" ? (domain === null ?
-                                            fn : util.domainBind(domain, fn))
-                                 : undefined;
-};
-
-var disableLongStackTraces = function() {};
-Promise.longStackTraces = function () {
-    if (async.haveItemsQueued() && !config.longStackTraces) {
-        throw new Error("cannot enable long stack traces after promises have been created\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    }
-    if (!config.longStackTraces && longStackTracesIsSupported()) {
-        var Promise_captureStackTrace = Promise.prototype._captureStackTrace;
-        var Promise_attachExtraTrace = Promise.prototype._attachExtraTrace;
-        config.longStackTraces = true;
-        disableLongStackTraces = function() {
-            if (async.haveItemsQueued() && !config.longStackTraces) {
-                throw new Error("cannot enable long stack traces after promises have been created\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-            }
-            Promise.prototype._captureStackTrace = Promise_captureStackTrace;
-            Promise.prototype._attachExtraTrace = Promise_attachExtraTrace;
-            Context.deactivateLongStackTraces();
-            async.enableTrampoline();
-            config.longStackTraces = false;
-        };
-        Promise.prototype._captureStackTrace = longStackTracesCaptureStackTrace;
-        Promise.prototype._attachExtraTrace = longStackTracesAttachExtraTrace;
-        Context.activateLongStackTraces();
-        async.disableTrampolineIfNecessary();
-    }
-};
-
-Promise.hasLongStackTraces = function () {
-    return config.longStackTraces && longStackTracesIsSupported();
-};
-
-var fireDomEvent = (function() {
-    try {
-        if (typeof CustomEvent === "function") {
-            var event = new CustomEvent("CustomEvent");
-            util.global.dispatchEvent(event);
-            return function(name, event) {
-                var domEvent = new CustomEvent(name.toLowerCase(), {
-                    detail: event,
-                    cancelable: true
-                });
-                return !util.global.dispatchEvent(domEvent);
-            };
-        } else if (typeof Event === "function") {
-            var event = new Event("CustomEvent");
-            util.global.dispatchEvent(event);
-            return function(name, event) {
-                var domEvent = new Event(name.toLowerCase(), {
-                    cancelable: true
-                });
-                domEvent.detail = event;
-                return !util.global.dispatchEvent(domEvent);
-            };
-        } else {
-            var event = document.createEvent("CustomEvent");
-            event.initCustomEvent("testingtheevent", false, true, {});
-            util.global.dispatchEvent(event);
-            return function(name, event) {
-                var domEvent = document.createEvent("CustomEvent");
-                domEvent.initCustomEvent(name.toLowerCase(), false, true,
-                    event);
-                return !util.global.dispatchEvent(domEvent);
-            };
-        }
-    } catch (e) {}
-    return function() {
-        return false;
-    };
-})();
-
-var fireGlobalEvent = (function() {
-    if (util.isNode) {
-        return function() {
-            return process.emit.apply(process, arguments);
-        };
-    } else {
-        if (!util.global) {
-            return function() {
-                return false;
-            };
-        }
-        return function(name) {
-            var methodName = "on" + name.toLowerCase();
-            var method = util.global[methodName];
-            if (!method) return false;
-            method.apply(util.global, [].slice.call(arguments, 1));
-            return true;
-        };
-    }
-})();
-
-function generatePromiseLifecycleEventObject(name, promise) {
-    return {promise: promise};
-}
-
-var eventToObjectGenerator = {
-    promiseCreated: generatePromiseLifecycleEventObject,
-    promiseFulfilled: generatePromiseLifecycleEventObject,
-    promiseRejected: generatePromiseLifecycleEventObject,
-    promiseResolved: generatePromiseLifecycleEventObject,
-    promiseCancelled: generatePromiseLifecycleEventObject,
-    promiseChained: function(name, promise, child) {
-        return {promise: promise, child: child};
-    },
-    warning: function(name, warning) {
-        return {warning: warning};
-    },
-    unhandledRejection: function (name, reason, promise) {
-        return {reason: reason, promise: promise};
-    },
-    rejectionHandled: generatePromiseLifecycleEventObject
-};
-
-var activeFireEvent = function (name) {
-    var globalEventFired = false;
-    try {
-        globalEventFired = fireGlobalEvent.apply(null, arguments);
-    } catch (e) {
-        async.throwLater(e);
-        globalEventFired = true;
-    }
-
-    var domEventFired = false;
-    try {
-        domEventFired = fireDomEvent(name,
-                    eventToObjectGenerator[name].apply(null, arguments));
-    } catch (e) {
-        async.throwLater(e);
-        domEventFired = true;
-    }
-
-    return domEventFired || globalEventFired;
-};
-
-Promise.config = function(opts) {
-    opts = Object(opts);
-    if ("longStackTraces" in opts) {
-        if (opts.longStackTraces) {
-            Promise.longStackTraces();
-        } else if (!opts.longStackTraces && Promise.hasLongStackTraces()) {
-            disableLongStackTraces();
-        }
-    }
-    if ("warnings" in opts) {
-        var warningsOption = opts.warnings;
-        config.warnings = !!warningsOption;
-        wForgottenReturn = config.warnings;
-
-        if (util.isObject(warningsOption)) {
-            if ("wForgottenReturn" in warningsOption) {
-                wForgottenReturn = !!warningsOption.wForgottenReturn;
-            }
-        }
-    }
-    if ("cancellation" in opts && opts.cancellation && !config.cancellation) {
-        if (async.haveItemsQueued()) {
-            throw new Error(
-                "cannot enable cancellation after promises are in use");
-        }
-        Promise.prototype._clearCancellationData =
-            cancellationClearCancellationData;
-        Promise.prototype._propagateFrom = cancellationPropagateFrom;
-        Promise.prototype._onCancel = cancellationOnCancel;
-        Promise.prototype._setOnCancel = cancellationSetOnCancel;
-        Promise.prototype._attachCancellationCallback =
-            cancellationAttachCancellationCallback;
-        Promise.prototype._execute = cancellationExecute;
-        propagateFromFunction = cancellationPropagateFrom;
-        config.cancellation = true;
-    }
-    if ("monitoring" in opts) {
-        if (opts.monitoring && !config.monitoring) {
-            config.monitoring = true;
-            Promise.prototype._fireEvent = activeFireEvent;
-        } else if (!opts.monitoring && config.monitoring) {
-            config.monitoring = false;
-            Promise.prototype._fireEvent = defaultFireEvent;
-        }
-    }
-    return Promise;
-};
-
-function defaultFireEvent() { return false; }
-
-Promise.prototype._fireEvent = defaultFireEvent;
-Promise.prototype._execute = function(executor, resolve, reject) {
-    try {
-        executor(resolve, reject);
-    } catch (e) {
-        return e;
-    }
-};
-Promise.prototype._onCancel = function () {};
-Promise.prototype._setOnCancel = function (handler) { ; };
-Promise.prototype._attachCancellationCallback = function(onCancel) {
-    ;
-};
-Promise.prototype._captureStackTrace = function () {};
-Promise.prototype._attachExtraTrace = function () {};
-Promise.prototype._clearCancellationData = function() {};
-Promise.prototype._propagateFrom = function (parent, flags) {
-    ;
-    ;
-};
-
-function cancellationExecute(executor, resolve, reject) {
-    var promise = this;
-    try {
-        executor(resolve, reject, function(onCancel) {
-            if (typeof onCancel !== "function") {
-                throw new TypeError("onCancel must be a function, got: " +
-                                    util.toString(onCancel));
-            }
-            promise._attachCancellationCallback(onCancel);
-        });
-    } catch (e) {
-        return e;
-    }
-}
-
-function cancellationAttachCancellationCallback(onCancel) {
-    if (!this._isCancellable()) return this;
-
-    var previousOnCancel = this._onCancel();
-    if (previousOnCancel !== undefined) {
-        if (util.isArray(previousOnCancel)) {
-            previousOnCancel.push(onCancel);
-        } else {
-            this._setOnCancel([previousOnCancel, onCancel]);
-        }
-    } else {
-        this._setOnCancel(onCancel);
-    }
-}
-
-function cancellationOnCancel() {
-    return this._onCancelField;
-}
-
-function cancellationSetOnCancel(onCancel) {
-    this._onCancelField = onCancel;
-}
-
-function cancellationClearCancellationData() {
-    this._cancellationParent = undefined;
-    this._onCancelField = undefined;
-}
-
-function cancellationPropagateFrom(parent, flags) {
-    if ((flags & 1) !== 0) {
-        this._cancellationParent = parent;
-        var branchesRemainingToCancel = parent._branchesRemainingToCancel;
-        if (branchesRemainingToCancel === undefined) {
-            branchesRemainingToCancel = 0;
-        }
-        parent._branchesRemainingToCancel = branchesRemainingToCancel + 1;
-    }
-    if ((flags & 2) !== 0 && parent._isBound()) {
-        this._setBoundTo(parent._boundTo);
-    }
-}
-
-function bindingPropagateFrom(parent, flags) {
-    if ((flags & 2) !== 0 && parent._isBound()) {
-        this._setBoundTo(parent._boundTo);
-    }
-}
-var propagateFromFunction = bindingPropagateFrom;
-
-function boundValueFunction() {
-    var ret = this._boundTo;
-    if (ret !== undefined) {
-        if (ret instanceof Promise) {
-            if (ret.isFulfilled()) {
-                return ret.value();
-            } else {
-                return undefined;
-            }
-        }
-    }
-    return ret;
-}
-
-function longStackTracesCaptureStackTrace() {
-    this._trace = new CapturedTrace(this._peekContext());
-}
-
-function longStackTracesAttachExtraTrace(error, ignoreSelf) {
-    if (canAttachTrace(error)) {
-        var trace = this._trace;
-        if (trace !== undefined) {
-            if (ignoreSelf) trace = trace._parent;
-        }
-        if (trace !== undefined) {
-            trace.attachExtraTrace(error);
-        } else if (!error.__stackCleaned__) {
-            var parsed = parseStackAndMessage(error);
-            util.notEnumerableProp(error, "stack",
-                parsed.message + "\n" + parsed.stack.join("\n"));
-            util.notEnumerableProp(error, "__stackCleaned__", true);
-        }
-    }
-}
-
-function checkForgottenReturns(returnValue, promiseCreated, name, promise,
-                               parent) {
-    if (returnValue === undefined && promiseCreated !== null &&
-        wForgottenReturn) {
-        if (parent !== undefined && parent._returnedNonUndefined()) return;
-        if ((promise._bitField & 65535) === 0) return;
-
-        if (name) name = name + " ";
-        var handlerLine = "";
-        var creatorLine = "";
-        if (promiseCreated._trace) {
-            var traceLines = promiseCreated._trace.stack.split("\n");
-            var stack = cleanStack(traceLines);
-            for (var i = stack.length - 1; i >= 0; --i) {
-                var line = stack[i];
-                if (!nodeFramePattern.test(line)) {
-                    var lineMatches = line.match(parseLinePattern);
-                    if (lineMatches) {
-                        handlerLine  = "at " + lineMatches[1] +
-                            ":" + lineMatches[2] + ":" + lineMatches[3] + " ";
-                    }
-                    break;
-                }
-            }
-
-            if (stack.length > 0) {
-                var firstUserLine = stack[0];
-                for (var i = 0; i < traceLines.length; ++i) {
-
-                    if (traceLines[i] === firstUserLine) {
-                        if (i > 0) {
-                            creatorLine = "\n" + traceLines[i - 1];
-                        }
-                        break;
-                    }
-                }
-
-            }
-        }
-        var msg = "a promise was created in a " + name +
-            "handler " + handlerLine + "but was not returned from it, " +
-            "see http://goo.gl/rRqMUw" +
-            creatorLine;
-        promise._warn(msg, true, promiseCreated);
-    }
-}
-
-function deprecated(name, replacement) {
-    var message = name +
-        " is deprecated and will be removed in a future version.";
-    if (replacement) message += " Use " + replacement + " instead.";
-    return warn(message);
-}
-
-function warn(message, shouldUseOwnTrace, promise) {
-    if (!config.warnings) return;
-    var warning = new Warning(message);
-    var ctx;
-    if (shouldUseOwnTrace) {
-        promise._attachExtraTrace(warning);
-    } else if (config.longStackTraces && (ctx = Promise._peekContext())) {
-        ctx.attachExtraTrace(warning);
-    } else {
-        var parsed = parseStackAndMessage(warning);
-        warning.stack = parsed.message + "\n" + parsed.stack.join("\n");
-    }
-
-    if (!activeFireEvent("warning", warning)) {
-        formatAndLogError(warning, "", true);
-    }
-}
-
-function reconstructStack(message, stacks) {
-    for (var i = 0; i < stacks.length - 1; ++i) {
-        stacks[i].push("From previous event:");
-        stacks[i] = stacks[i].join("\n");
-    }
-    if (i < stacks.length) {
-        stacks[i] = stacks[i].join("\n");
-    }
-    return message + "\n" + stacks.join("\n");
-}
-
-function removeDuplicateOrEmptyJumps(stacks) {
-    for (var i = 0; i < stacks.length; ++i) {
-        if (stacks[i].length === 0 ||
-            ((i + 1 < stacks.length) && stacks[i][0] === stacks[i+1][0])) {
-            stacks.splice(i, 1);
-            i--;
-        }
-    }
-}
-
-function removeCommonRoots(stacks) {
-    var current = stacks[0];
-    for (var i = 1; i < stacks.length; ++i) {
-        var prev = stacks[i];
-        var currentLastIndex = current.length - 1;
-        var currentLastLine = current[currentLastIndex];
-        var commonRootMeetPoint = -1;
-
-        for (var j = prev.length - 1; j >= 0; --j) {
-            if (prev[j] === currentLastLine) {
-                commonRootMeetPoint = j;
-                break;
-            }
-        }
-
-        for (var j = commonRootMeetPoint; j >= 0; --j) {
-            var line = prev[j];
-            if (current[currentLastIndex] === line) {
-                current.pop();
-                currentLastIndex--;
-            } else {
-                break;
-            }
-        }
-        current = prev;
-    }
-}
-
-function cleanStack(stack) {
-    var ret = [];
-    for (var i = 0; i < stack.length; ++i) {
-        var line = stack[i];
-        var isTraceLine = "    (No stack trace)" === line ||
-            stackFramePattern.test(line);
-        var isInternalFrame = isTraceLine && shouldIgnore(line);
-        if (isTraceLine && !isInternalFrame) {
-            if (indentStackFrames && line.charAt(0) !== " ") {
-                line = "    " + line;
-            }
-            ret.push(line);
-        }
-    }
-    return ret;
-}
-
-function stackFramesAsArray(error) {
-    var stack = error.stack.replace(/\s+$/g, "").split("\n");
-    for (var i = 0; i < stack.length; ++i) {
-        var line = stack[i];
-        if ("    (No stack trace)" === line || stackFramePattern.test(line)) {
-            break;
-        }
-    }
-    if (i > 0 && error.name != "SyntaxError") {
-        stack = stack.slice(i);
-    }
-    return stack;
-}
-
-function parseStackAndMessage(error) {
-    var stack = error.stack;
-    var message = error.toString();
-    stack = typeof stack === "string" && stack.length > 0
-                ? stackFramesAsArray(error) : ["    (No stack trace)"];
-    return {
-        message: message,
-        stack: error.name == "SyntaxError" ? stack : cleanStack(stack)
-    };
-}
-
-function formatAndLogError(error, title, isSoft) {
-    if (typeof console !== "undefined") {
-        var message;
-        if (util.isObject(error)) {
-            var stack = error.stack;
-            message = title + formatStack(stack, error);
-        } else {
-            message = title + String(error);
-        }
-        if (typeof printWarning === "function") {
-            printWarning(message, isSoft);
-        } else if (typeof console.log === "function" ||
-            typeof console.log === "object") {
-            console.log(message);
-        }
-    }
-}
-
-function fireRejectionEvent(name, localHandler, reason, promise) {
-    var localEventFired = false;
-    try {
-        if (typeof localHandler === "function") {
-            localEventFired = true;
-            if (name === "rejectionHandled") {
-                localHandler(promise);
-            } else {
-                localHandler(reason, promise);
-            }
-        }
-    } catch (e) {
-        async.throwLater(e);
-    }
-
-    if (name === "unhandledRejection") {
-        if (!activeFireEvent(name, reason, promise) && !localEventFired) {
-            formatAndLogError(reason, "Unhandled rejection ");
-        }
-    } else {
-        activeFireEvent(name, promise);
-    }
-}
-
-function formatNonError(obj) {
-    var str;
-    if (typeof obj === "function") {
-        str = "[function " +
-            (obj.name || "anonymous") +
-            "]";
-    } else {
-        str = obj && typeof obj.toString === "function"
-            ? obj.toString() : util.toString(obj);
-        var ruselessToString = /\[object [a-zA-Z0-9$_]+\]/;
-        if (ruselessToString.test(str)) {
-            try {
-                var newStr = JSON.stringify(obj);
-                str = newStr;
-            }
-            catch(e) {
-
-            }
-        }
-        if (str.length === 0) {
-            str = "(empty array)";
-        }
-    }
-    return ("(<" + snip(str) + ">, no stack trace)");
-}
-
-function snip(str) {
-    var maxChars = 41;
-    if (str.length < maxChars) {
-        return str;
-    }
-    return str.substr(0, maxChars - 3) + "...";
-}
-
-function longStackTracesIsSupported() {
-    return typeof captureStackTrace === "function";
-}
-
-var shouldIgnore = function() { return false; };
-var parseLineInfoRegex = /[\/<\(]([^:\/]+):(\d+):(?:\d+)\)?\s*$/;
-function parseLineInfo(line) {
-    var matches = line.match(parseLineInfoRegex);
-    if (matches) {
-        return {
-            fileName: matches[1],
-            line: parseInt(matches[2], 10)
-        };
-    }
-}
-
-function setBounds(firstLineError, lastLineError) {
-    if (!longStackTracesIsSupported()) return;
-    var firstStackLines = firstLineError.stack.split("\n");
-    var lastStackLines = lastLineError.stack.split("\n");
-    var firstIndex = -1;
-    var lastIndex = -1;
-    var firstFileName;
-    var lastFileName;
-    for (var i = 0; i < firstStackLines.length; ++i) {
-        var result = parseLineInfo(firstStackLines[i]);
-        if (result) {
-            firstFileName = result.fileName;
-            firstIndex = result.line;
-            break;
-        }
-    }
-    for (var i = 0; i < lastStackLines.length; ++i) {
-        var result = parseLineInfo(lastStackLines[i]);
-        if (result) {
-            lastFileName = result.fileName;
-            lastIndex = result.line;
-            break;
-        }
-    }
-    if (firstIndex < 0 || lastIndex < 0 || !firstFileName || !lastFileName ||
-        firstFileName !== lastFileName || firstIndex >= lastIndex) {
-        return;
-    }
-
-    shouldIgnore = function(line) {
-        if (bluebirdFramePattern.test(line)) return true;
-        var info = parseLineInfo(line);
-        if (info) {
-            if (info.fileName === firstFileName &&
-                (firstIndex <= info.line && info.line <= lastIndex)) {
-                return true;
-            }
-        }
-        return false;
-    };
-}
-
-function CapturedTrace(parent) {
-    this._parent = parent;
-    this._promisesCreated = 0;
-    var length = this._length = 1 + (parent === undefined ? 0 : parent._length);
-    captureStackTrace(this, CapturedTrace);
-    if (length > 32) this.uncycle();
-}
-util.inherits(CapturedTrace, Error);
-Context.CapturedTrace = CapturedTrace;
-
-CapturedTrace.prototype.uncycle = function() {
-    var length = this._length;
-    if (length < 2) return;
-    var nodes = [];
-    var stackToIndex = {};
-
-    for (var i = 0, node = this; node !== undefined; ++i) {
-        nodes.push(node);
-        node = node._parent;
-    }
-    length = this._length = i;
-    for (var i = length - 1; i >= 0; --i) {
-        var stack = nodes[i].stack;
-        if (stackToIndex[stack] === undefined) {
-            stackToIndex[stack] = i;
-        }
-    }
-    for (var i = 0; i < length; ++i) {
-        var currentStack = nodes[i].stack;
-        var index = stackToIndex[currentStack];
-        if (index !== undefined && index !== i) {
-            if (index > 0) {
-                nodes[index - 1]._parent = undefined;
-                nodes[index - 1]._length = 1;
-            }
-            nodes[i]._parent = undefined;
-            nodes[i]._length = 1;
-            var cycleEdgeNode = i > 0 ? nodes[i - 1] : this;
-
-            if (index < length - 1) {
-                cycleEdgeNode._parent = nodes[index + 1];
-                cycleEdgeNode._parent.uncycle();
-                cycleEdgeNode._length =
-                    cycleEdgeNode._parent._length + 1;
-            } else {
-                cycleEdgeNode._parent = undefined;
-                cycleEdgeNode._length = 1;
-            }
-            var currentChildLength = cycleEdgeNode._length + 1;
-            for (var j = i - 2; j >= 0; --j) {
-                nodes[j]._length = currentChildLength;
-                currentChildLength++;
-            }
-            return;
-        }
-    }
-};
-
-CapturedTrace.prototype.attachExtraTrace = function(error) {
-    if (error.__stackCleaned__) return;
-    this.uncycle();
-    var parsed = parseStackAndMessage(error);
-    var message = parsed.message;
-    var stacks = [parsed.stack];
-
-    var trace = this;
-    while (trace !== undefined) {
-        stacks.push(cleanStack(trace.stack.split("\n")));
-        trace = trace._parent;
-    }
-    removeCommonRoots(stacks);
-    removeDuplicateOrEmptyJumps(stacks);
-    util.notEnumerableProp(error, "stack", reconstructStack(message, stacks));
-    util.notEnumerableProp(error, "__stackCleaned__", true);
-};
-
-var captureStackTrace = (function stackDetection() {
-    var v8stackFramePattern = /^\s*at\s*/;
-    var v8stackFormatter = function(stack, error) {
-        if (typeof stack === "string") return stack;
-
-        if (error.name !== undefined &&
-            error.message !== undefined) {
-            return error.toString();
-        }
-        return formatNonError(error);
-    };
-
-    if (typeof Error.stackTraceLimit === "number" &&
-        typeof Error.captureStackTrace === "function") {
-        Error.stackTraceLimit += 6;
-        stackFramePattern = v8stackFramePattern;
-        formatStack = v8stackFormatter;
-        var captureStackTrace = Error.captureStackTrace;
-
-        shouldIgnore = function(line) {
-            return bluebirdFramePattern.test(line);
-        };
-        return function(receiver, ignoreUntil) {
-            Error.stackTraceLimit += 6;
-            captureStackTrace(receiver, ignoreUntil);
-            Error.stackTraceLimit -= 6;
-        };
-    }
-    var err = new Error();
-
-    if (typeof err.stack === "string" &&
-        err.stack.split("\n")[0].indexOf("stackDetection@") >= 0) {
-        stackFramePattern = /@/;
-        formatStack = v8stackFormatter;
-        indentStackFrames = true;
-        return function captureStackTrace(o) {
-            o.stack = new Error().stack;
-        };
-    }
-
-    var hasStackAfterThrow;
-    try { throw new Error(); }
-    catch(e) {
-        hasStackAfterThrow = ("stack" in e);
-    }
-    if (!("stack" in err) && hasStackAfterThrow &&
-        typeof Error.stackTraceLimit === "number") {
-        stackFramePattern = v8stackFramePattern;
-        formatStack = v8stackFormatter;
-        return function captureStackTrace(o) {
-            Error.stackTraceLimit += 6;
-            try { throw new Error(); }
-            catch(e) { o.stack = e.stack; }
-            Error.stackTraceLimit -= 6;
-        };
-    }
-
-    formatStack = function(stack, error) {
-        if (typeof stack === "string") return stack;
-
-        if ((typeof error === "object" ||
-            typeof error === "function") &&
-            error.name !== undefined &&
-            error.message !== undefined) {
-            return error.toString();
-        }
-        return formatNonError(error);
-    };
-
-    return null;
-
-})([]);
-
-if (typeof console !== "undefined" && typeof console.warn !== "undefined") {
-    printWarning = function (message) {
-        console.warn(message);
-    };
-    if (util.isNode && process.stderr.isTTY) {
-        printWarning = function(message, isSoft) {
-            var color = isSoft ? "\u001b[33m" : "\u001b[31m";
-            console.warn(color + message + "\u001b[0m\n");
-        };
-    } else if (!util.isNode && typeof (new Error().stack) === "string") {
-        printWarning = function(message, isSoft) {
-            console.warn("%c" + message,
-                        isSoft ? "color: darkorange" : "color: red");
-        };
-    }
-}
-
-var config = {
-    warnings: warnings,
-    longStackTraces: false,
-    cancellation: false,
-    monitoring: false
-};
-
-if (longStackTraces) Promise.longStackTraces();
-
-return {
-    longStackTraces: function() {
-        return config.longStackTraces;
-    },
-    warnings: function() {
-        return config.warnings;
-    },
-    cancellation: function() {
-        return config.cancellation;
-    },
-    monitoring: function() {
-        return config.monitoring;
-    },
-    propagateFromFunction: function() {
-        return propagateFromFunction;
-    },
-    boundValueFunction: function() {
-        return boundValueFunction;
-    },
-    checkForgottenReturns: checkForgottenReturns,
-    setBounds: setBounds,
-    warn: warn,
-    deprecated: deprecated,
-    CapturedTrace: CapturedTrace,
-    fireDomEvent: fireDomEvent,
-    fireGlobalEvent: fireGlobalEvent
-};
-};
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise, tryConvertToPromise, NEXT_FILTER) {
-var util = __webpack_require__(5);
-var CancellationError = Promise.CancellationError;
-var errorObj = util.errorObj;
-var catchFilter = __webpack_require__(16)(NEXT_FILTER);
-
-function PassThroughHandlerContext(promise, type, handler) {
-    this.promise = promise;
-    this.type = type;
-    this.handler = handler;
-    this.called = false;
-    this.cancelPromise = null;
-}
-
-PassThroughHandlerContext.prototype.isFinallyHandler = function() {
-    return this.type === 0;
-};
-
-function FinallyHandlerCancelReaction(finallyHandler) {
-    this.finallyHandler = finallyHandler;
-}
-
-FinallyHandlerCancelReaction.prototype._resultCancelled = function() {
-    checkCancel(this.finallyHandler);
-};
-
-function checkCancel(ctx, reason) {
-    if (ctx.cancelPromise != null) {
-        if (arguments.length > 1) {
-            ctx.cancelPromise._reject(reason);
-        } else {
-            ctx.cancelPromise._cancel();
-        }
-        ctx.cancelPromise = null;
-        return true;
-    }
-    return false;
-}
-
-function succeed() {
-    return finallyHandler.call(this, this.promise._target()._settledValue());
-}
-function fail(reason) {
-    if (checkCancel(this, reason)) return;
-    errorObj.e = reason;
-    return errorObj;
-}
-function finallyHandler(reasonOrValue) {
-    var promise = this.promise;
-    var handler = this.handler;
-
-    if (!this.called) {
-        this.called = true;
-        var ret = this.isFinallyHandler()
-            ? handler.call(promise._boundValue())
-            : handler.call(promise._boundValue(), reasonOrValue);
-        if (ret === NEXT_FILTER) {
-            return ret;
-        } else if (ret !== undefined) {
-            promise._setReturnedNonUndefined();
-            var maybePromise = tryConvertToPromise(ret, promise);
-            if (maybePromise instanceof Promise) {
-                if (this.cancelPromise != null) {
-                    if (maybePromise._isCancelled()) {
-                        var reason =
-                            new CancellationError("late cancellation observer");
-                        promise._attachExtraTrace(reason);
-                        errorObj.e = reason;
-                        return errorObj;
-                    } else if (maybePromise.isPending()) {
-                        maybePromise._attachCancellationCallback(
-                            new FinallyHandlerCancelReaction(this));
-                    }
-                }
-                return maybePromise._then(
-                    succeed, fail, undefined, this, undefined);
-            }
-        }
-    }
-
-    if (promise.isRejected()) {
-        checkCancel(this);
-        errorObj.e = reasonOrValue;
-        return errorObj;
-    } else {
-        checkCancel(this);
-        return reasonOrValue;
-    }
-}
-
-Promise.prototype._passThrough = function(handler, type, success, fail) {
-    if (typeof handler !== "function") return this.then();
-    return this._then(success,
-                      fail,
-                      undefined,
-                      new PassThroughHandlerContext(this, type, handler),
-                      undefined);
-};
-
-Promise.prototype.lastly =
-Promise.prototype["finally"] = function (handler) {
-    return this._passThrough(handler,
-                             0,
-                             finallyHandler,
-                             finallyHandler);
-};
-
-
-Promise.prototype.tap = function (handler) {
-    return this._passThrough(handler, 1, finallyHandler);
-};
-
-Promise.prototype.tapCatch = function (handlerOrPredicate) {
-    var len = arguments.length;
-    if(len === 1) {
-        return this._passThrough(handlerOrPredicate,
-                                 1,
-                                 undefined,
-                                 finallyHandler);
-    } else {
-         var catchInstances = new Array(len - 1),
-            j = 0, i;
-        for (i = 0; i < len - 1; ++i) {
-            var item = arguments[i];
-            if (util.isObject(item)) {
-                catchInstances[j++] = item;
-            } else {
-                return Promise.reject(new TypeError(
-                    "tapCatch statement predicate: "
-                    + "expecting an object but got " + util.classString(item)
-                ));
-            }
-        }
-        catchInstances.length = j;
-        var handler = arguments[i];
-        return this._passThrough(catchFilter(catchInstances, handler, this),
-                                 1,
-                                 undefined,
-                                 finallyHandler);
-    }
-
-};
-
-return PassThroughHandlerContext;
-};
-
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(NEXT_FILTER) {
-var util = __webpack_require__(5);
-var getKeys = __webpack_require__(6).keys;
-var tryCatch = util.tryCatch;
-var errorObj = util.errorObj;
-
-function catchFilter(instances, cb, promise) {
-    return function(e) {
-        var boundTo = promise._boundValue();
-        predicateLoop: for (var i = 0; i < instances.length; ++i) {
-            var item = instances[i];
-
-            if (item === Error ||
-                (item != null && item.prototype instanceof Error)) {
-                if (e instanceof item) {
-                    return tryCatch(cb).call(boundTo, e);
-                }
-            } else if (typeof item === "function") {
-                var matchesPredicate = tryCatch(item).call(boundTo, e);
-                if (matchesPredicate === errorObj) {
-                    return matchesPredicate;
-                } else if (matchesPredicate) {
-                    return tryCatch(cb).call(boundTo, e);
-                }
-            } else if (util.isObject(e)) {
-                var keys = getKeys(item);
-                for (var j = 0; j < keys.length; ++j) {
-                    var key = keys[j];
-                    if (item[key] != e[key]) {
-                        continue predicateLoop;
-                    }
-                }
-                return tryCatch(cb).call(boundTo, e);
-            }
-        }
-        return NEXT_FILTER;
-    };
-}
-
-return catchFilter;
-};
-
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var util = __webpack_require__(5);
-var maybeWrapAsError = util.maybeWrapAsError;
-var errors = __webpack_require__(10);
-var OperationalError = errors.OperationalError;
-var es5 = __webpack_require__(6);
-
-function isUntypedError(obj) {
-    return obj instanceof Error &&
-        es5.getPrototypeOf(obj) === Error.prototype;
-}
-
-var rErrorKey = /^(?:name|message|stack|cause)$/;
-function wrapAsOperationalError(obj) {
-    var ret;
-    if (isUntypedError(obj)) {
-        ret = new OperationalError(obj);
-        ret.name = obj.name;
-        ret.message = obj.message;
-        ret.stack = obj.stack;
-        var keys = es5.keys(obj);
-        for (var i = 0; i < keys.length; ++i) {
-            var key = keys[i];
-            if (!rErrorKey.test(key)) {
-                ret[key] = obj[key];
-            }
-        }
-        return ret;
-    }
-    util.markAsOriginatingFromRejection(obj);
-    return obj;
-}
-
-function nodebackForPromise(promise, multiArgs) {
-    return function(err, value) {
-        if (promise === null) return;
-        if (err) {
-            var wrapped = wrapAsOperationalError(maybeWrapAsError(err));
-            promise._attachExtraTrace(wrapped);
-            promise._reject(wrapped);
-        } else if (!multiArgs) {
-            promise._fulfill(value);
-        } else {
-            var $_len = arguments.length;var args = new Array(Math.max($_len - 1, 0)); for(var $_i = 1; $_i < $_len; ++$_i) {args[$_i - 1] = arguments[$_i];};
-            promise._fulfill(args);
-        }
-        promise = null;
-    };
-}
-
-module.exports = nodebackForPromise;
-
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports =
-function(Promise, INTERNAL, tryConvertToPromise, apiRejection, debug) {
-var util = __webpack_require__(5);
-var tryCatch = util.tryCatch;
-
-Promise.method = function (fn) {
-    if (typeof fn !== "function") {
-        throw new Promise.TypeError("expecting a function but got " + util.classString(fn));
-    }
-    return function () {
-        var ret = new Promise(INTERNAL);
-        ret._captureStackTrace();
-        ret._pushContext();
-        var value = tryCatch(fn).apply(this, arguments);
-        var promiseCreated = ret._popContext();
-        debug.checkForgottenReturns(
-            value, promiseCreated, "Promise.method", ret);
-        ret._resolveFromSyncValue(value);
-        return ret;
-    };
-};
-
-Promise.attempt = Promise["try"] = function (fn) {
-    if (typeof fn !== "function") {
-        return apiRejection("expecting a function but got " + util.classString(fn));
-    }
-    var ret = new Promise(INTERNAL);
-    ret._captureStackTrace();
-    ret._pushContext();
-    var value;
-    if (arguments.length > 1) {
-        debug.deprecated("calling Promise.try with more than 1 argument");
-        var arg = arguments[1];
-        var ctx = arguments[2];
-        value = util.isArray(arg) ? tryCatch(fn).apply(ctx, arg)
-                                  : tryCatch(fn).call(ctx, arg);
-    } else {
-        value = tryCatch(fn)();
-    }
-    var promiseCreated = ret._popContext();
-    debug.checkForgottenReturns(
-        value, promiseCreated, "Promise.try", ret);
-    ret._resolveFromSyncValue(value);
-    return ret;
-};
-
-Promise.prototype._resolveFromSyncValue = function (value) {
-    if (value === util.errorObj) {
-        this._rejectCallback(value.e, false);
-    } else {
-        this._resolveCallback(value, true);
-    }
-};
-};
-
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise, INTERNAL, tryConvertToPromise, debug) {
-var calledBind = false;
-var rejectThis = function(_, e) {
-    this._reject(e);
-};
-
-var targetRejected = function(e, context) {
-    context.promiseRejectionQueued = true;
-    context.bindingPromise._then(rejectThis, rejectThis, null, this, e);
-};
-
-var bindingResolved = function(thisArg, context) {
-    if (((this._bitField & 50397184) === 0)) {
-        this._resolveCallback(context.target);
-    }
-};
-
-var bindingRejected = function(e, context) {
-    if (!context.promiseRejectionQueued) this._reject(e);
-};
-
-Promise.prototype.bind = function (thisArg) {
-    if (!calledBind) {
-        calledBind = true;
-        Promise.prototype._propagateFrom = debug.propagateFromFunction();
-        Promise.prototype._boundValue = debug.boundValueFunction();
-    }
-    var maybePromise = tryConvertToPromise(thisArg);
-    var ret = new Promise(INTERNAL);
-    ret._propagateFrom(this, 1);
-    var target = this._target();
-    ret._setBoundTo(maybePromise);
-    if (maybePromise instanceof Promise) {
-        var context = {
-            promiseRejectionQueued: false,
-            promise: ret,
-            target: target,
-            bindingPromise: maybePromise
-        };
-        target._then(INTERNAL, targetRejected, undefined, ret, context);
-        maybePromise._then(
-            bindingResolved, bindingRejected, undefined, ret, context);
-        ret._setOnCancel(maybePromise);
-    } else {
-        ret._resolveCallback(target);
-    }
-    return ret;
-};
-
-Promise.prototype._setBoundTo = function (obj) {
-    if (obj !== undefined) {
-        this._bitField = this._bitField | 2097152;
-        this._boundTo = obj;
-    } else {
-        this._bitField = this._bitField & (~2097152);
-    }
-};
-
-Promise.prototype._isBound = function () {
-    return (this._bitField & 2097152) === 2097152;
-};
-
-Promise.bind = function (thisArg, value) {
-    return Promise.resolve(value).bind(thisArg);
-};
-};
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise, PromiseArray, apiRejection, debug) {
-var util = __webpack_require__(5);
-var tryCatch = util.tryCatch;
-var errorObj = util.errorObj;
-var async = Promise._async;
-
-Promise.prototype["break"] = Promise.prototype.cancel = function() {
-    if (!debug.cancellation()) return this._warn("cancellation is disabled");
-
-    var promise = this;
-    var child = promise;
-    while (promise._isCancellable()) {
-        if (!promise._cancelBy(child)) {
-            if (child._isFollowing()) {
-                child._followee().cancel();
-            } else {
-                child._cancelBranched();
-            }
-            break;
-        }
-
-        var parent = promise._cancellationParent;
-        if (parent == null || !parent._isCancellable()) {
-            if (promise._isFollowing()) {
-                promise._followee().cancel();
-            } else {
-                promise._cancelBranched();
-            }
-            break;
-        } else {
-            if (promise._isFollowing()) promise._followee().cancel();
-            promise._setWillBeCancelled();
-            child = promise;
-            promise = parent;
-        }
-    }
-};
-
-Promise.prototype._branchHasCancelled = function() {
-    this._branchesRemainingToCancel--;
-};
-
-Promise.prototype._enoughBranchesHaveCancelled = function() {
-    return this._branchesRemainingToCancel === undefined ||
-           this._branchesRemainingToCancel <= 0;
-};
-
-Promise.prototype._cancelBy = function(canceller) {
-    if (canceller === this) {
-        this._branchesRemainingToCancel = 0;
-        this._invokeOnCancel();
-        return true;
-    } else {
-        this._branchHasCancelled();
-        if (this._enoughBranchesHaveCancelled()) {
-            this._invokeOnCancel();
-            return true;
-        }
-    }
-    return false;
-};
-
-Promise.prototype._cancelBranched = function() {
-    if (this._enoughBranchesHaveCancelled()) {
-        this._cancel();
-    }
-};
-
-Promise.prototype._cancel = function() {
-    if (!this._isCancellable()) return;
-    this._setCancelled();
-    async.invoke(this._cancelPromises, this, undefined);
-};
-
-Promise.prototype._cancelPromises = function() {
-    if (this._length() > 0) this._settlePromises();
-};
-
-Promise.prototype._unsetOnCancel = function() {
-    this._onCancelField = undefined;
-};
-
-Promise.prototype._isCancellable = function() {
-    return this.isPending() && !this._isCancelled();
-};
-
-Promise.prototype.isCancellable = function() {
-    return this.isPending() && !this.isCancelled();
-};
-
-Promise.prototype._doInvokeOnCancel = function(onCancelCallback, internalOnly) {
-    if (util.isArray(onCancelCallback)) {
-        for (var i = 0; i < onCancelCallback.length; ++i) {
-            this._doInvokeOnCancel(onCancelCallback[i], internalOnly);
-        }
-    } else if (onCancelCallback !== undefined) {
-        if (typeof onCancelCallback === "function") {
-            if (!internalOnly) {
-                var e = tryCatch(onCancelCallback).call(this._boundValue());
-                if (e === errorObj) {
-                    this._attachExtraTrace(e.e);
-                    async.throwLater(e.e);
-                }
-            }
-        } else {
-            onCancelCallback._resultCancelled(this);
-        }
-    }
-};
-
-Promise.prototype._invokeOnCancel = function() {
-    var onCancelCallback = this._onCancel();
-    this._unsetOnCancel();
-    async.invoke(this._doInvokeOnCancel, this, onCancelCallback);
-};
-
-Promise.prototype._invokeInternalOnCancel = function() {
-    if (this._isCancellable()) {
-        this._doInvokeOnCancel(this._onCancel(), true);
-        this._unsetOnCancel();
-    }
-};
-
-Promise.prototype._resultCancelled = function() {
-    this.cancel();
-};
-
-};
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise) {
-function returner() {
-    return this.value;
-}
-function thrower() {
-    throw this.reason;
-}
-
-Promise.prototype["return"] =
-Promise.prototype.thenReturn = function (value) {
-    if (value instanceof Promise) value.suppressUnhandledRejections();
-    return this._then(
-        returner, undefined, undefined, {value: value}, undefined);
-};
-
-Promise.prototype["throw"] =
-Promise.prototype.thenThrow = function (reason) {
-    return this._then(
-        thrower, undefined, undefined, {reason: reason}, undefined);
-};
-
-Promise.prototype.catchThrow = function (reason) {
-    if (arguments.length <= 1) {
-        return this._then(
-            undefined, thrower, undefined, {reason: reason}, undefined);
-    } else {
-        var _reason = arguments[1];
-        var handler = function() {throw _reason;};
-        return this.caught(reason, handler);
-    }
-};
-
-Promise.prototype.catchReturn = function (value) {
-    if (arguments.length <= 1) {
-        if (value instanceof Promise) value.suppressUnhandledRejections();
-        return this._then(
-            undefined, returner, undefined, {value: value}, undefined);
-    } else {
-        var _value = arguments[1];
-        if (_value instanceof Promise) _value.suppressUnhandledRejections();
-        var handler = function() {return _value;};
-        return this.caught(value, handler);
-    }
-};
-};
-
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise) {
-function PromiseInspection(promise) {
-    if (promise !== undefined) {
-        promise = promise._target();
-        this._bitField = promise._bitField;
-        this._settledValueField = promise._isFateSealed()
-            ? promise._settledValue() : undefined;
-    }
-    else {
-        this._bitField = 0;
-        this._settledValueField = undefined;
-    }
-}
-
-PromiseInspection.prototype._settledValue = function() {
-    return this._settledValueField;
-};
-
-var value = PromiseInspection.prototype.value = function () {
-    if (!this.isFulfilled()) {
-        throw new TypeError("cannot get fulfillment value of a non-fulfilled promise\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    }
-    return this._settledValue();
-};
-
-var reason = PromiseInspection.prototype.error =
-PromiseInspection.prototype.reason = function () {
-    if (!this.isRejected()) {
-        throw new TypeError("cannot get rejection reason of a non-rejected promise\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    }
-    return this._settledValue();
-};
-
-var isFulfilled = PromiseInspection.prototype.isFulfilled = function() {
-    return (this._bitField & 33554432) !== 0;
-};
-
-var isRejected = PromiseInspection.prototype.isRejected = function () {
-    return (this._bitField & 16777216) !== 0;
-};
-
-var isPending = PromiseInspection.prototype.isPending = function () {
-    return (this._bitField & 50397184) === 0;
-};
-
-var isResolved = PromiseInspection.prototype.isResolved = function () {
-    return (this._bitField & 50331648) !== 0;
-};
-
-PromiseInspection.prototype.isCancelled = function() {
-    return (this._bitField & 8454144) !== 0;
-};
-
-Promise.prototype.__isCancelled = function() {
-    return (this._bitField & 65536) === 65536;
-};
-
-Promise.prototype._isCancelled = function() {
-    return this._target().__isCancelled();
-};
-
-Promise.prototype.isCancelled = function() {
-    return (this._target()._bitField & 8454144) !== 0;
-};
-
-Promise.prototype.isPending = function() {
-    return isPending.call(this._target());
-};
-
-Promise.prototype.isRejected = function() {
-    return isRejected.call(this._target());
-};
-
-Promise.prototype.isFulfilled = function() {
-    return isFulfilled.call(this._target());
-};
-
-Promise.prototype.isResolved = function() {
-    return isResolved.call(this._target());
-};
-
-Promise.prototype.value = function() {
-    return value.call(this._target());
-};
-
-Promise.prototype.reason = function() {
-    var target = this._target();
-    target._unsetRejectionIsUnhandled();
-    return reason.call(target);
-};
-
-Promise.prototype._value = function() {
-    return this._settledValue();
-};
-
-Promise.prototype._reason = function() {
-    this._unsetRejectionIsUnhandled();
-    return this._settledValue();
-};
-
-Promise.PromiseInspection = PromiseInspection;
-};
-
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports =
-function(Promise, PromiseArray, tryConvertToPromise, INTERNAL, async,
-         getDomain) {
-var util = __webpack_require__(5);
-var canEvaluate = util.canEvaluate;
-var tryCatch = util.tryCatch;
-var errorObj = util.errorObj;
-var reject;
-
-if (true) {
-if (canEvaluate) {
-    var thenCallback = function(i) {
-        return new Function("value", "holder", "                             \n\
-            'use strict';                                                    \n\
-            holder.pIndex = value;                                           \n\
-            holder.checkFulfillment(this);                                   \n\
-            ".replace(/Index/g, i));
-    };
-
-    var promiseSetter = function(i) {
-        return new Function("promise", "holder", "                           \n\
-            'use strict';                                                    \n\
-            holder.pIndex = promise;                                         \n\
-            ".replace(/Index/g, i));
-    };
-
-    var generateHolderClass = function(total) {
-        var props = new Array(total);
-        for (var i = 0; i < props.length; ++i) {
-            props[i] = "this.p" + (i+1);
-        }
-        var assignment = props.join(" = ") + " = null;";
-        var cancellationCode= "var promise;\n" + props.map(function(prop) {
-            return "                                                         \n\
-                promise = " + prop + ";                                      \n\
-                if (promise instanceof Promise) {                            \n\
-                    promise.cancel();                                        \n\
-                }                                                            \n\
-            ";
-        }).join("\n");
-        var passedArguments = props.join(", ");
-        var name = "Holder$" + total;
-
-
-        var code = "return function(tryCatch, errorObj, Promise, async) {    \n\
-            'use strict';                                                    \n\
-            function [TheName](fn) {                                         \n\
-                [TheProperties]                                              \n\
-                this.fn = fn;                                                \n\
-                this.asyncNeeded = true;                                     \n\
-                this.now = 0;                                                \n\
-            }                                                                \n\
-                                                                             \n\
-            [TheName].prototype._callFunction = function(promise) {          \n\
-                promise._pushContext();                                      \n\
-                var ret = tryCatch(this.fn)([ThePassedArguments]);           \n\
-                promise._popContext();                                       \n\
-                if (ret === errorObj) {                                      \n\
-                    promise._rejectCallback(ret.e, false);                   \n\
-                } else {                                                     \n\
-                    promise._resolveCallback(ret);                           \n\
-                }                                                            \n\
-            };                                                               \n\
-                                                                             \n\
-            [TheName].prototype.checkFulfillment = function(promise) {       \n\
-                var now = ++this.now;                                        \n\
-                if (now === [TheTotal]) {                                    \n\
-                    if (this.asyncNeeded) {                                  \n\
-                        async.invoke(this._callFunction, this, promise);     \n\
-                    } else {                                                 \n\
-                        this._callFunction(promise);                         \n\
-                    }                                                        \n\
-                                                                             \n\
-                }                                                            \n\
-            };                                                               \n\
-                                                                             \n\
-            [TheName].prototype._resultCancelled = function() {              \n\
-                [CancellationCode]                                           \n\
-            };                                                               \n\
-                                                                             \n\
-            return [TheName];                                                \n\
-        }(tryCatch, errorObj, Promise, async);                               \n\
-        ";
-
-        code = code.replace(/\[TheName\]/g, name)
-            .replace(/\[TheTotal\]/g, total)
-            .replace(/\[ThePassedArguments\]/g, passedArguments)
-            .replace(/\[TheProperties\]/g, assignment)
-            .replace(/\[CancellationCode\]/g, cancellationCode);
-
-        return new Function("tryCatch", "errorObj", "Promise", "async", code)
-                           (tryCatch, errorObj, Promise, async);
-    };
-
-    var holderClasses = [];
-    var thenCallbacks = [];
-    var promiseSetters = [];
-
-    for (var i = 0; i < 8; ++i) {
-        holderClasses.push(generateHolderClass(i + 1));
-        thenCallbacks.push(thenCallback(i + 1));
-        promiseSetters.push(promiseSetter(i + 1));
-    }
-
-    reject = function (reason) {
-        this._reject(reason);
-    };
-}}
-
-Promise.join = function () {
-    var last = arguments.length - 1;
-    var fn;
-    if (last > 0 && typeof arguments[last] === "function") {
-        fn = arguments[last];
-        if (true) {
-            if (last <= 8 && canEvaluate) {
-                var ret = new Promise(INTERNAL);
-                ret._captureStackTrace();
-                var HolderClass = holderClasses[last - 1];
-                var holder = new HolderClass(fn);
-                var callbacks = thenCallbacks;
-
-                for (var i = 0; i < last; ++i) {
-                    var maybePromise = tryConvertToPromise(arguments[i], ret);
-                    if (maybePromise instanceof Promise) {
-                        maybePromise = maybePromise._target();
-                        var bitField = maybePromise._bitField;
-                        ;
-                        if (((bitField & 50397184) === 0)) {
-                            maybePromise._then(callbacks[i], reject,
-                                               undefined, ret, holder);
-                            promiseSetters[i](maybePromise, holder);
-                            holder.asyncNeeded = false;
-                        } else if (((bitField & 33554432) !== 0)) {
-                            callbacks[i].call(ret,
-                                              maybePromise._value(), holder);
-                        } else if (((bitField & 16777216) !== 0)) {
-                            ret._reject(maybePromise._reason());
-                        } else {
-                            ret._cancel();
-                        }
-                    } else {
-                        callbacks[i].call(ret, maybePromise, holder);
-                    }
-                }
-
-                if (!ret._isFateSealed()) {
-                    if (holder.asyncNeeded) {
-                        var domain = getDomain();
-                        if (domain !== null) {
-                            holder.fn = util.domainBind(domain, holder.fn);
-                        }
-                    }
-                    ret._setAsyncGuaranteed();
-                    ret._setOnCancel(holder);
-                }
-                return ret;
-            }
-        }
-    }
-    var $_len = arguments.length;var args = new Array($_len); for(var $_i = 0; $_i < $_len; ++$_i) {args[$_i] = arguments[$_i];};
-    if (fn) args.pop();
-    var ret = new PromiseArray(args).promise();
-    return fn !== undefined ? ret.spread(fn) : ret;
-};
-
-};
-
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise,
-                          PromiseArray,
-                          apiRejection,
-                          tryConvertToPromise,
-                          INTERNAL,
-                          debug) {
-var getDomain = Promise._getDomain;
-var util = __webpack_require__(5);
-var tryCatch = util.tryCatch;
-var errorObj = util.errorObj;
-var async = Promise._async;
-
-function MappingPromiseArray(promises, fn, limit, _filter) {
-    this.constructor$(promises);
-    this._promise._captureStackTrace();
-    var domain = getDomain();
-    this._callback = domain === null ? fn : util.domainBind(domain, fn);
-    this._preservedValues = _filter === INTERNAL
-        ? new Array(this.length())
-        : null;
-    this._limit = limit;
-    this._inFlight = 0;
-    this._queue = [];
-    async.invoke(this._asyncInit, this, undefined);
-}
-util.inherits(MappingPromiseArray, PromiseArray);
-
-MappingPromiseArray.prototype._asyncInit = function() {
-    this._init$(undefined, -2);
-};
-
-MappingPromiseArray.prototype._init = function () {};
-
-MappingPromiseArray.prototype._promiseFulfilled = function (value, index) {
-    var values = this._values;
-    var length = this.length();
-    var preservedValues = this._preservedValues;
-    var limit = this._limit;
-
-    if (index < 0) {
-        index = (index * -1) - 1;
-        values[index] = value;
-        if (limit >= 1) {
-            this._inFlight--;
-            this._drainQueue();
-            if (this._isResolved()) return true;
-        }
-    } else {
-        if (limit >= 1 && this._inFlight >= limit) {
-            values[index] = value;
-            this._queue.push(index);
-            return false;
-        }
-        if (preservedValues !== null) preservedValues[index] = value;
-
-        var promise = this._promise;
-        var callback = this._callback;
-        var receiver = promise._boundValue();
-        promise._pushContext();
-        var ret = tryCatch(callback).call(receiver, value, index, length);
-        var promiseCreated = promise._popContext();
-        debug.checkForgottenReturns(
-            ret,
-            promiseCreated,
-            preservedValues !== null ? "Promise.filter" : "Promise.map",
-            promise
-        );
-        if (ret === errorObj) {
-            this._reject(ret.e);
-            return true;
-        }
-
-        var maybePromise = tryConvertToPromise(ret, this._promise);
-        if (maybePromise instanceof Promise) {
-            maybePromise = maybePromise._target();
-            var bitField = maybePromise._bitField;
-            ;
-            if (((bitField & 50397184) === 0)) {
-                if (limit >= 1) this._inFlight++;
-                values[index] = maybePromise;
-                maybePromise._proxy(this, (index + 1) * -1);
-                return false;
-            } else if (((bitField & 33554432) !== 0)) {
-                ret = maybePromise._value();
-            } else if (((bitField & 16777216) !== 0)) {
-                this._reject(maybePromise._reason());
-                return true;
-            } else {
-                this._cancel();
-                return true;
-            }
-        }
-        values[index] = ret;
-    }
-    var totalResolved = ++this._totalResolved;
-    if (totalResolved >= length) {
-        if (preservedValues !== null) {
-            this._filter(values, preservedValues);
-        } else {
-            this._resolve(values);
-        }
-        return true;
-    }
-    return false;
-};
-
-MappingPromiseArray.prototype._drainQueue = function () {
-    var queue = this._queue;
-    var limit = this._limit;
-    var values = this._values;
-    while (queue.length > 0 && this._inFlight < limit) {
-        if (this._isResolved()) return;
-        var index = queue.pop();
-        this._promiseFulfilled(values[index], index);
-    }
-};
-
-MappingPromiseArray.prototype._filter = function (booleans, values) {
-    var len = values.length;
-    var ret = new Array(len);
-    var j = 0;
-    for (var i = 0; i < len; ++i) {
-        if (booleans[i]) ret[j++] = values[i];
-    }
-    ret.length = j;
-    this._resolve(ret);
-};
-
-MappingPromiseArray.prototype.preservedValues = function () {
-    return this._preservedValues;
-};
-
-function map(promises, fn, options, _filter) {
-    if (typeof fn !== "function") {
-        return apiRejection("expecting a function but got " + util.classString(fn));
-    }
-
-    var limit = 0;
-    if (options !== undefined) {
-        if (typeof options === "object" && options !== null) {
-            if (typeof options.concurrency !== "number") {
-                return Promise.reject(
-                    new TypeError("'concurrency' must be a number but it is " +
-                                    util.classString(options.concurrency)));
-            }
-            limit = options.concurrency;
-        } else {
-            return Promise.reject(new TypeError(
-                            "options argument must be an object but it is " +
-                             util.classString(options)));
-        }
-    }
-    limit = typeof limit === "number" &&
-        isFinite(limit) && limit >= 1 ? limit : 0;
-    return new MappingPromiseArray(promises, fn, limit, _filter).promise();
-}
-
-Promise.prototype.map = function (fn, options) {
-    return map(this, fn, options, null);
-};
-
-Promise.map = function (promises, fn, options, _filter) {
-    return map(promises, fn, options, _filter);
-};
-
-
-};
-
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var cr = Object.create;
-if (cr) {
-    var callerCache = cr(null);
-    var getterCache = cr(null);
-    callerCache[" size"] = getterCache[" size"] = 0;
-}
-
-module.exports = function(Promise) {
-var util = __webpack_require__(5);
-var canEvaluate = util.canEvaluate;
-var isIdentifier = util.isIdentifier;
-
-var getMethodCaller;
-var getGetter;
-if (true) {
-var makeMethodCaller = function (methodName) {
-    return new Function("ensureMethod", "                                    \n\
-        return function(obj) {                                               \n\
-            'use strict'                                                     \n\
-            var len = this.length;                                           \n\
-            ensureMethod(obj, 'methodName');                                 \n\
-            switch(len) {                                                    \n\
-                case 1: return obj.methodName(this[0]);                      \n\
-                case 2: return obj.methodName(this[0], this[1]);             \n\
-                case 3: return obj.methodName(this[0], this[1], this[2]);    \n\
-                case 0: return obj.methodName();                             \n\
-                default:                                                     \n\
-                    return obj.methodName.apply(obj, this);                  \n\
-            }                                                                \n\
-        };                                                                   \n\
-        ".replace(/methodName/g, methodName))(ensureMethod);
-};
-
-var makeGetter = function (propertyName) {
-    return new Function("obj", "                                             \n\
-        'use strict';                                                        \n\
-        return obj.propertyName;                                             \n\
-        ".replace("propertyName", propertyName));
-};
-
-var getCompiled = function(name, compiler, cache) {
-    var ret = cache[name];
-    if (typeof ret !== "function") {
-        if (!isIdentifier(name)) {
-            return null;
-        }
-        ret = compiler(name);
-        cache[name] = ret;
-        cache[" size"]++;
-        if (cache[" size"] > 512) {
-            var keys = Object.keys(cache);
-            for (var i = 0; i < 256; ++i) delete cache[keys[i]];
-            cache[" size"] = keys.length - 256;
-        }
-    }
-    return ret;
-};
-
-getMethodCaller = function(name) {
-    return getCompiled(name, makeMethodCaller, callerCache);
-};
-
-getGetter = function(name) {
-    return getCompiled(name, makeGetter, getterCache);
-};
-}
-
-function ensureMethod(obj, methodName) {
-    var fn;
-    if (obj != null) fn = obj[methodName];
-    if (typeof fn !== "function") {
-        var message = "Object " + util.classString(obj) + " has no method '" +
-            util.toString(methodName) + "'";
-        throw new Promise.TypeError(message);
-    }
-    return fn;
-}
-
-function caller(obj) {
-    var methodName = this.pop();
-    var fn = ensureMethod(obj, methodName);
-    return fn.apply(obj, this);
-}
-Promise.prototype.call = function (methodName) {
-    var $_len = arguments.length;var args = new Array(Math.max($_len - 1, 0)); for(var $_i = 1; $_i < $_len; ++$_i) {args[$_i - 1] = arguments[$_i];};
-    if (true) {
-        if (canEvaluate) {
-            var maybeCaller = getMethodCaller(methodName);
-            if (maybeCaller !== null) {
-                return this._then(
-                    maybeCaller, undefined, undefined, args, undefined);
-            }
-        }
-    }
-    args.push(methodName);
-    return this._then(caller, undefined, undefined, args, undefined);
-};
-
-function namedGetter(obj) {
-    return obj[this];
-}
-function indexedGetter(obj) {
-    var index = +this;
-    if (index < 0) index = Math.max(0, index + obj.length);
-    return obj[index];
-}
-Promise.prototype.get = function (propertyName) {
-    var isIndex = (typeof propertyName === "number");
-    var getter;
-    if (!isIndex) {
-        if (canEvaluate) {
-            var maybeGetter = getGetter(propertyName);
-            getter = maybeGetter !== null ? maybeGetter : namedGetter;
-        } else {
-            getter = namedGetter;
-        }
-    } else {
-        getter = indexedGetter;
-    }
-    return this._then(getter, undefined, undefined, propertyName, undefined);
-};
-};
-
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function (Promise, apiRejection, tryConvertToPromise,
-    createContext, INTERNAL, debug) {
-    var util = __webpack_require__(5);
-    var TypeError = __webpack_require__(10).TypeError;
-    var inherits = __webpack_require__(5).inherits;
-    var errorObj = util.errorObj;
-    var tryCatch = util.tryCatch;
-    var NULL = {};
-
-    function thrower(e) {
-        setTimeout(function(){throw e;}, 0);
-    }
-
-    function castPreservingDisposable(thenable) {
-        var maybePromise = tryConvertToPromise(thenable);
-        if (maybePromise !== thenable &&
-            typeof thenable._isDisposable === "function" &&
-            typeof thenable._getDisposer === "function" &&
-            thenable._isDisposable()) {
-            maybePromise._setDisposable(thenable._getDisposer());
-        }
-        return maybePromise;
-    }
-    function dispose(resources, inspection) {
-        var i = 0;
-        var len = resources.length;
-        var ret = new Promise(INTERNAL);
-        function iterator() {
-            if (i >= len) return ret._fulfill();
-            var maybePromise = castPreservingDisposable(resources[i++]);
-            if (maybePromise instanceof Promise &&
-                maybePromise._isDisposable()) {
-                try {
-                    maybePromise = tryConvertToPromise(
-                        maybePromise._getDisposer().tryDispose(inspection),
-                        resources.promise);
-                } catch (e) {
-                    return thrower(e);
-                }
-                if (maybePromise instanceof Promise) {
-                    return maybePromise._then(iterator, thrower,
-                                              null, null, null);
-                }
-            }
-            iterator();
-        }
-        iterator();
-        return ret;
-    }
-
-    function Disposer(data, promise, context) {
-        this._data = data;
-        this._promise = promise;
-        this._context = context;
-    }
-
-    Disposer.prototype.data = function () {
-        return this._data;
-    };
-
-    Disposer.prototype.promise = function () {
-        return this._promise;
-    };
-
-    Disposer.prototype.resource = function () {
-        if (this.promise().isFulfilled()) {
-            return this.promise().value();
-        }
-        return NULL;
-    };
-
-    Disposer.prototype.tryDispose = function(inspection) {
-        var resource = this.resource();
-        var context = this._context;
-        if (context !== undefined) context._pushContext();
-        var ret = resource !== NULL
-            ? this.doDispose(resource, inspection) : null;
-        if (context !== undefined) context._popContext();
-        this._promise._unsetDisposable();
-        this._data = null;
-        return ret;
-    };
-
-    Disposer.isDisposer = function (d) {
-        return (d != null &&
-                typeof d.resource === "function" &&
-                typeof d.tryDispose === "function");
-    };
-
-    function FunctionDisposer(fn, promise, context) {
-        this.constructor$(fn, promise, context);
-    }
-    inherits(FunctionDisposer, Disposer);
-
-    FunctionDisposer.prototype.doDispose = function (resource, inspection) {
-        var fn = this.data();
-        return fn.call(resource, resource, inspection);
-    };
-
-    function maybeUnwrapDisposer(value) {
-        if (Disposer.isDisposer(value)) {
-            this.resources[this.index]._setDisposable(value);
-            return value.promise();
-        }
-        return value;
-    }
-
-    function ResourceList(length) {
-        this.length = length;
-        this.promise = null;
-        this[length-1] = null;
-    }
-
-    ResourceList.prototype._resultCancelled = function() {
-        var len = this.length;
-        for (var i = 0; i < len; ++i) {
-            var item = this[i];
-            if (item instanceof Promise) {
-                item.cancel();
-            }
-        }
-    };
-
-    Promise.using = function () {
-        var len = arguments.length;
-        if (len < 2) return apiRejection(
-                        "you must pass at least 2 arguments to Promise.using");
-        var fn = arguments[len - 1];
-        if (typeof fn !== "function") {
-            return apiRejection("expecting a function but got " + util.classString(fn));
-        }
-        var input;
-        var spreadArgs = true;
-        if (len === 2 && Array.isArray(arguments[0])) {
-            input = arguments[0];
-            len = input.length;
-            spreadArgs = false;
-        } else {
-            input = arguments;
-            len--;
-        }
-        var resources = new ResourceList(len);
-        for (var i = 0; i < len; ++i) {
-            var resource = input[i];
-            if (Disposer.isDisposer(resource)) {
-                var disposer = resource;
-                resource = resource.promise();
-                resource._setDisposable(disposer);
-            } else {
-                var maybePromise = tryConvertToPromise(resource);
-                if (maybePromise instanceof Promise) {
-                    resource =
-                        maybePromise._then(maybeUnwrapDisposer, null, null, {
-                            resources: resources,
-                            index: i
-                    }, undefined);
-                }
-            }
-            resources[i] = resource;
-        }
-
-        var reflectedResources = new Array(resources.length);
-        for (var i = 0; i < reflectedResources.length; ++i) {
-            reflectedResources[i] = Promise.resolve(resources[i]).reflect();
-        }
-
-        var resultPromise = Promise.all(reflectedResources)
-            .then(function(inspections) {
-                for (var i = 0; i < inspections.length; ++i) {
-                    var inspection = inspections[i];
-                    if (inspection.isRejected()) {
-                        errorObj.e = inspection.error();
-                        return errorObj;
-                    } else if (!inspection.isFulfilled()) {
-                        resultPromise.cancel();
-                        return;
-                    }
-                    inspections[i] = inspection.value();
-                }
-                promise._pushContext();
-
-                fn = tryCatch(fn);
-                var ret = spreadArgs
-                    ? fn.apply(undefined, inspections) : fn(inspections);
-                var promiseCreated = promise._popContext();
-                debug.checkForgottenReturns(
-                    ret, promiseCreated, "Promise.using", promise);
-                return ret;
-            });
-
-        var promise = resultPromise.lastly(function() {
-            var inspection = new Promise.PromiseInspection(resultPromise);
-            return dispose(resources, inspection);
-        });
-        resources.promise = promise;
-        promise._setOnCancel(resources);
-        return promise;
-    };
-
-    Promise.prototype._setDisposable = function (disposer) {
-        this._bitField = this._bitField | 131072;
-        this._disposer = disposer;
-    };
-
-    Promise.prototype._isDisposable = function () {
-        return (this._bitField & 131072) > 0;
-    };
-
-    Promise.prototype._getDisposer = function () {
-        return this._disposer;
-    };
-
-    Promise.prototype._unsetDisposable = function () {
-        this._bitField = this._bitField & (~131072);
-        this._disposer = undefined;
-    };
-
-    Promise.prototype.disposer = function (fn) {
-        if (typeof fn === "function") {
-            return new FunctionDisposer(fn, this, createContext());
-        }
-        throw new TypeError();
-    };
-
-};
-
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise, INTERNAL, debug) {
-var util = __webpack_require__(5);
-var TimeoutError = Promise.TimeoutError;
-
-function HandleWrapper(handle)  {
-    this.handle = handle;
-}
-
-HandleWrapper.prototype._resultCancelled = function() {
-    clearTimeout(this.handle);
-};
-
-var afterValue = function(value) { return delay(+this).thenReturn(value); };
-var delay = Promise.delay = function (ms, value) {
-    var ret;
-    var handle;
-    if (value !== undefined) {
-        ret = Promise.resolve(value)
-                ._then(afterValue, null, null, ms, undefined);
-        if (debug.cancellation() && value instanceof Promise) {
-            ret._setOnCancel(value);
-        }
-    } else {
-        ret = new Promise(INTERNAL);
-        handle = setTimeout(function() { ret._fulfill(); }, +ms);
-        if (debug.cancellation()) {
-            ret._setOnCancel(new HandleWrapper(handle));
-        }
-        ret._captureStackTrace();
-    }
-    ret._setAsyncGuaranteed();
-    return ret;
-};
-
-Promise.prototype.delay = function (ms) {
-    return delay(ms, this);
-};
-
-var afterTimeout = function (promise, message, parent) {
-    var err;
-    if (typeof message !== "string") {
-        if (message instanceof Error) {
-            err = message;
-        } else {
-            err = new TimeoutError("operation timed out");
-        }
-    } else {
-        err = new TimeoutError(message);
-    }
-    util.markAsOriginatingFromRejection(err);
-    promise._attachExtraTrace(err);
-    promise._reject(err);
-
-    if (parent != null) {
-        parent.cancel();
-    }
-};
-
-function successClear(value) {
-    clearTimeout(this.handle);
-    return value;
-}
-
-function failureClear(reason) {
-    clearTimeout(this.handle);
-    throw reason;
-}
-
-Promise.prototype.timeout = function (ms, message) {
-    ms = +ms;
-    var ret, parent;
-
-    var handleWrapper = new HandleWrapper(setTimeout(function timeoutTimeout() {
-        if (ret.isPending()) {
-            afterTimeout(ret, message, parent);
-        }
-    }, ms));
-
-    if (debug.cancellation()) {
-        parent = this.then();
-        ret = parent._then(successClear, failureClear,
-                            undefined, handleWrapper, undefined);
-        ret._setOnCancel(handleWrapper);
-    } else {
-        ret = this._then(successClear, failureClear,
-                            undefined, handleWrapper, undefined);
-    }
-
-    return ret;
-};
-
-};
-
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise,
-                          apiRejection,
-                          INTERNAL,
-                          tryConvertToPromise,
-                          Proxyable,
-                          debug) {
-var errors = __webpack_require__(10);
-var TypeError = errors.TypeError;
-var util = __webpack_require__(5);
-var errorObj = util.errorObj;
-var tryCatch = util.tryCatch;
-var yieldHandlers = [];
-
-function promiseFromYieldHandler(value, yieldHandlers, traceParent) {
-    for (var i = 0; i < yieldHandlers.length; ++i) {
-        traceParent._pushContext();
-        var result = tryCatch(yieldHandlers[i])(value);
-        traceParent._popContext();
-        if (result === errorObj) {
-            traceParent._pushContext();
-            var ret = Promise.reject(errorObj.e);
-            traceParent._popContext();
-            return ret;
-        }
-        var maybePromise = tryConvertToPromise(result, traceParent);
-        if (maybePromise instanceof Promise) return maybePromise;
-    }
-    return null;
-}
-
-function PromiseSpawn(generatorFunction, receiver, yieldHandler, stack) {
-    if (debug.cancellation()) {
-        var internal = new Promise(INTERNAL);
-        var _finallyPromise = this._finallyPromise = new Promise(INTERNAL);
-        this._promise = internal.lastly(function() {
-            return _finallyPromise;
-        });
-        internal._captureStackTrace();
-        internal._setOnCancel(this);
-    } else {
-        var promise = this._promise = new Promise(INTERNAL);
-        promise._captureStackTrace();
-    }
-    this._stack = stack;
-    this._generatorFunction = generatorFunction;
-    this._receiver = receiver;
-    this._generator = undefined;
-    this._yieldHandlers = typeof yieldHandler === "function"
-        ? [yieldHandler].concat(yieldHandlers)
-        : yieldHandlers;
-    this._yieldedPromise = null;
-    this._cancellationPhase = false;
-}
-util.inherits(PromiseSpawn, Proxyable);
-
-PromiseSpawn.prototype._isResolved = function() {
-    return this._promise === null;
-};
-
-PromiseSpawn.prototype._cleanup = function() {
-    this._promise = this._generator = null;
-    if (debug.cancellation() && this._finallyPromise !== null) {
-        this._finallyPromise._fulfill();
-        this._finallyPromise = null;
-    }
-};
-
-PromiseSpawn.prototype._promiseCancelled = function() {
-    if (this._isResolved()) return;
-    var implementsReturn = typeof this._generator["return"] !== "undefined";
-
-    var result;
-    if (!implementsReturn) {
-        var reason = new Promise.CancellationError(
-            "generator .return() sentinel");
-        Promise.coroutine.returnSentinel = reason;
-        this._promise._attachExtraTrace(reason);
-        this._promise._pushContext();
-        result = tryCatch(this._generator["throw"]).call(this._generator,
-                                                         reason);
-        this._promise._popContext();
-    } else {
-        this._promise._pushContext();
-        result = tryCatch(this._generator["return"]).call(this._generator,
-                                                          undefined);
-        this._promise._popContext();
-    }
-    this._cancellationPhase = true;
-    this._yieldedPromise = null;
-    this._continue(result);
-};
-
-PromiseSpawn.prototype._promiseFulfilled = function(value) {
-    this._yieldedPromise = null;
-    this._promise._pushContext();
-    var result = tryCatch(this._generator.next).call(this._generator, value);
-    this._promise._popContext();
-    this._continue(result);
-};
-
-PromiseSpawn.prototype._promiseRejected = function(reason) {
-    this._yieldedPromise = null;
-    this._promise._attachExtraTrace(reason);
-    this._promise._pushContext();
-    var result = tryCatch(this._generator["throw"])
-        .call(this._generator, reason);
-    this._promise._popContext();
-    this._continue(result);
-};
-
-PromiseSpawn.prototype._resultCancelled = function() {
-    if (this._yieldedPromise instanceof Promise) {
-        var promise = this._yieldedPromise;
-        this._yieldedPromise = null;
-        promise.cancel();
-    }
-};
-
-PromiseSpawn.prototype.promise = function () {
-    return this._promise;
-};
-
-PromiseSpawn.prototype._run = function () {
-    this._generator = this._generatorFunction.call(this._receiver);
-    this._receiver =
-        this._generatorFunction = undefined;
-    this._promiseFulfilled(undefined);
-};
-
-PromiseSpawn.prototype._continue = function (result) {
-    var promise = this._promise;
-    if (result === errorObj) {
-        this._cleanup();
-        if (this._cancellationPhase) {
-            return promise.cancel();
-        } else {
-            return promise._rejectCallback(result.e, false);
-        }
-    }
-
-    var value = result.value;
-    if (result.done === true) {
-        this._cleanup();
-        if (this._cancellationPhase) {
-            return promise.cancel();
-        } else {
-            return promise._resolveCallback(value);
-        }
-    } else {
-        var maybePromise = tryConvertToPromise(value, this._promise);
-        if (!(maybePromise instanceof Promise)) {
-            maybePromise =
-                promiseFromYieldHandler(maybePromise,
-                                        this._yieldHandlers,
-                                        this._promise);
-            if (maybePromise === null) {
-                this._promiseRejected(
-                    new TypeError(
-                        "A value %s was yielded that could not be treated as a promise\u000a\u000a    See http://goo.gl/MqrFmX\u000a\u000a".replace("%s", String(value)) +
-                        "From coroutine:\u000a" +
-                        this._stack.split("\n").slice(1, -7).join("\n")
-                    )
-                );
-                return;
-            }
-        }
-        maybePromise = maybePromise._target();
-        var bitField = maybePromise._bitField;
-        ;
-        if (((bitField & 50397184) === 0)) {
-            this._yieldedPromise = maybePromise;
-            maybePromise._proxy(this, null);
-        } else if (((bitField & 33554432) !== 0)) {
-            Promise._async.invoke(
-                this._promiseFulfilled, this, maybePromise._value()
-            );
-        } else if (((bitField & 16777216) !== 0)) {
-            Promise._async.invoke(
-                this._promiseRejected, this, maybePromise._reason()
-            );
-        } else {
-            this._promiseCancelled();
-        }
-    }
-};
-
-Promise.coroutine = function (generatorFunction, options) {
-    if (typeof generatorFunction !== "function") {
-        throw new TypeError("generatorFunction must be a function\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    }
-    var yieldHandler = Object(options).yieldHandler;
-    var PromiseSpawn$ = PromiseSpawn;
-    var stack = new Error().stack;
-    return function () {
-        var generator = generatorFunction.apply(this, arguments);
-        var spawn = new PromiseSpawn$(undefined, undefined, yieldHandler,
-                                      stack);
-        var ret = spawn.promise();
-        spawn._generator = generator;
-        spawn._promiseFulfilled(undefined);
-        return ret;
-    };
-};
-
-Promise.coroutine.addYieldHandler = function(fn) {
-    if (typeof fn !== "function") {
-        throw new TypeError("expecting a function but got " + util.classString(fn));
-    }
-    yieldHandlers.push(fn);
-};
-
-Promise.spawn = function (generatorFunction) {
-    debug.deprecated("Promise.spawn()", "Promise.coroutine()");
-    if (typeof generatorFunction !== "function") {
-        return apiRejection("generatorFunction must be a function\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    }
-    var spawn = new PromiseSpawn(generatorFunction, this);
-    var ret = spawn.promise();
-    spawn._run(Promise.spawn);
-    return ret;
-};
-};
-
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise) {
-var util = __webpack_require__(5);
-var async = Promise._async;
-var tryCatch = util.tryCatch;
-var errorObj = util.errorObj;
-
-function spreadAdapter(val, nodeback) {
-    var promise = this;
-    if (!util.isArray(val)) return successAdapter.call(promise, val, nodeback);
-    var ret =
-        tryCatch(nodeback).apply(promise._boundValue(), [null].concat(val));
-    if (ret === errorObj) {
-        async.throwLater(ret.e);
-    }
-}
-
-function successAdapter(val, nodeback) {
-    var promise = this;
-    var receiver = promise._boundValue();
-    var ret = val === undefined
-        ? tryCatch(nodeback).call(receiver, null)
-        : tryCatch(nodeback).call(receiver, null, val);
-    if (ret === errorObj) {
-        async.throwLater(ret.e);
-    }
-}
-function errorAdapter(reason, nodeback) {
-    var promise = this;
-    if (!reason) {
-        var newReason = new Error(reason + "");
-        newReason.cause = reason;
-        reason = newReason;
-    }
-    var ret = tryCatch(nodeback).call(promise._boundValue(), reason);
-    if (ret === errorObj) {
-        async.throwLater(ret.e);
-    }
-}
-
-Promise.prototype.asCallback = Promise.prototype.nodeify = function (nodeback,
-                                                                     options) {
-    if (typeof nodeback == "function") {
-        var adapter = successAdapter;
-        if (options !== undefined && Object(options).spread) {
-            adapter = spreadAdapter;
-        }
-        this._then(
-            adapter,
-            errorAdapter,
-            undefined,
-            this,
-            nodeback
-        );
-    }
-    return this;
-};
-};
-
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise, INTERNAL) {
-var THIS = {};
-var util = __webpack_require__(5);
-var nodebackForPromise = __webpack_require__(17);
-var withAppended = util.withAppended;
-var maybeWrapAsError = util.maybeWrapAsError;
-var canEvaluate = util.canEvaluate;
-var TypeError = __webpack_require__(10).TypeError;
-var defaultSuffix = "Async";
-var defaultPromisified = {__isPromisified__: true};
-var noCopyProps = [
-    "arity",    "length",
-    "name",
-    "arguments",
-    "caller",
-    "callee",
-    "prototype",
-    "__isPromisified__"
-];
-var noCopyPropsPattern = new RegExp("^(?:" + noCopyProps.join("|") + ")$");
-
-var defaultFilter = function(name) {
-    return util.isIdentifier(name) &&
-        name.charAt(0) !== "_" &&
-        name !== "constructor";
-};
-
-function propsFilter(key) {
-    return !noCopyPropsPattern.test(key);
-}
-
-function isPromisified(fn) {
-    try {
-        return fn.__isPromisified__ === true;
-    }
-    catch (e) {
-        return false;
-    }
-}
-
-function hasPromisified(obj, key, suffix) {
-    var val = util.getDataPropertyOrDefault(obj, key + suffix,
-                                            defaultPromisified);
-    return val ? isPromisified(val) : false;
-}
-function checkValid(ret, suffix, suffixRegexp) {
-    for (var i = 0; i < ret.length; i += 2) {
-        var key = ret[i];
-        if (suffixRegexp.test(key)) {
-            var keyWithoutAsyncSuffix = key.replace(suffixRegexp, "");
-            for (var j = 0; j < ret.length; j += 2) {
-                if (ret[j] === keyWithoutAsyncSuffix) {
-                    throw new TypeError("Cannot promisify an API that has normal methods with '%s'-suffix\u000a\u000a    See http://goo.gl/MqrFmX\u000a"
-                        .replace("%s", suffix));
-                }
-            }
-        }
-    }
-}
-
-function promisifiableMethods(obj, suffix, suffixRegexp, filter) {
-    var keys = util.inheritedDataKeys(obj);
-    var ret = [];
-    for (var i = 0; i < keys.length; ++i) {
-        var key = keys[i];
-        var value = obj[key];
-        var passesDefaultFilter = filter === defaultFilter
-            ? true : defaultFilter(key, value, obj);
-        if (typeof value === "function" &&
-            !isPromisified(value) &&
-            !hasPromisified(obj, key, suffix) &&
-            filter(key, value, obj, passesDefaultFilter)) {
-            ret.push(key, value);
-        }
-    }
-    checkValid(ret, suffix, suffixRegexp);
-    return ret;
-}
-
-var escapeIdentRegex = function(str) {
-    return str.replace(/([$])/, "\\$");
-};
-
-var makeNodePromisifiedEval;
-if (true) {
-var switchCaseArgumentOrder = function(likelyArgumentCount) {
-    var ret = [likelyArgumentCount];
-    var min = Math.max(0, likelyArgumentCount - 1 - 3);
-    for(var i = likelyArgumentCount - 1; i >= min; --i) {
-        ret.push(i);
-    }
-    for(var i = likelyArgumentCount + 1; i <= 3; ++i) {
-        ret.push(i);
-    }
-    return ret;
-};
-
-var argumentSequence = function(argumentCount) {
-    return util.filledRange(argumentCount, "_arg", "");
-};
-
-var parameterDeclaration = function(parameterCount) {
-    return util.filledRange(
-        Math.max(parameterCount, 3), "_arg", "");
-};
-
-var parameterCount = function(fn) {
-    if (typeof fn.length === "number") {
-        return Math.max(Math.min(fn.length, 1023 + 1), 0);
-    }
-    return 0;
-};
-
-makeNodePromisifiedEval =
-function(callback, receiver, originalName, fn, _, multiArgs) {
-    var newParameterCount = Math.max(0, parameterCount(fn) - 1);
-    var argumentOrder = switchCaseArgumentOrder(newParameterCount);
-    var shouldProxyThis = typeof callback === "string" || receiver === THIS;
-
-    function generateCallForArgumentCount(count) {
-        var args = argumentSequence(count).join(", ");
-        var comma = count > 0 ? ", " : "";
-        var ret;
-        if (shouldProxyThis) {
-            ret = "ret = callback.call(this, {{args}}, nodeback); break;\n";
-        } else {
-            ret = receiver === undefined
-                ? "ret = callback({{args}}, nodeback); break;\n"
-                : "ret = callback.call(receiver, {{args}}, nodeback); break;\n";
-        }
-        return ret.replace("{{args}}", args).replace(", ", comma);
-    }
-
-    function generateArgumentSwitchCase() {
-        var ret = "";
-        for (var i = 0; i < argumentOrder.length; ++i) {
-            ret += "case " + argumentOrder[i] +":" +
-                generateCallForArgumentCount(argumentOrder[i]);
-        }
-
-        ret += "                                                             \n\
-        default:                                                             \n\
-            var args = new Array(len + 1);                                   \n\
-            var i = 0;                                                       \n\
-            for (var i = 0; i < len; ++i) {                                  \n\
-               args[i] = arguments[i];                                       \n\
-            }                                                                \n\
-            args[i] = nodeback;                                              \n\
-            [CodeForCall]                                                    \n\
-            break;                                                           \n\
-        ".replace("[CodeForCall]", (shouldProxyThis
-                                ? "ret = callback.apply(this, args);\n"
-                                : "ret = callback.apply(receiver, args);\n"));
-        return ret;
-    }
-
-    var getFunctionCode = typeof callback === "string"
-                                ? ("this != null ? this['"+callback+"'] : fn")
-                                : "fn";
-    var body = "'use strict';                                                \n\
-        var ret = function (Parameters) {                                    \n\
-            'use strict';                                                    \n\
-            var len = arguments.length;                                      \n\
-            var promise = new Promise(INTERNAL);                             \n\
-            promise._captureStackTrace();                                    \n\
-            var nodeback = nodebackForPromise(promise, " + multiArgs + ");   \n\
-            var ret;                                                         \n\
-            var callback = tryCatch([GetFunctionCode]);                      \n\
-            switch(len) {                                                    \n\
-                [CodeForSwitchCase]                                          \n\
-            }                                                                \n\
-            if (ret === errorObj) {                                          \n\
-                promise._rejectCallback(maybeWrapAsError(ret.e), true, true);\n\
-            }                                                                \n\
-            if (!promise._isFateSealed()) promise._setAsyncGuaranteed();     \n\
-            return promise;                                                  \n\
-        };                                                                   \n\
-        notEnumerableProp(ret, '__isPromisified__', true);                   \n\
-        return ret;                                                          \n\
-    ".replace("[CodeForSwitchCase]", generateArgumentSwitchCase())
-        .replace("[GetFunctionCode]", getFunctionCode);
-    body = body.replace("Parameters", parameterDeclaration(newParameterCount));
-    return new Function("Promise",
-                        "fn",
-                        "receiver",
-                        "withAppended",
-                        "maybeWrapAsError",
-                        "nodebackForPromise",
-                        "tryCatch",
-                        "errorObj",
-                        "notEnumerableProp",
-                        "INTERNAL",
-                        body)(
-                    Promise,
-                    fn,
-                    receiver,
-                    withAppended,
-                    maybeWrapAsError,
-                    nodebackForPromise,
-                    util.tryCatch,
-                    util.errorObj,
-                    util.notEnumerableProp,
-                    INTERNAL);
-};
-}
-
-function makeNodePromisifiedClosure(callback, receiver, _, fn, __, multiArgs) {
-    var defaultThis = (function() {return this;})();
-    var method = callback;
-    if (typeof method === "string") {
-        callback = fn;
-    }
-    function promisified() {
-        var _receiver = receiver;
-        if (receiver === THIS) _receiver = this;
-        var promise = new Promise(INTERNAL);
-        promise._captureStackTrace();
-        var cb = typeof method === "string" && this !== defaultThis
-            ? this[method] : callback;
-        var fn = nodebackForPromise(promise, multiArgs);
-        try {
-            cb.apply(_receiver, withAppended(arguments, fn));
-        } catch(e) {
-            promise._rejectCallback(maybeWrapAsError(e), true, true);
-        }
-        if (!promise._isFateSealed()) promise._setAsyncGuaranteed();
-        return promise;
-    }
-    util.notEnumerableProp(promisified, "__isPromisified__", true);
-    return promisified;
-}
-
-var makeNodePromisified = canEvaluate
-    ? makeNodePromisifiedEval
-    : makeNodePromisifiedClosure;
-
-function promisifyAll(obj, suffix, filter, promisifier, multiArgs) {
-    var suffixRegexp = new RegExp(escapeIdentRegex(suffix) + "$");
-    var methods =
-        promisifiableMethods(obj, suffix, suffixRegexp, filter);
-
-    for (var i = 0, len = methods.length; i < len; i+= 2) {
-        var key = methods[i];
-        var fn = methods[i+1];
-        var promisifiedKey = key + suffix;
-        if (promisifier === makeNodePromisified) {
-            obj[promisifiedKey] =
-                makeNodePromisified(key, THIS, key, fn, suffix, multiArgs);
-        } else {
-            var promisified = promisifier(fn, function() {
-                return makeNodePromisified(key, THIS, key,
-                                           fn, suffix, multiArgs);
-            });
-            util.notEnumerableProp(promisified, "__isPromisified__", true);
-            obj[promisifiedKey] = promisified;
-        }
-    }
-    util.toFastProperties(obj);
-    return obj;
-}
-
-function promisify(callback, receiver, multiArgs) {
-    return makeNodePromisified(callback, receiver, undefined,
-                                callback, null, multiArgs);
-}
-
-Promise.promisify = function (fn, options) {
-    if (typeof fn !== "function") {
-        throw new TypeError("expecting a function but got " + util.classString(fn));
-    }
-    if (isPromisified(fn)) {
-        return fn;
-    }
-    options = Object(options);
-    var receiver = options.context === undefined ? THIS : options.context;
-    var multiArgs = !!options.multiArgs;
-    var ret = promisify(fn, receiver, multiArgs);
-    util.copyDescriptors(fn, ret, propsFilter);
-    return ret;
-};
-
-Promise.promisifyAll = function (target, options) {
-    if (typeof target !== "function" && typeof target !== "object") {
-        throw new TypeError("the target of promisifyAll must be an object or a function\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    }
-    options = Object(options);
-    var multiArgs = !!options.multiArgs;
-    var suffix = options.suffix;
-    if (typeof suffix !== "string") suffix = defaultSuffix;
-    var filter = options.filter;
-    if (typeof filter !== "function") filter = defaultFilter;
-    var promisifier = options.promisifier;
-    if (typeof promisifier !== "function") promisifier = makeNodePromisified;
-
-    if (!util.isIdentifier(suffix)) {
-        throw new RangeError("suffix must be a valid identifier\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    }
-
-    var keys = util.inheritedDataKeys(target);
-    for (var i = 0; i < keys.length; ++i) {
-        var value = target[keys[i]];
-        if (keys[i] !== "constructor" &&
-            util.isClass(value)) {
-            promisifyAll(value.prototype, suffix, filter, promisifier,
-                multiArgs);
-            promisifyAll(value, suffix, filter, promisifier, multiArgs);
-        }
-    }
-
-    return promisifyAll(target, suffix, filter, promisifier, multiArgs);
-};
-};
-
-
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(
-    Promise, PromiseArray, tryConvertToPromise, apiRejection) {
-var util = __webpack_require__(5);
-var isObject = util.isObject;
-var es5 = __webpack_require__(6);
-var Es6Map;
-if (typeof Map === "function") Es6Map = Map;
-
-var mapToEntries = (function() {
-    var index = 0;
-    var size = 0;
-
-    function extractEntry(value, key) {
-        this[index] = value;
-        this[index + size] = key;
-        index++;
-    }
-
-    return function mapToEntries(map) {
-        size = map.size;
-        index = 0;
-        var ret = new Array(map.size * 2);
-        map.forEach(extractEntry, ret);
-        return ret;
-    };
-})();
-
-var entriesToMap = function(entries) {
-    var ret = new Es6Map();
-    var length = entries.length / 2 | 0;
-    for (var i = 0; i < length; ++i) {
-        var key = entries[length + i];
-        var value = entries[i];
-        ret.set(key, value);
-    }
-    return ret;
-};
-
-function PropertiesPromiseArray(obj) {
-    var isMap = false;
-    var entries;
-    if (Es6Map !== undefined && obj instanceof Es6Map) {
-        entries = mapToEntries(obj);
-        isMap = true;
-    } else {
-        var keys = es5.keys(obj);
-        var len = keys.length;
-        entries = new Array(len * 2);
-        for (var i = 0; i < len; ++i) {
-            var key = keys[i];
-            entries[i] = obj[key];
-            entries[i + len] = key;
-        }
-    }
-    this.constructor$(entries);
-    this._isMap = isMap;
-    this._init$(undefined, isMap ? -6 : -3);
-}
-util.inherits(PropertiesPromiseArray, PromiseArray);
-
-PropertiesPromiseArray.prototype._init = function () {};
-
-PropertiesPromiseArray.prototype._promiseFulfilled = function (value, index) {
-    this._values[index] = value;
-    var totalResolved = ++this._totalResolved;
-    if (totalResolved >= this._length) {
-        var val;
-        if (this._isMap) {
-            val = entriesToMap(this._values);
-        } else {
-            val = {};
-            var keyOffset = this.length();
-            for (var i = 0, len = this.length(); i < len; ++i) {
-                val[this._values[i + keyOffset]] = this._values[i];
-            }
-        }
-        this._resolve(val);
-        return true;
-    }
-    return false;
-};
-
-PropertiesPromiseArray.prototype.shouldCopyValues = function () {
-    return false;
-};
-
-PropertiesPromiseArray.prototype.getActualLength = function (len) {
-    return len >> 1;
-};
-
-function props(promises) {
-    var ret;
-    var castValue = tryConvertToPromise(promises);
-
-    if (!isObject(castValue)) {
-        return apiRejection("cannot await properties of a non-object\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    } else if (castValue instanceof Promise) {
-        ret = castValue._then(
-            Promise.props, undefined, undefined, undefined, undefined);
-    } else {
-        ret = new PropertiesPromiseArray(castValue).promise();
-    }
-
-    if (castValue instanceof Promise) {
-        ret._propagateFrom(castValue, 2);
-    }
-    return ret;
-}
-
-Promise.prototype.props = function () {
-    return props(this);
-};
-
-Promise.props = function (promises) {
-    return props(promises);
-};
-};
-
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(
-    Promise, INTERNAL, tryConvertToPromise, apiRejection) {
-var util = __webpack_require__(5);
-
-var raceLater = function (promise) {
-    return promise.then(function(array) {
-        return race(array, promise);
-    });
-};
-
-function race(promises, parent) {
-    var maybePromise = tryConvertToPromise(promises);
-
-    if (maybePromise instanceof Promise) {
-        return raceLater(maybePromise);
-    } else {
-        promises = util.asArray(promises);
-        if (promises === null)
-            return apiRejection("expecting an array or an iterable object but got " + util.classString(promises));
-    }
-
-    var ret = new Promise(INTERNAL);
-    if (parent !== undefined) {
-        ret._propagateFrom(parent, 3);
-    }
-    var fulfill = ret._fulfill;
-    var reject = ret._reject;
-    for (var i = 0, len = promises.length; i < len; ++i) {
-        var val = promises[i];
-
-        if (val === undefined && !(i in promises)) {
-            continue;
-        }
-
-        Promise.cast(val)._then(fulfill, reject, undefined, ret, null);
-    }
-    return ret;
-}
-
-Promise.race = function (promises) {
-    return race(promises, undefined);
-};
-
-Promise.prototype.race = function () {
-    return race(this, undefined);
-};
-
-};
-
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise,
-                          PromiseArray,
-                          apiRejection,
-                          tryConvertToPromise,
-                          INTERNAL,
-                          debug) {
-var getDomain = Promise._getDomain;
-var util = __webpack_require__(5);
-var tryCatch = util.tryCatch;
-
-function ReductionPromiseArray(promises, fn, initialValue, _each) {
-    this.constructor$(promises);
-    var domain = getDomain();
-    this._fn = domain === null ? fn : util.domainBind(domain, fn);
-    if (initialValue !== undefined) {
-        initialValue = Promise.resolve(initialValue);
-        initialValue._attachCancellationCallback(this);
-    }
-    this._initialValue = initialValue;
-    this._currentCancellable = null;
-    if(_each === INTERNAL) {
-        this._eachValues = Array(this._length);
-    } else if (_each === 0) {
-        this._eachValues = null;
-    } else {
-        this._eachValues = undefined;
-    }
-    this._promise._captureStackTrace();
-    this._init$(undefined, -5);
-}
-util.inherits(ReductionPromiseArray, PromiseArray);
-
-ReductionPromiseArray.prototype._gotAccum = function(accum) {
-    if (this._eachValues !== undefined && 
-        this._eachValues !== null && 
-        accum !== INTERNAL) {
-        this._eachValues.push(accum);
-    }
-};
-
-ReductionPromiseArray.prototype._eachComplete = function(value) {
-    if (this._eachValues !== null) {
-        this._eachValues.push(value);
-    }
-    return this._eachValues;
-};
-
-ReductionPromiseArray.prototype._init = function() {};
-
-ReductionPromiseArray.prototype._resolveEmptyArray = function() {
-    this._resolve(this._eachValues !== undefined ? this._eachValues
-                                                 : this._initialValue);
-};
-
-ReductionPromiseArray.prototype.shouldCopyValues = function () {
-    return false;
-};
-
-ReductionPromiseArray.prototype._resolve = function(value) {
-    this._promise._resolveCallback(value);
-    this._values = null;
-};
-
-ReductionPromiseArray.prototype._resultCancelled = function(sender) {
-    if (sender === this._initialValue) return this._cancel();
-    if (this._isResolved()) return;
-    this._resultCancelled$();
-    if (this._currentCancellable instanceof Promise) {
-        this._currentCancellable.cancel();
-    }
-    if (this._initialValue instanceof Promise) {
-        this._initialValue.cancel();
-    }
-};
-
-ReductionPromiseArray.prototype._iterate = function (values) {
-    this._values = values;
-    var value;
-    var i;
-    var length = values.length;
-    if (this._initialValue !== undefined) {
-        value = this._initialValue;
-        i = 0;
-    } else {
-        value = Promise.resolve(values[0]);
-        i = 1;
-    }
-
-    this._currentCancellable = value;
-
-    if (!value.isRejected()) {
-        for (; i < length; ++i) {
-            var ctx = {
-                accum: null,
-                value: values[i],
-                index: i,
-                length: length,
-                array: this
-            };
-            value = value._then(gotAccum, undefined, undefined, ctx, undefined);
-        }
-    }
-
-    if (this._eachValues !== undefined) {
-        value = value
-            ._then(this._eachComplete, undefined, undefined, this, undefined);
-    }
-    value._then(completed, completed, undefined, value, this);
-};
-
-Promise.prototype.reduce = function (fn, initialValue) {
-    return reduce(this, fn, initialValue, null);
-};
-
-Promise.reduce = function (promises, fn, initialValue, _each) {
-    return reduce(promises, fn, initialValue, _each);
-};
-
-function completed(valueOrReason, array) {
-    if (this.isFulfilled()) {
-        array._resolve(valueOrReason);
-    } else {
-        array._reject(valueOrReason);
-    }
-}
-
-function reduce(promises, fn, initialValue, _each) {
-    if (typeof fn !== "function") {
-        return apiRejection("expecting a function but got " + util.classString(fn));
-    }
-    var array = new ReductionPromiseArray(promises, fn, initialValue, _each);
-    return array.promise();
-}
-
-function gotAccum(accum) {
-    this.accum = accum;
-    this.array._gotAccum(accum);
-    var value = tryConvertToPromise(this.value, this.array._promise);
-    if (value instanceof Promise) {
-        this.array._currentCancellable = value;
-        return value._then(gotValue, undefined, undefined, this, undefined);
-    } else {
-        return gotValue.call(this, value);
-    }
-}
-
-function gotValue(value) {
-    var array = this.array;
-    var promise = array._promise;
-    var fn = tryCatch(array._fn);
-    promise._pushContext();
-    var ret;
-    if (array._eachValues !== undefined) {
-        ret = fn.call(promise._boundValue(), value, this.index, this.length);
-    } else {
-        ret = fn.call(promise._boundValue(),
-                              this.accum, value, this.index, this.length);
-    }
-    if (ret instanceof Promise) {
-        array._currentCancellable = ret;
-    }
-    var promiseCreated = promise._popContext();
-    debug.checkForgottenReturns(
-        ret,
-        promiseCreated,
-        array._eachValues !== undefined ? "Promise.each" : "Promise.reduce",
-        promise
-    );
-    return ret;
-}
-};
-
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports =
-    function(Promise, PromiseArray, debug) {
-var PromiseInspection = Promise.PromiseInspection;
-var util = __webpack_require__(5);
-
-function SettledPromiseArray(values) {
-    this.constructor$(values);
-}
-util.inherits(SettledPromiseArray, PromiseArray);
-
-SettledPromiseArray.prototype._promiseResolved = function (index, inspection) {
-    this._values[index] = inspection;
-    var totalResolved = ++this._totalResolved;
-    if (totalResolved >= this._length) {
-        this._resolve(this._values);
-        return true;
-    }
-    return false;
-};
-
-SettledPromiseArray.prototype._promiseFulfilled = function (value, index) {
-    var ret = new PromiseInspection();
-    ret._bitField = 33554432;
-    ret._settledValueField = value;
-    return this._promiseResolved(index, ret);
-};
-SettledPromiseArray.prototype._promiseRejected = function (reason, index) {
-    var ret = new PromiseInspection();
-    ret._bitField = 16777216;
-    ret._settledValueField = reason;
-    return this._promiseResolved(index, ret);
-};
-
-Promise.settle = function (promises) {
-    debug.deprecated(".settle()", ".reflect()");
-    return new SettledPromiseArray(promises).promise();
-};
-
-Promise.prototype.settle = function () {
-    return Promise.settle(this);
-};
-};
-
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports =
-function(Promise, PromiseArray, apiRejection) {
-var util = __webpack_require__(5);
-var RangeError = __webpack_require__(10).RangeError;
-var AggregateError = __webpack_require__(10).AggregateError;
-var isArray = util.isArray;
-var CANCELLATION = {};
-
-
-function SomePromiseArray(values) {
-    this.constructor$(values);
-    this._howMany = 0;
-    this._unwrap = false;
-    this._initialized = false;
-}
-util.inherits(SomePromiseArray, PromiseArray);
-
-SomePromiseArray.prototype._init = function () {
-    if (!this._initialized) {
-        return;
-    }
-    if (this._howMany === 0) {
-        this._resolve([]);
-        return;
-    }
-    this._init$(undefined, -5);
-    var isArrayResolved = isArray(this._values);
-    if (!this._isResolved() &&
-        isArrayResolved &&
-        this._howMany > this._canPossiblyFulfill()) {
-        this._reject(this._getRangeError(this.length()));
-    }
-};
-
-SomePromiseArray.prototype.init = function () {
-    this._initialized = true;
-    this._init();
-};
-
-SomePromiseArray.prototype.setUnwrap = function () {
-    this._unwrap = true;
-};
-
-SomePromiseArray.prototype.howMany = function () {
-    return this._howMany;
-};
-
-SomePromiseArray.prototype.setHowMany = function (count) {
-    this._howMany = count;
-};
-
-SomePromiseArray.prototype._promiseFulfilled = function (value) {
-    this._addFulfilled(value);
-    if (this._fulfilled() === this.howMany()) {
-        this._values.length = this.howMany();
-        if (this.howMany() === 1 && this._unwrap) {
-            this._resolve(this._values[0]);
-        } else {
-            this._resolve(this._values);
-        }
-        return true;
-    }
-    return false;
-
-};
-SomePromiseArray.prototype._promiseRejected = function (reason) {
-    this._addRejected(reason);
-    return this._checkOutcome();
-};
-
-SomePromiseArray.prototype._promiseCancelled = function () {
-    if (this._values instanceof Promise || this._values == null) {
-        return this._cancel();
-    }
-    this._addRejected(CANCELLATION);
-    return this._checkOutcome();
-};
-
-SomePromiseArray.prototype._checkOutcome = function() {
-    if (this.howMany() > this._canPossiblyFulfill()) {
-        var e = new AggregateError();
-        for (var i = this.length(); i < this._values.length; ++i) {
-            if (this._values[i] !== CANCELLATION) {
-                e.push(this._values[i]);
-            }
-        }
-        if (e.length > 0) {
-            this._reject(e);
-        } else {
-            this._cancel();
-        }
-        return true;
-    }
-    return false;
-};
-
-SomePromiseArray.prototype._fulfilled = function () {
-    return this._totalResolved;
-};
-
-SomePromiseArray.prototype._rejected = function () {
-    return this._values.length - this.length();
-};
-
-SomePromiseArray.prototype._addRejected = function (reason) {
-    this._values.push(reason);
-};
-
-SomePromiseArray.prototype._addFulfilled = function (value) {
-    this._values[this._totalResolved++] = value;
-};
-
-SomePromiseArray.prototype._canPossiblyFulfill = function () {
-    return this.length() - this._rejected();
-};
-
-SomePromiseArray.prototype._getRangeError = function (count) {
-    var message = "Input array must contain at least " +
-            this._howMany + " items but contains only " + count + " items";
-    return new RangeError(message);
-};
-
-SomePromiseArray.prototype._resolveEmptyArray = function () {
-    this._reject(this._getRangeError(0));
-};
-
-function some(promises, howMany) {
-    if ((howMany | 0) !== howMany || howMany < 0) {
-        return apiRejection("expecting a positive integer\u000a\u000a    See http://goo.gl/MqrFmX\u000a");
-    }
-    var ret = new SomePromiseArray(promises);
-    var promise = ret.promise();
-    ret.setHowMany(howMany);
-    ret.init();
-    return promise;
-}
-
-Promise.some = function (promises, howMany) {
-    return some(promises, howMany);
-};
-
-Promise.prototype.some = function (howMany) {
-    return some(this, howMany);
-};
-
-Promise._SomePromiseArray = SomePromiseArray;
-};
-
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise, INTERNAL) {
-var PromiseMap = Promise.map;
-
-Promise.prototype.filter = function (fn, options) {
-    return PromiseMap(this, fn, options, INTERNAL);
-};
-
-Promise.filter = function (promises, fn, options) {
-    return PromiseMap(promises, fn, options, INTERNAL);
-};
-};
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise, INTERNAL) {
-var PromiseReduce = Promise.reduce;
-var PromiseAll = Promise.all;
-
-function promiseAllThis() {
-    return PromiseAll(this);
-}
-
-function PromiseMapSeries(promises, fn) {
-    return PromiseReduce(promises, fn, INTERNAL, INTERNAL);
-}
-
-Promise.prototype.each = function (fn) {
-    return PromiseReduce(this, fn, INTERNAL, 0)
-              ._then(promiseAllThis, undefined, undefined, this, undefined);
-};
-
-Promise.prototype.mapSeries = function (fn) {
-    return PromiseReduce(this, fn, INTERNAL, INTERNAL);
-};
-
-Promise.each = function (promises, fn) {
-    return PromiseReduce(promises, fn, INTERNAL, 0)
-              ._then(promiseAllThis, undefined, undefined, promises, undefined);
-};
-
-Promise.mapSeries = PromiseMapSeries;
-};
-
-
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-module.exports = function(Promise) {
-var SomePromiseArray = Promise._SomePromiseArray;
-function any(promises) {
-    var ret = new SomePromiseArray(promises);
-    var promise = ret.promise();
-    ret.setHowMany(1);
-    ret.setUnwrap();
-    ret.init();
-    return promise;
-}
-
-Promise.any = function (promises) {
-    return any(promises);
-};
-
-Promise.prototype.any = function () {
-    return any(this);
-};
-
-};
-
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var core = __webpack_require__(40),
-    isArray = __webpack_require__(52),
-    isFunction = __webpack_require__(42),
-    isObjectLike = __webpack_require__(50);
-
-
-module.exports = function (options) {
-
-    var errorText = 'Please verify options'; // For better minification because this string is repeating
-
-    if (!isObjectLike(options)) {
-        throw new TypeError(errorText);
-    }
-
-    if (!isFunction(options.request)) {
-        throw new TypeError(errorText + '.request');
-    }
-
-    if (!isArray(options.expose) || options.expose.length === 0) {
-        throw new TypeError(errorText + '.expose');
-    }
-
-
-    var plumbing = core({
-        PromiseImpl: options.PromiseImpl,
-        constructorMixin: options.constructorMixin
-    });
-
-
-    // Intercepting Request's init method
-
-    var originalInit = options.request.Request.prototype.init;
-
-    options.request.Request.prototype.init = function RP$initInterceptor(requestOptions) {
-
-        // Init may be called again - currently in case of redirects
-        if (isObjectLike(requestOptions) && !this._callback && !this._rp_promise) {
-
-            plumbing.init.call(this, requestOptions);
-
-        }
-
-        return originalInit.apply(this, arguments);
-
-    };
-
-
-    // Exposing the Promise capabilities
-
-    var thenExposed = false;
-    for ( var i = 0; i < options.expose.length; i+=1 ) {
-
-        var method = options.expose[i];
-
-        plumbing[ method === 'promise' ? 'exposePromise' : 'exposePromiseMethod' ](
-            options.request.Request.prototype,
-            null,
-            '_rp_promise',
-            method
-        );
-
-        if (method === 'then') {
-            thenExposed = true;
-        }
-
-    }
-
-    if (!thenExposed) {
-        throw new Error('Please expose "then"');
-    }
-
-};
-
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var errors = __webpack_require__(41),
-    isFunction = __webpack_require__(42),
-    isObjectLike = __webpack_require__(50),
-    isString = __webpack_require__(51),
-    isUndefined = __webpack_require__(53);
-
-
-module.exports = function (options) {
-
-    var errorText = 'Please verify options'; // For better minification because this string is repeating
-
-    if (!isObjectLike(options)) {
-        throw new TypeError(errorText);
-    }
-
-    if (!isFunction(options.PromiseImpl)) {
-        throw new TypeError(errorText + '.PromiseImpl');
-    }
-
-    if (!isUndefined(options.constructorMixin) && !isFunction(options.constructorMixin)) {
-        throw new TypeError(errorText + '.PromiseImpl');
-    }
-
-    var PromiseImpl = options.PromiseImpl;
-    var constructorMixin = options.constructorMixin;
-
-
-    var plumbing = {};
-
-    plumbing.init = function (requestOptions) {
-
-        var self = this;
-
-        self._rp_promise = new PromiseImpl(function (resolve, reject) {
-            self._rp_resolve = resolve;
-            self._rp_reject = reject;
-            if (constructorMixin) {
-                constructorMixin.apply(self, arguments); // Using arguments since specific Promise libraries may pass additional parameters
-            }
-        });
-
-        self._rp_callbackOrig = requestOptions.callback;
-        requestOptions.callback = self.callback = function RP$callback(err, response, body) {
-            plumbing.callback.call(self, err, response, body);
-        };
-
-        if (isString(requestOptions.method)) {
-            requestOptions.method = requestOptions.method.toUpperCase();
-        }
-
-        requestOptions.transform = requestOptions.transform || plumbing.defaultTransformations[requestOptions.method];
-
-        self._rp_options = requestOptions;
-        self._rp_options.simple = requestOptions.simple !== false;
-        self._rp_options.resolveWithFullResponse = requestOptions.resolveWithFullResponse === true;
-        self._rp_options.transform2xxOnly = requestOptions.transform2xxOnly === true;
-
-    };
-
-    plumbing.defaultTransformations = {
-        HEAD: function (body, response, resolveWithFullResponse) {
-            return resolveWithFullResponse ? response : response.headers;
-        }
-    };
-
-    plumbing.callback = function (err, response, body) {
-
-        var self = this;
-
-        var origCallbackThrewException = false, thrownException = null;
-
-        if (isFunction(self._rp_callbackOrig)) {
-            try {
-                self._rp_callbackOrig.apply(self, arguments); // TODO: Apply to self mimics behavior of request@2. Is that also right for request@next?
-            } catch (e) {
-                origCallbackThrewException = true;
-                thrownException = e;
-            }
-        }
-
-        var is2xx = !err && /^2/.test('' + response.statusCode);
-
-        if (err) {
-
-            self._rp_reject(new errors.RequestError(err, self._rp_options, response));
-
-        } else if (self._rp_options.simple && !is2xx) {
-
-            if (isFunction(self._rp_options.transform) && self._rp_options.transform2xxOnly === false) {
-
-                (new PromiseImpl(function (resolve) {
-                    resolve(self._rp_options.transform(body, response, self._rp_options.resolveWithFullResponse)); // transform may return a Promise
-                }))
-                    .then(function (transformedResponse) {
-                        self._rp_reject(new errors.StatusCodeError(response.statusCode, body, self._rp_options, transformedResponse));
-                    })
-                    .catch(function (transformErr) {
-                        self._rp_reject(new errors.TransformError(transformErr, self._rp_options, response));
-                    });
-
-            } else {
-                self._rp_reject(new errors.StatusCodeError(response.statusCode, body, self._rp_options, response));
-            }
-
-        } else {
-
-            if (isFunction(self._rp_options.transform) && (is2xx || self._rp_options.transform2xxOnly === false)) {
-
-                (new PromiseImpl(function (resolve) {
-                    resolve(self._rp_options.transform(body, response, self._rp_options.resolveWithFullResponse)); // transform may return a Promise
-                }))
-                    .then(function (transformedResponse) {
-                        self._rp_resolve(transformedResponse);
-                    })
-                    .catch(function (transformErr) {
-                        self._rp_reject(new errors.TransformError(transformErr, self._rp_options, response));
-                    });
-
-            } else if (self._rp_options.resolveWithFullResponse) {
-                self._rp_resolve(response);
-            } else {
-                self._rp_resolve(body);
-            }
-
-        }
-
-        if (origCallbackThrewException) {
-            throw thrownException;
-        }
-
-    };
-
-    plumbing.exposePromiseMethod = function (exposeTo, bindTo, promisePropertyKey, methodToExpose, exposeAs) {
-
-        exposeAs = exposeAs || methodToExpose;
-
-        if (exposeAs in exposeTo) {
-            throw new Error('Unable to expose method "' + exposeAs + '"');
-        }
-
-        exposeTo[exposeAs] = function RP$exposed() {
-            var self = bindTo || this;
-            return self[promisePropertyKey][methodToExpose].apply(self[promisePropertyKey], arguments);
-        };
-
-    };
-
-    plumbing.exposePromise = function (exposeTo, bindTo, promisePropertyKey, exposeAs) {
-
-        exposeAs = exposeAs || 'promise';
-
-        if (exposeAs in exposeTo) {
-            throw new Error('Unable to expose method "' + exposeAs + '"');
-        }
-
-        exposeTo[exposeAs] = function RP$promise() {
-            var self = bindTo || this;
-            return self[promisePropertyKey];
-        };
-
-    };
-
-    return plumbing;
-
-};
-
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-
-function RequestError(cause, options, response) {
-
-    this.name = 'RequestError';
-    this.message = String(cause);
-    this.cause = cause;
-    this.error = cause; // legacy attribute
-    this.options = options;
-    this.response = response;
-
-    if (Error.captureStackTrace) { // required for non-V8 environments
-        Error.captureStackTrace(this);
-    }
-
-}
-RequestError.prototype = Object.create(Error.prototype);
-RequestError.prototype.constructor = RequestError;
-
-
-function StatusCodeError(statusCode, body, options, response) {
-
-    this.name = 'StatusCodeError';
-    this.statusCode = statusCode;
-    this.message = statusCode + ' - ' + (JSON && JSON.stringify ? JSON.stringify(body) : body);
-    this.error = body; // legacy attribute
-    this.options = options;
-    this.response = response;
-
-    if (Error.captureStackTrace) { // required for non-V8 environments
-        Error.captureStackTrace(this);
-    }
-
-}
-StatusCodeError.prototype = Object.create(Error.prototype);
-StatusCodeError.prototype.constructor = StatusCodeError;
-
-
-function TransformError(cause, options, response) {
-
-    this.name = 'TransformError';
-    this.message = String(cause);
-    this.cause = cause;
-    this.error = cause; // legacy attribute
-    this.options = options;
-    this.response = response;
-
-    if (Error.captureStackTrace) { // required for non-V8 environments
-        Error.captureStackTrace(this);
-    }
-
-}
-TransformError.prototype = Object.create(Error.prototype);
-TransformError.prototype.constructor = TransformError;
-
-
-module.exports = {
-    RequestError: RequestError,
-    StatusCodeError: StatusCodeError,
-    TransformError: TransformError
-};
-
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var baseGetTag = __webpack_require__(43),
-    isObject = __webpack_require__(49);
-
-/** `Object#toString` result references. */
-var asyncTag = '[object AsyncFunction]',
-    funcTag = '[object Function]',
-    genTag = '[object GeneratorFunction]',
-    proxyTag = '[object Proxy]';
-
-/**
- * Checks if `value` is classified as a `Function` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a function, else `false`.
- * @example
- *
- * _.isFunction(_);
- * // => true
- *
- * _.isFunction(/abc/);
- * // => false
- */
-function isFunction(value) {
-  if (!isObject(value)) {
-    return false;
-  }
-  // The use of `Object#toString` avoids issues with the `typeof` operator
-  // in Safari 9 which returns 'object' for typed arrays and other constructors.
-  var tag = baseGetTag(value);
-  return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
-}
-
-module.exports = isFunction;
-
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Symbol = __webpack_require__(44),
-    getRawTag = __webpack_require__(47),
-    objectToString = __webpack_require__(48);
-
-/** `Object#toString` result references. */
-var nullTag = '[object Null]',
-    undefinedTag = '[object Undefined]';
-
-/** Built-in value references. */
-var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
-
-/**
- * The base implementation of `getTag` without fallbacks for buggy environments.
- *
- * @private
- * @param {*} value The value to query.
- * @returns {string} Returns the `toStringTag`.
- */
-function baseGetTag(value) {
-  if (value == null) {
-    return value === undefined ? undefinedTag : nullTag;
-  }
-  return (symToStringTag && symToStringTag in Object(value))
-    ? getRawTag(value)
-    : objectToString(value);
-}
-
-module.exports = baseGetTag;
-
-
-/***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var root = __webpack_require__(45);
-
-/** Built-in value references. */
-var Symbol = root.Symbol;
-
-module.exports = Symbol;
-
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var freeGlobal = __webpack_require__(46);
-
-/** Detect free variable `self`. */
-var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
-
-/** Used as a reference to the global object. */
-var root = freeGlobal || freeSelf || Function('return this')();
-
-module.exports = root;
-
-
-/***/ }),
-/* 46 */
-/***/ (function(module, exports) {
-
-/** Detect free variable `global` from Node.js. */
-var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
-
-module.exports = freeGlobal;
-
-
-/***/ }),
-/* 47 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Symbol = __webpack_require__(44);
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var nativeObjectToString = objectProto.toString;
-
-/** Built-in value references. */
-var symToStringTag = Symbol ? Symbol.toStringTag : undefined;
-
-/**
- * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
- *
- * @private
- * @param {*} value The value to query.
- * @returns {string} Returns the raw `toStringTag`.
- */
-function getRawTag(value) {
-  var isOwn = hasOwnProperty.call(value, symToStringTag),
-      tag = value[symToStringTag];
-
-  try {
-    value[symToStringTag] = undefined;
-    var unmasked = true;
-  } catch (e) {}
-
-  var result = nativeObjectToString.call(value);
-  if (unmasked) {
-    if (isOwn) {
-      value[symToStringTag] = tag;
-    } else {
-      delete value[symToStringTag];
-    }
-  }
-  return result;
-}
-
-module.exports = getRawTag;
-
-
-/***/ }),
-/* 48 */
-/***/ (function(module, exports) {
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var nativeObjectToString = objectProto.toString;
-
-/**
- * Converts `value` to a string using `Object.prototype.toString`.
- *
- * @private
- * @param {*} value The value to convert.
- * @returns {string} Returns the converted string.
- */
-function objectToString(value) {
-  return nativeObjectToString.call(value);
-}
-
-module.exports = objectToString;
-
-
-/***/ }),
-/* 49 */
-/***/ (function(module, exports) {
-
-/**
- * Checks if `value` is the
- * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
- * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(_.noop);
- * // => true
- *
- * _.isObject(null);
- * // => false
- */
-function isObject(value) {
-  var type = typeof value;
-  return value != null && (type == 'object' || type == 'function');
-}
-
-module.exports = isObject;
-
-
-/***/ }),
-/* 50 */
-/***/ (function(module, exports) {
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike(value) {
-  return value != null && typeof value == 'object';
-}
-
-module.exports = isObjectLike;
-
-
-/***/ }),
-/* 51 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var baseGetTag = __webpack_require__(43),
-    isArray = __webpack_require__(52),
-    isObjectLike = __webpack_require__(50);
-
-/** `Object#toString` result references. */
-var stringTag = '[object String]';
-
-/**
- * Checks if `value` is classified as a `String` primitive or object.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a string, else `false`.
- * @example
- *
- * _.isString('abc');
- * // => true
- *
- * _.isString(1);
- * // => false
- */
-function isString(value) {
-  return typeof value == 'string' ||
-    (!isArray(value) && isObjectLike(value) && baseGetTag(value) == stringTag);
-}
-
-module.exports = isString;
-
-
-/***/ }),
-/* 52 */
-/***/ (function(module, exports) {
-
-/**
- * Checks if `value` is classified as an `Array` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an array, else `false`.
- * @example
- *
- * _.isArray([1, 2, 3]);
- * // => true
- *
- * _.isArray(document.body.children);
- * // => false
- *
- * _.isArray('abc');
- * // => false
- *
- * _.isArray(_.noop);
- * // => false
- */
-var isArray = Array.isArray;
-
-module.exports = isArray;
-
-
-/***/ }),
-/* 53 */
-/***/ (function(module, exports) {
-
-/**
- * Checks if `value` is `undefined`.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is `undefined`, else `false`.
- * @example
- *
- * _.isUndefined(void 0);
- * // => true
- *
- * _.isUndefined(null);
- * // => false
- */
-function isUndefined(value) {
-  return value === undefined;
-}
-
-module.exports = isUndefined;
-
-
-/***/ }),
-/* 54 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var isNative = /\.node$/;
-
-function forEach(obj, callback) {
-    for ( var key in obj ) {
-        if (!Object.prototype.hasOwnProperty.call(obj, key)) {
-            continue;
-        }
-        callback(key);
-    }
-}
-
-function assign(target, source) {
-    forEach(source, function (key) {
-        target[key] = source[key];
-    });
-    return target;
-}
-
-function clearCache(requireCache) {
-    forEach(requireCache, function (resolvedPath) {
-        if (!isNative.test(resolvedPath)) {
-            delete requireCache[resolvedPath];
-        }
-    });
-}
-
-module.exports = function (requireCache, callback, callbackForModulesToKeep, module) {
-
-    var originalCache = assign({}, requireCache);
-    clearCache(requireCache);
-
-    if (callbackForModulesToKeep) {
-
-        var originalModuleChildren = module.children ? module.children.slice() : false; // Creates a shallow copy of module.children
-
-        callbackForModulesToKeep();
-
-        // Lists the cache entries made by callbackForModulesToKeep()
-        var modulesToKeep = [];
-        forEach(requireCache, function (key) {
-            modulesToKeep.push(key);
-        });
-
-        // Discards the modules required in callbackForModulesToKeep()
-        clearCache(requireCache);
-
-        if (module.children) { // Only true for node.js
-            module.children = originalModuleChildren; // Removes last references to modules required in callbackForModulesToKeep() -> No memory leak
-        }
-
-        // Takes the cache entries of the original cache in case the modules where required before
-        for ( var i = 0; i < modulesToKeep.length; i+=1 ) {
-            if (originalCache[modulesToKeep[i]]) {
-                requireCache[modulesToKeep[i]] = originalCache[modulesToKeep[i]];
-            }
-        }
-
-    }
-
-    var freshModule = callback();
-
-    var stealthCache = callbackForModulesToKeep ? assign({}, requireCache) : false;
-
-    clearCache(requireCache);
-
-    if (callbackForModulesToKeep) {
-        // In case modules to keep were required inside the stealthy require for the first time, copy them to the restored cache
-        for ( var k = 0; k < modulesToKeep.length; k+=1 ) {
-            if (stealthCache[modulesToKeep[k]]) {
-                requireCache[modulesToKeep[k]] = stealthCache[modulesToKeep[k]];
-            }
-        }
-    }
-
-    assign(requireCache, originalCache);
-
-    return freshModule;
-
-};
-
-
-/***/ }),
-/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6736,9 +105,9 @@ module.exports = function (requireCache, callback, callbackForModulesToKeep, mod
 
 
 
-var extend = __webpack_require__(56)
-var cookies = __webpack_require__(57)
-var helpers = __webpack_require__(69)
+var extend = __webpack_require__(2)
+var cookies = __webpack_require__(3)
+var helpers = __webpack_require__(15)
 
 var paramsHaveRequestBody = helpers.paramsHaveRequestBody
 
@@ -6862,7 +231,7 @@ request.forever = function (agentOptions, optionsArg) {
 // Exports
 
 module.exports = request
-request.Request = __webpack_require__(74)
+request.Request = __webpack_require__(20)
 request.initParams = initParams
 
 // Backwards compatibility for request.debug
@@ -6878,7 +247,7 @@ Object.defineProperty(request, 'debug', {
 
 
 /***/ }),
-/* 56 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6971,13 +340,13 @@ module.exports = function extend() {
 
 
 /***/ }),
-/* 57 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var tough = __webpack_require__(58)
+var tough = __webpack_require__(4)
 
 var Cookie = tough.Cookie
 var CookieJar = tough.CookieJar
@@ -7016,7 +385,7 @@ exports.jar = function (store) {
 
 
 /***/ }),
-/* 58 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7051,17 +420,17 @@ exports.jar = function (store) {
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-var net = __webpack_require__(59);
-var urlParse = __webpack_require__(60).parse;
-var pubsuffix = __webpack_require__(61);
-var Store = __webpack_require__(63).Store;
-var MemoryCookieStore = __webpack_require__(64).MemoryCookieStore;
-var pathMatch = __webpack_require__(66).pathMatch;
-var VERSION = __webpack_require__(68).version;
+var net = __webpack_require__(5);
+var urlParse = __webpack_require__(6).parse;
+var pubsuffix = __webpack_require__(7);
+var Store = __webpack_require__(9).Store;
+var MemoryCookieStore = __webpack_require__(10).MemoryCookieStore;
+var pathMatch = __webpack_require__(12).pathMatch;
+var VERSION = __webpack_require__(14).version;
 
 var punycode;
 try {
-  punycode = __webpack_require__(62);
+  punycode = __webpack_require__(8);
 } catch(e) {
   console.warn("cookie: can't load punycode; won't use punycode for domain normalization");
 }
@@ -8442,26 +1811,26 @@ module.exports = {
   pathMatch: pathMatch,
   getPublicSuffix: pubsuffix.getPublicSuffix,
   cookieCompare: cookieCompare,
-  permuteDomain: __webpack_require__(65).permuteDomain,
+  permuteDomain: __webpack_require__(11).permuteDomain,
   permutePath: permutePath,
   canonicalDomain: canonicalDomain
 };
 
 
 /***/ }),
-/* 59 */
+/* 5 */
 /***/ (function(module, exports) {
 
 module.exports = require("net");
 
 /***/ }),
-/* 60 */
+/* 6 */
 /***/ (function(module, exports) {
 
 module.exports = require("url");
 
 /***/ }),
-/* 61 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8472,7 +1841,7 @@ module.exports = require("url");
 
 
 
-var punycode = __webpack_require__(62);
+var punycode = __webpack_require__(8);
 
 module.exports.getPublicSuffix = function getPublicSuffix(domain) {
   /*!
@@ -8566,13 +1935,13 @@ var index = module.exports.index = Object.freeze(
 
 
 /***/ }),
-/* 62 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = require("punycode");
 
 /***/ }),
-/* 63 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8650,7 +2019,7 @@ Store.prototype.getAllCookies = function(cb) {
 
 
 /***/ }),
-/* 64 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8685,10 +2054,10 @@ Store.prototype.getAllCookies = function(cb) {
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-var Store = __webpack_require__(63).Store;
-var permuteDomain = __webpack_require__(65).permuteDomain;
-var pathMatch = __webpack_require__(66).pathMatch;
-var util = __webpack_require__(67);
+var Store = __webpack_require__(9).Store;
+var permuteDomain = __webpack_require__(11).permuteDomain;
+var pathMatch = __webpack_require__(12).pathMatch;
+var util = __webpack_require__(13);
 
 function MemoryCookieStore() {
   Store.call(this);
@@ -8827,7 +2196,7 @@ MemoryCookieStore.prototype.getAllCookies = function(cb) {
 
 
 /***/ }),
-/* 65 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8862,7 +2231,7 @@ MemoryCookieStore.prototype.getAllCookies = function(cb) {
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-var pubsuffix = __webpack_require__(61);
+var pubsuffix = __webpack_require__(7);
 
 // Gives the permutation of all possible domainMatch()es of a given domain. The
 // array is in shortest-to-longest order.  Handy for indexing.
@@ -8890,7 +2259,7 @@ exports.permuteDomain = permuteDomain;
 
 
 /***/ }),
-/* 66 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8958,27 +2327,27 @@ exports.pathMatch = pathMatch;
 
 
 /***/ }),
-/* 67 */
+/* 13 */
 /***/ (function(module, exports) {
 
 module.exports = require("util");
 
 /***/ }),
-/* 68 */
+/* 14 */
 /***/ (function(module) {
 
 module.exports = {"author":{"name":"Jeremy Stashewsky","email":"jstashewsky@salesforce.com","website":"https://github.com/stash"},"contributors":[{"name":"Alexander Savin","website":"https://github.com/apsavin"},{"name":"Ian Livingstone","website":"https://github.com/ianlivingstone"},{"name":"Ivan Nikulin","website":"https://github.com/inikulin"},{"name":"Lalit Kapoor","website":"https://github.com/lalitkapoor"},{"name":"Sam Thompson","website":"https://github.com/sambthompson"},{"name":"Sebastian Mayr","website":"https://github.com/Sebmaster"}],"license":"BSD-3-Clause","name":"tough-cookie","description":"RFC6265 Cookies and Cookie Jar for node.js","keywords":["HTTP","cookie","cookies","set-cookie","cookiejar","jar","RFC6265","RFC2965"],"version":"2.3.4","homepage":"https://github.com/salesforce/tough-cookie","repository":{"type":"git","url":"git://github.com/salesforce/tough-cookie.git"},"bugs":{"url":"https://github.com/salesforce/tough-cookie/issues"},"main":"./lib/cookie","files":["lib"],"scripts":{"suffixup":"curl -o public_suffix_list.dat https://publicsuffix.org/list/public_suffix_list.dat && ./generate-pubsuffix.js","test":"vows test/*_test.js"},"engines":{"node":">=0.8"},"devDependencies":{"async":"^1.4.2","string.prototype.repeat":"^0.2.0","vows":"^0.8.1"},"dependencies":{"punycode":"^1.4.1"}};
 
 /***/ }),
-/* 69 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var jsonSafeStringify = __webpack_require__(70)
-var crypto = __webpack_require__(71)
-var Buffer = __webpack_require__(72).Buffer
+var jsonSafeStringify = __webpack_require__(16)
+var crypto = __webpack_require__(17)
+var Buffer = __webpack_require__(18).Buffer
 
 var defer = typeof setImmediate === 'undefined'
   ? process.nextTick
@@ -9043,7 +2412,7 @@ exports.defer = defer
 
 
 /***/ }),
-/* 70 */
+/* 16 */
 /***/ (function(module, exports) {
 
 exports = module.exports = stringify
@@ -9076,17 +2445,17 @@ function serializer(replacer, cycleReplacer) {
 
 
 /***/ }),
-/* 71 */
+/* 17 */
 /***/ (function(module, exports) {
 
 module.exports = require("crypto");
 
 /***/ }),
-/* 72 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* eslint-disable node/no-deprecated-api */
-var buffer = __webpack_require__(73)
+var buffer = __webpack_require__(19)
 var Buffer = buffer.Buffer
 
 // alternative to using Object.keys for old browsers
@@ -9150,48 +2519,48 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 
 /***/ }),
-/* 73 */
+/* 19 */
 /***/ (function(module, exports) {
 
 module.exports = require("buffer");
 
 /***/ }),
-/* 74 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var http = __webpack_require__(75)
-var https = __webpack_require__(76)
-var url = __webpack_require__(60)
-var util = __webpack_require__(67)
-var stream = __webpack_require__(77)
-var zlib = __webpack_require__(78)
-var hawk = __webpack_require__(79)
-var aws2 = __webpack_require__(94)
-var aws4 = __webpack_require__(95)
-var httpSignature = __webpack_require__(98)
-var mime = __webpack_require__(147)
-var stringstream = __webpack_require__(150)
-var caseless = __webpack_require__(152)
-var ForeverAgent = __webpack_require__(153)
-var FormData = __webpack_require__(155)
-var extend = __webpack_require__(56)
-var isstream = __webpack_require__(171)
-var isTypedArray = __webpack_require__(172).strict
-var helpers = __webpack_require__(69)
-var cookies = __webpack_require__(57)
-var getProxyFromURI = __webpack_require__(173)
-var Querystring = __webpack_require__(174).Querystring
-var Har = __webpack_require__(180).Har
-var Auth = __webpack_require__(246).Auth
-var OAuth = __webpack_require__(252).OAuth
-var Multipart = __webpack_require__(254).Multipart
-var Redirect = __webpack_require__(255).Redirect
-var Tunnel = __webpack_require__(256).Tunnel
-var now = __webpack_require__(259)
-var Buffer = __webpack_require__(72).Buffer
+var http = __webpack_require__(21)
+var https = __webpack_require__(22)
+var url = __webpack_require__(6)
+var util = __webpack_require__(13)
+var stream = __webpack_require__(23)
+var zlib = __webpack_require__(24)
+var hawk = __webpack_require__(25)
+var aws2 = __webpack_require__(40)
+var aws4 = __webpack_require__(41)
+var httpSignature = __webpack_require__(44)
+var mime = __webpack_require__(93)
+var stringstream = __webpack_require__(96)
+var caseless = __webpack_require__(98)
+var ForeverAgent = __webpack_require__(99)
+var FormData = __webpack_require__(101)
+var extend = __webpack_require__(2)
+var isstream = __webpack_require__(117)
+var isTypedArray = __webpack_require__(118).strict
+var helpers = __webpack_require__(15)
+var cookies = __webpack_require__(3)
+var getProxyFromURI = __webpack_require__(119)
+var Querystring = __webpack_require__(120).Querystring
+var Har = __webpack_require__(126).Har
+var Auth = __webpack_require__(192).Auth
+var OAuth = __webpack_require__(198).OAuth
+var Multipart = __webpack_require__(200).Multipart
+var Redirect = __webpack_require__(201).Redirect
+var Tunnel = __webpack_require__(202).Tunnel
+var now = __webpack_require__(205)
+var Buffer = __webpack_require__(18).Buffer
 
 var safeStringify = helpers.safeStringify
 var isReadStream = helpers.isReadStream
@@ -10715,31 +4084,31 @@ module.exports = Request
 
 
 /***/ }),
-/* 75 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = require("http");
 
 /***/ }),
-/* 76 */
+/* 22 */
 /***/ (function(module, exports) {
 
 module.exports = require("https");
 
 /***/ }),
-/* 77 */
+/* 23 */
 /***/ (function(module, exports) {
 
 module.exports = require("stream");
 
 /***/ }),
-/* 78 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = require("zlib");
 
 /***/ }),
-/* 79 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10747,13 +4116,13 @@ module.exports = require("zlib");
 
 // Export sub-modules
 
-exports.error = exports.Error = __webpack_require__(80);
-exports.sntp = __webpack_require__(84);
+exports.error = exports.Error = __webpack_require__(26);
+exports.sntp = __webpack_require__(30);
 
-exports.server = __webpack_require__(87);
-exports.client = __webpack_require__(93);
-exports.crypto = __webpack_require__(90);
-exports.utils = __webpack_require__(91);
+exports.server = __webpack_require__(33);
+exports.client = __webpack_require__(39);
+exports.crypto = __webpack_require__(36);
+exports.utils = __webpack_require__(37);
 
 exports.uri = {
     authenticate: exports.server.authenticateBewit,
@@ -10763,7 +4132,7 @@ exports.uri = {
 
 
 /***/ }),
-/* 80 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10771,7 +4140,7 @@ exports.uri = {
 
 // Load modules
 
-const Hoek = __webpack_require__(81);
+const Hoek = __webpack_require__(27);
 
 
 // Declare internals
@@ -11203,7 +4572,7 @@ exports.badImplementation = function (message, data) {
 
 
 /***/ }),
-/* 81 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11211,10 +4580,10 @@ exports.badImplementation = function (message, data) {
 
 // Load modules
 
-const Crypto = __webpack_require__(71);
-const Path = __webpack_require__(82);
-const Util = __webpack_require__(67);
-const Escape = __webpack_require__(83);
+const Crypto = __webpack_require__(17);
+const Path = __webpack_require__(28);
+const Util = __webpack_require__(13);
+const Escape = __webpack_require__(29);
 
 
 // Declare internals
@@ -12188,13 +5557,13 @@ exports.shallow = function (source) {
 
 
 /***/ }),
-/* 82 */
+/* 28 */
 /***/ (function(module, exports) {
 
 module.exports = require("path");
 
 /***/ }),
-/* 83 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12369,7 +5738,7 @@ internals.safeCharCodes = (function () {
 
 
 /***/ }),
-/* 84 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12377,10 +5746,10 @@ internals.safeCharCodes = (function () {
 
 // Load modules
 
-const Dgram = __webpack_require__(85);
-const Dns = __webpack_require__(86);
+const Dgram = __webpack_require__(31);
+const Dns = __webpack_require__(32);
 
-const Hoek = __webpack_require__(81);
+const Hoek = __webpack_require__(27);
 
 
 // Declare internals
@@ -12788,19 +6157,19 @@ exports.now = function () {
 
 
 /***/ }),
-/* 85 */
+/* 31 */
 /***/ (function(module, exports) {
 
 module.exports = require("dgram");
 
 /***/ }),
-/* 86 */
+/* 32 */
 /***/ (function(module, exports) {
 
 module.exports = require("dns");
 
 /***/ }),
-/* 87 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12808,11 +6177,11 @@ module.exports = require("dns");
 
 // Load modules
 
-const Boom = __webpack_require__(80);
-const Hoek = __webpack_require__(81);
-const Cryptiles = __webpack_require__(88);
-const Crypto = __webpack_require__(90);
-const Utils = __webpack_require__(91);
+const Boom = __webpack_require__(26);
+const Hoek = __webpack_require__(27);
+const Cryptiles = __webpack_require__(34);
+const Crypto = __webpack_require__(36);
+const Utils = __webpack_require__(37);
 
 
 // Declare internals
@@ -13357,7 +6726,7 @@ internals.nonceFunc = function (key, nonce, ts, nonceCallback) {
 
 
 /***/ }),
-/* 88 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13365,8 +6734,8 @@ internals.nonceFunc = function (key, nonce, ts, nonceCallback) {
 
 // Load modules
 
-const Crypto = __webpack_require__(71);
-const Boom = __webpack_require__(89);
+const Crypto = __webpack_require__(17);
+const Boom = __webpack_require__(35);
 
 
 // Declare internals
@@ -13452,7 +6821,7 @@ exports.fixedTimeComparison = function (a, b) {
 
 
 /***/ }),
-/* 89 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13460,7 +6829,7 @@ exports.fixedTimeComparison = function (a, b) {
 
 // Load modules
 
-const Hoek = __webpack_require__(81);
+const Hoek = __webpack_require__(27);
 
 
 // Declare internals
@@ -13916,7 +7285,7 @@ exports.badImplementation = function (message, data) {
 
 
 /***/ }),
-/* 90 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13924,9 +7293,9 @@ exports.badImplementation = function (message, data) {
 
 // Load modules
 
-const Crypto = __webpack_require__(71);
-const Url = __webpack_require__(60);
-const Utils = __webpack_require__(91);
+const Crypto = __webpack_require__(17);
+const Url = __webpack_require__(6);
+const Utils = __webpack_require__(37);
 
 
 // Declare internals
@@ -14051,7 +7420,7 @@ exports.timestampMessage = function (credentials, localtimeOffsetMsec) {
 
 
 /***/ }),
-/* 91 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14059,8 +7428,8 @@ exports.timestampMessage = function (credentials, localtimeOffsetMsec) {
 
 // Load modules
 
-const Sntp = __webpack_require__(84);
-const Boom = __webpack_require__(80);
+const Sntp = __webpack_require__(30);
+const Boom = __webpack_require__(26);
 
 
 // Declare internals
@@ -14070,7 +7439,7 @@ const internals = {};
 
 exports.version = function () {
 
-    return __webpack_require__(92).version;
+    return __webpack_require__(38).version;
 };
 
 
@@ -14244,13 +7613,13 @@ exports.unauthorized = function (message, attributes) {
 
 
 /***/ }),
-/* 92 */
+/* 38 */
 /***/ (function(module) {
 
 module.exports = {"name":"hawk","description":"HTTP Hawk Authentication Scheme","version":"6.0.2","author":"Eran Hammer <eran@hammer.io> (http://hueniverse.com)","repository":"git://github.com/hueniverse/hawk","main":"lib/index.js","browser":"dist/browser.js","keywords":["http","authentication","scheme","hawk"],"engines":{"node":">=4.5.0"},"dependencies":{"hoek":"4.x.x","boom":"4.x.x","cryptiles":"3.x.x","sntp":"2.x.x"},"devDependencies":{"babel-cli":"^6.1.2","babel-preset-es2015":"^6.1.2","code":"4.x.x","lab":"14.x.x"},"babel":{"presets":["es2015"]},"scripts":{"build-client":"mkdir -p dist; babel lib/browser.js --out-file dist/browser.js","prepublish":"npm run-script build-client","test":"lab -a code -t 100 -L","test-cov-html":"lab -a code -r html -o coverage.html"},"license":"BSD-3-Clause"};
 
 /***/ }),
-/* 93 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14258,11 +7627,11 @@ module.exports = {"name":"hawk","description":"HTTP Hawk Authentication Scheme",
 
 // Load modules
 
-const Url = __webpack_require__(60);
-const Hoek = __webpack_require__(81);
-const Cryptiles = __webpack_require__(88);
-const Crypto = __webpack_require__(90);
-const Utils = __webpack_require__(91);
+const Url = __webpack_require__(6);
+const Hoek = __webpack_require__(27);
+const Cryptiles = __webpack_require__(34);
+const Crypto = __webpack_require__(36);
+const Utils = __webpack_require__(37);
 
 
 // Declare internals
@@ -14651,7 +8020,7 @@ exports.message = function (host, port, message, options) {
 
 
 /***/ }),
-/* 94 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -14675,8 +8044,8 @@ exports.message = function (host, port, message, options) {
  * Module dependencies.
  */
 
-var crypto = __webpack_require__(71)
-  , parse = __webpack_require__(60).parse
+var crypto = __webpack_require__(17)
+  , parse = __webpack_require__(6).parse
   ;
 
 /**
@@ -14869,14 +8238,14 @@ module.exports.canonicalizeResource = canonicalizeResource
 
 
 /***/ }),
-/* 95 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var aws4 = exports,
-    url = __webpack_require__(60),
-    querystring = __webpack_require__(96),
-    crypto = __webpack_require__(71),
-    lru = __webpack_require__(97),
+    url = __webpack_require__(6),
+    querystring = __webpack_require__(42),
+    crypto = __webpack_require__(17),
+    lru = __webpack_require__(43),
     credentialsCache = lru(1000)
 
 // http://docs.amazonwebservices.com/general/latest/gr/signature-version-4.html
@@ -15207,13 +8576,13 @@ aws4.sign = function(request, credentials) {
 
 
 /***/ }),
-/* 96 */
+/* 42 */
 /***/ (function(module, exports) {
 
 module.exports = require("querystring");
 
 /***/ }),
-/* 97 */
+/* 43 */
 /***/ (function(module, exports) {
 
 module.exports = function(size) {
@@ -15315,15 +8684,15 @@ function DoublyLinkedNode(key, val) {
 
 
 /***/ }),
-/* 98 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
 
-var parser = __webpack_require__(99);
-var signer = __webpack_require__(139);
-var verify = __webpack_require__(146);
-var utils = __webpack_require__(102);
+var parser = __webpack_require__(45);
+var signer = __webpack_require__(85);
+var verify = __webpack_require__(92);
+var utils = __webpack_require__(48);
 
 
 
@@ -15350,14 +8719,14 @@ module.exports = {
 
 
 /***/ }),
-/* 99 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2012 Joyent, Inc.  All rights reserved.
 
-var assert = __webpack_require__(100);
-var util = __webpack_require__(67);
-var utils = __webpack_require__(102);
+var assert = __webpack_require__(46);
+var util = __webpack_require__(13);
+var utils = __webpack_require__(48);
 
 
 
@@ -15671,15 +9040,15 @@ module.exports = {
 
 
 /***/ }),
-/* 100 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright (c) 2012, Mark Cavage. All rights reserved.
 // Copyright 2015 Joyent, Inc.
 
-var assert = __webpack_require__(101);
-var Stream = __webpack_require__(77).Stream;
-var util = __webpack_require__(67);
+var assert = __webpack_require__(47);
+var Stream = __webpack_require__(23).Stream;
+var util = __webpack_require__(13);
 
 
 ///--- Globals
@@ -15888,20 +9257,20 @@ module.exports = _setExports(process.env.NODE_NDEBUG);
 
 
 /***/ }),
-/* 101 */
+/* 47 */
 /***/ (function(module, exports) {
 
 module.exports = require("assert");
 
 /***/ }),
-/* 102 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2012 Joyent, Inc.  All rights reserved.
 
-var assert = __webpack_require__(100);
-var sshpk = __webpack_require__(103);
-var util = __webpack_require__(67);
+var assert = __webpack_require__(46);
+var sshpk = __webpack_require__(49);
+var util = __webpack_require__(13);
 
 var HASH_ALGOS = {
   'sha1': true,
@@ -16012,18 +9381,18 @@ module.exports = {
 
 
 /***/ }),
-/* 103 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
 
-var Key = __webpack_require__(104);
-var Fingerprint = __webpack_require__(106);
-var Signature = __webpack_require__(109);
-var PrivateKey = __webpack_require__(111);
-var Certificate = __webpack_require__(108);
-var Identity = __webpack_require__(135);
-var errs = __webpack_require__(107);
+var Key = __webpack_require__(50);
+var Fingerprint = __webpack_require__(52);
+var Signature = __webpack_require__(55);
+var PrivateKey = __webpack_require__(57);
+var Certificate = __webpack_require__(54);
+var Identity = __webpack_require__(81);
+var errs = __webpack_require__(53);
 
 module.exports = {
 	/* top-level classes */
@@ -16057,26 +9426,26 @@ module.exports = {
 
 
 /***/ }),
-/* 104 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2017 Joyent, Inc.
 
 module.exports = Key;
 
-var assert = __webpack_require__(100);
-var algs = __webpack_require__(105);
-var crypto = __webpack_require__(71);
-var Fingerprint = __webpack_require__(106);
-var Signature = __webpack_require__(109);
-var DiffieHellman = __webpack_require__(112).DiffieHellman;
-var errs = __webpack_require__(107);
-var utils = __webpack_require__(110);
-var PrivateKey = __webpack_require__(111);
+var assert = __webpack_require__(46);
+var algs = __webpack_require__(51);
+var crypto = __webpack_require__(17);
+var Fingerprint = __webpack_require__(52);
+var Signature = __webpack_require__(55);
+var DiffieHellman = __webpack_require__(58).DiffieHellman;
+var errs = __webpack_require__(53);
+var utils = __webpack_require__(56);
+var PrivateKey = __webpack_require__(57);
 var edCompat;
 
 try {
-	edCompat = __webpack_require__(118);
+	edCompat = __webpack_require__(64);
 } catch (e) {
 	/* Just continue through, and bail out if we try to use it. */
 }
@@ -16085,15 +9454,15 @@ var InvalidAlgorithmError = errs.InvalidAlgorithmError;
 var KeyParseError = errs.KeyParseError;
 
 var formats = {};
-formats['auto'] = __webpack_require__(119);
-formats['pem'] = __webpack_require__(120);
-formats['pkcs1'] = __webpack_require__(127);
-formats['pkcs8'] = __webpack_require__(128);
-formats['rfc4253'] = __webpack_require__(130);
-formats['ssh'] = __webpack_require__(133);
-formats['ssh-private'] = __webpack_require__(129);
+formats['auto'] = __webpack_require__(65);
+formats['pem'] = __webpack_require__(66);
+formats['pkcs1'] = __webpack_require__(73);
+formats['pkcs8'] = __webpack_require__(74);
+formats['rfc4253'] = __webpack_require__(76);
+formats['ssh'] = __webpack_require__(79);
+formats['ssh-private'] = __webpack_require__(75);
 formats['openssh'] = formats['ssh-private'];
-formats['dnssec'] = __webpack_require__(134);
+formats['dnssec'] = __webpack_require__(80);
 
 function Key(opts) {
 	assert.object(opts, 'options');
@@ -16338,7 +9707,7 @@ Key._oldVersionDetect = function (obj) {
 
 
 /***/ }),
-/* 105 */
+/* 51 */
 /***/ (function(module, exports) {
 
 // Copyright 2015 Joyent, Inc.
@@ -16510,20 +9879,20 @@ module.exports = {
 
 
 /***/ }),
-/* 106 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
 
 module.exports = Fingerprint;
 
-var assert = __webpack_require__(100);
-var algs = __webpack_require__(105);
-var crypto = __webpack_require__(71);
-var errs = __webpack_require__(107);
-var Key = __webpack_require__(104);
-var Certificate = __webpack_require__(108);
-var utils = __webpack_require__(110);
+var assert = __webpack_require__(46);
+var algs = __webpack_require__(51);
+var crypto = __webpack_require__(17);
+var errs = __webpack_require__(53);
+var Key = __webpack_require__(50);
+var Certificate = __webpack_require__(54);
+var utils = __webpack_require__(56);
 
 var FingerprintFormatError = errs.FingerprintFormatError;
 var InvalidAlgorithmError = errs.InvalidAlgorithmError;
@@ -16677,13 +10046,13 @@ Fingerprint._oldVersionDetect = function (obj) {
 
 
 /***/ }),
-/* 107 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
 
-var assert = __webpack_require__(100);
-var util = __webpack_require__(67);
+var assert = __webpack_require__(46);
+var util = __webpack_require__(13);
 
 function FingerprintFormatError(fp, format) {
 	if (Error.captureStackTrace)
@@ -16767,29 +10136,29 @@ module.exports = {
 
 
 /***/ }),
-/* 108 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2016 Joyent, Inc.
 
 module.exports = Certificate;
 
-var assert = __webpack_require__(100);
-var algs = __webpack_require__(105);
-var crypto = __webpack_require__(71);
-var Fingerprint = __webpack_require__(106);
-var Signature = __webpack_require__(109);
-var errs = __webpack_require__(107);
-var util = __webpack_require__(67);
-var utils = __webpack_require__(110);
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
-var Identity = __webpack_require__(135);
+var assert = __webpack_require__(46);
+var algs = __webpack_require__(51);
+var crypto = __webpack_require__(17);
+var Fingerprint = __webpack_require__(52);
+var Signature = __webpack_require__(55);
+var errs = __webpack_require__(53);
+var util = __webpack_require__(13);
+var utils = __webpack_require__(56);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
+var Identity = __webpack_require__(81);
 
 var formats = {};
-formats['openssh'] = __webpack_require__(136);
-formats['x509'] = __webpack_require__(137);
-formats['pem'] = __webpack_require__(138);
+formats['openssh'] = __webpack_require__(82);
+formats['x509'] = __webpack_require__(83);
+formats['pem'] = __webpack_require__(84);
 
 var CertificateParseError = errs.CertificateParseError;
 var InvalidAlgorithmError = errs.InvalidAlgorithmError;
@@ -17150,20 +10519,20 @@ Certificate._oldVersionDetect = function (obj) {
 
 
 /***/ }),
-/* 109 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
 
 module.exports = Signature;
 
-var assert = __webpack_require__(100);
-var algs = __webpack_require__(105);
-var crypto = __webpack_require__(71);
-var errs = __webpack_require__(107);
-var utils = __webpack_require__(110);
-var asn1 = __webpack_require__(121);
-var SSHBuffer = __webpack_require__(131);
+var assert = __webpack_require__(46);
+var algs = __webpack_require__(51);
+var crypto = __webpack_require__(17);
+var errs = __webpack_require__(53);
+var utils = __webpack_require__(56);
+var asn1 = __webpack_require__(67);
+var SSHBuffer = __webpack_require__(77);
 
 var InvalidAlgorithmError = errs.InvalidAlgorithmError;
 var SignatureParseError = errs.SignatureParseError;
@@ -17469,7 +10838,7 @@ Signature._oldVersionDetect = function (obj) {
 
 
 /***/ }),
-/* 110 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
@@ -17494,12 +10863,12 @@ module.exports = {
 	readBitString: readBitString
 };
 
-var assert = __webpack_require__(100);
-var PrivateKey = __webpack_require__(111);
-var Key = __webpack_require__(104);
-var crypto = __webpack_require__(71);
-var algs = __webpack_require__(105);
-var asn1 = __webpack_require__(121);
+var assert = __webpack_require__(46);
+var PrivateKey = __webpack_require__(57);
+var Key = __webpack_require__(50);
+var crypto = __webpack_require__(17);
+var algs = __webpack_require__(51);
+var asn1 = __webpack_require__(67);
 
 var ec, jsbn;
 var nacl;
@@ -17730,7 +11099,7 @@ function calculateDSAPublic(g, p, x) {
 	assert.buffer(p);
 	assert.buffer(x);
 	try {
-		var bigInt = __webpack_require__(114).BigInteger;
+		var bigInt = __webpack_require__(60).BigInteger;
 	} catch (e) {
 		throw (new Error('To load a PKCS#8 format DSA private key, ' +
 		    'the node jsbn library is required.'));
@@ -17747,7 +11116,7 @@ function calculateED25519Public(k) {
 	assert.buffer(k);
 
 	if (nacl === undefined)
-		nacl = __webpack_require__(117);
+		nacl = __webpack_require__(63);
 
 	var kp = nacl.sign.keyPair.fromSeed(new Uint8Array(k));
 	return (new Buffer(kp.publicKey));
@@ -17757,7 +11126,7 @@ function calculateX25519Public(k) {
 	assert.buffer(k);
 
 	if (nacl === undefined)
-		nacl = __webpack_require__(117);
+		nacl = __webpack_require__(63);
 
 	var kp = nacl.box.keyPair.fromSeed(new Uint8Array(k));
 	return (new Buffer(kp.publicKey));
@@ -17767,7 +11136,7 @@ function addRSAMissing(key) {
 	assert.object(key);
 	assertCompatible(key, PrivateKey, [1, 1]);
 	try {
-		var bigInt = __webpack_require__(114).BigInteger;
+		var bigInt = __webpack_require__(60).BigInteger;
 	} catch (e) {
 		throw (new Error('To write a PEM private key from ' +
 		    'this source, the node jsbn lib is required.'));
@@ -17798,9 +11167,9 @@ function publicFromPrivateECDSA(curveName, priv) {
 	assert.string(curveName, 'curveName');
 	assert.buffer(priv);
 	if (ec === undefined)
-		ec = __webpack_require__(115);
+		ec = __webpack_require__(61);
 	if (jsbn === undefined)
-		jsbn = __webpack_require__(114).BigInteger;
+		jsbn = __webpack_require__(60).BigInteger;
 	var params = algs.curves[curveName];
 	var p = new jsbn(params.p);
 	var a = new jsbn(params.a);
@@ -17863,49 +11232,49 @@ function opensshCipherInfo(cipher) {
 
 
 /***/ }),
-/* 111 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2017 Joyent, Inc.
 
 module.exports = PrivateKey;
 
-var assert = __webpack_require__(100);
-var algs = __webpack_require__(105);
-var crypto = __webpack_require__(71);
-var Fingerprint = __webpack_require__(106);
-var Signature = __webpack_require__(109);
-var errs = __webpack_require__(107);
-var util = __webpack_require__(67);
-var utils = __webpack_require__(110);
-var dhe = __webpack_require__(112);
+var assert = __webpack_require__(46);
+var algs = __webpack_require__(51);
+var crypto = __webpack_require__(17);
+var Fingerprint = __webpack_require__(52);
+var Signature = __webpack_require__(55);
+var errs = __webpack_require__(53);
+var util = __webpack_require__(13);
+var utils = __webpack_require__(56);
+var dhe = __webpack_require__(58);
 var generateECDSA = dhe.generateECDSA;
 var generateED25519 = dhe.generateED25519;
 var edCompat;
 var nacl;
 
 try {
-	edCompat = __webpack_require__(118);
+	edCompat = __webpack_require__(64);
 } catch (e) {
 	/* Just continue through, and bail out if we try to use it. */
 }
 
-var Key = __webpack_require__(104);
+var Key = __webpack_require__(50);
 
 var InvalidAlgorithmError = errs.InvalidAlgorithmError;
 var KeyParseError = errs.KeyParseError;
 var KeyEncryptedError = errs.KeyEncryptedError;
 
 var formats = {};
-formats['auto'] = __webpack_require__(119);
-formats['pem'] = __webpack_require__(120);
-formats['pkcs1'] = __webpack_require__(127);
-formats['pkcs8'] = __webpack_require__(128);
-formats['rfc4253'] = __webpack_require__(130);
-formats['ssh-private'] = __webpack_require__(129);
+formats['auto'] = __webpack_require__(65);
+formats['pem'] = __webpack_require__(66);
+formats['pkcs1'] = __webpack_require__(73);
+formats['pkcs8'] = __webpack_require__(74);
+formats['rfc4253'] = __webpack_require__(76);
+formats['ssh-private'] = __webpack_require__(75);
 formats['openssh'] = formats['ssh-private'];
 formats['ssh'] = formats['ssh-private'];
-formats['dnssec'] = __webpack_require__(134);
+formats['dnssec'] = __webpack_require__(80);
 
 function PrivateKey(opts) {
 	assert.object(opts, 'options');
@@ -17958,7 +11327,7 @@ PrivateKey.prototype.derive = function (newType) {
 
 	if (this.type === 'ed25519' && newType === 'curve25519') {
 		if (nacl === undefined)
-			nacl = __webpack_require__(117);
+			nacl = __webpack_require__(63);
 
 		priv = this.part.k.data;
 		if (priv[0] === 0x00)
@@ -17976,7 +11345,7 @@ PrivateKey.prototype.derive = function (newType) {
 		}));
 	} else if (this.type === 'curve25519' && newType === 'ed25519') {
 		if (nacl === undefined)
-			nacl = __webpack_require__(117);
+			nacl = __webpack_require__(63);
 
 		priv = this.part.k.data;
 		if (priv[0] === 0x00)
@@ -18121,7 +11490,7 @@ PrivateKey._oldVersionDetect = function (obj) {
 
 
 /***/ }),
-/* 112 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2017 Joyent, Inc.
@@ -18132,14 +11501,14 @@ module.exports = {
 	generateED25519: generateED25519
 };
 
-var assert = __webpack_require__(100);
-var crypto = __webpack_require__(71);
-var algs = __webpack_require__(105);
-var utils = __webpack_require__(110);
+var assert = __webpack_require__(46);
+var crypto = __webpack_require__(17);
+var algs = __webpack_require__(51);
+var utils = __webpack_require__(56);
 var nacl;
 
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
 
 var CRYPTO_HAVE_ECDH = (crypto.createECDH !== undefined);
 
@@ -18169,11 +11538,11 @@ function DiffieHellman(key) {
 	} else if (key.type === 'ecdsa') {
 		if (!CRYPTO_HAVE_ECDH) {
 			if (ecdh === undefined)
-				ecdh = __webpack_require__(113);
+				ecdh = __webpack_require__(59);
 			if (ec === undefined)
-				ec = __webpack_require__(115);
+				ec = __webpack_require__(61);
 			if (jsbn === undefined)
-				jsbn = __webpack_require__(114).BigInteger;
+				jsbn = __webpack_require__(60).BigInteger;
 
 			this._ecParams = new X9ECParameters(this._curve);
 
@@ -18202,7 +11571,7 @@ function DiffieHellman(key) {
 
 	} else if (key.type === 'curve25519') {
 		if (nacl === undefined)
-			nacl = __webpack_require__(117);
+			nacl = __webpack_require__(63);
 
 		if (this._isPriv) {
 			utils.assertCompatible(key, PrivateKey, [1, 5], 'key');
@@ -18447,7 +11816,7 @@ ECPrivate.prototype.deriveSharedSecret = function (pubKey) {
 
 function generateED25519() {
 	if (nacl === undefined)
-		nacl = __webpack_require__(117);
+		nacl = __webpack_require__(63);
 
 	var pair = nacl.sign.keyPair();
 	var priv = new Buffer(pair.secretKey);
@@ -18500,11 +11869,11 @@ function generateECDSA(curve) {
 		return (key);
 	} else {
 		if (ecdh === undefined)
-			ecdh = __webpack_require__(113);
+			ecdh = __webpack_require__(59);
 		if (ec === undefined)
-			ec = __webpack_require__(115);
+			ec = __webpack_require__(61);
 		if (jsbn === undefined)
-			jsbn = __webpack_require__(114).BigInteger;
+			jsbn = __webpack_require__(60).BigInteger;
 
 		var ecParams = new X9ECParameters(curve);
 
@@ -18540,13 +11909,13 @@ function generateECDSA(curve) {
 
 
 /***/ }),
-/* 113 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var crypto = __webpack_require__(71);
-var BigInteger = __webpack_require__(114).BigInteger;
-var ECPointFp = __webpack_require__(115).ECPointFp;
-exports.ECCurves = __webpack_require__(116);
+var crypto = __webpack_require__(17);
+var BigInteger = __webpack_require__(60).BigInteger;
+var ECPointFp = __webpack_require__(61).ECPointFp;
+exports.ECCurves = __webpack_require__(62);
 
 // zero prepad
 function unstupid(hex,len)
@@ -18603,7 +11972,7 @@ exports.ECKey = function(curve, key, isPublic)
 
 
 /***/ }),
-/* 114 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function(){
@@ -19963,7 +13332,7 @@ exports.ECKey = function(curve, key, isPublic)
 
 
 /***/ }),
-/* 115 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Basic Javascript Elliptic Curve implementation
@@ -19971,7 +13340,7 @@ exports.ECKey = function(curve, key, isPublic)
 // Only Fp curves implemented for now
 
 // Requires jsbn.js and jsbn2.js
-var BigInteger = __webpack_require__(114).BigInteger
+var BigInteger = __webpack_require__(60).BigInteger
 var Barrett = BigInteger.prototype.Barrett
 
 // ----------------
@@ -20530,14 +13899,14 @@ module.exports = exports
 
 
 /***/ }),
-/* 116 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Named EC curves
 
 // Requires ec.js, jsbn.js, and jsbn2.js
-var BigInteger = __webpack_require__(114).BigInteger
-var ECCurveFp = __webpack_require__(115).ECCurveFp
+var BigInteger = __webpack_require__(60).BigInteger
+var ECCurveFp = __webpack_require__(61).ECCurveFp
 
 
 // ----------------
@@ -20706,7 +14075,7 @@ module.exports = {
 
 
 /***/ }),
-/* 117 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function(nacl) {
@@ -23085,7 +16454,7 @@ nacl.setPRNG = function(fn) {
     });
   } else if (true) {
     // Node.js.
-    crypto = __webpack_require__(71);
+    crypto = __webpack_require__(17);
     if (crypto && crypto.randomBytes) {
       nacl.setPRNG(function(x, n) {
         var i, v = crypto.randomBytes(n);
@@ -23100,7 +16469,7 @@ nacl.setPRNG = function(fn) {
 
 
 /***/ }),
-/* 118 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
@@ -23111,14 +16480,14 @@ module.exports = {
 };
 
 var nacl;
-var stream = __webpack_require__(77);
-var util = __webpack_require__(67);
-var assert = __webpack_require__(100);
-var Signature = __webpack_require__(109);
+var stream = __webpack_require__(23);
+var util = __webpack_require__(13);
+var assert = __webpack_require__(46);
+var Signature = __webpack_require__(55);
 
 function Verifier(key, hashAlgo) {
 	if (nacl === undefined)
-		nacl = __webpack_require__(117);
+		nacl = __webpack_require__(63);
 
 	if (hashAlgo.toLowerCase() !== 'sha512')
 		throw (new Error('ED25519 only supports the use of ' +
@@ -23166,7 +16535,7 @@ Verifier.prototype.verify = function (signature, fmt) {
 
 function Signer(key, hashAlgo) {
 	if (nacl === undefined)
-		nacl = __webpack_require__(117);
+		nacl = __webpack_require__(63);
 
 	if (hashAlgo.toLowerCase() !== 'sha512')
 		throw (new Error('ED25519 only supports the use of ' +
@@ -23203,7 +16572,7 @@ Signer.prototype.sign = function () {
 
 
 /***/ }),
-/* 119 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
@@ -23213,15 +16582,15 @@ module.exports = {
 	write: write
 };
 
-var assert = __webpack_require__(100);
-var utils = __webpack_require__(110);
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
+var assert = __webpack_require__(46);
+var utils = __webpack_require__(56);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
 
-var pem = __webpack_require__(120);
-var ssh = __webpack_require__(133);
-var rfc4253 = __webpack_require__(130);
-var dnssec = __webpack_require__(134);
+var pem = __webpack_require__(66);
+var ssh = __webpack_require__(79);
+var rfc4253 = __webpack_require__(76);
+var dnssec = __webpack_require__(80);
 
 var DNSSEC_PRIVKEY_HEADER_PREFIX = 'Private-key-format: v1';
 
@@ -23315,7 +16684,7 @@ function write(key, options) {
 
 
 /***/ }),
-/* 120 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
@@ -23325,20 +16694,20 @@ module.exports = {
 	write: write
 };
 
-var assert = __webpack_require__(100);
-var asn1 = __webpack_require__(121);
-var crypto = __webpack_require__(71);
-var algs = __webpack_require__(105);
-var utils = __webpack_require__(110);
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
+var assert = __webpack_require__(46);
+var asn1 = __webpack_require__(67);
+var crypto = __webpack_require__(17);
+var algs = __webpack_require__(51);
+var utils = __webpack_require__(56);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
 
-var pkcs1 = __webpack_require__(127);
-var pkcs8 = __webpack_require__(128);
-var sshpriv = __webpack_require__(129);
-var rfc4253 = __webpack_require__(130);
+var pkcs1 = __webpack_require__(73);
+var pkcs8 = __webpack_require__(74);
+var sshpriv = __webpack_require__(75);
+var rfc4253 = __webpack_require__(76);
 
-var errors = __webpack_require__(107);
+var errors = __webpack_require__(53);
 
 /*
  * For reading we support both PKCS#1 and PKCS#8. If we find a private key,
@@ -23512,7 +16881,7 @@ function write(key, options, type) {
 
 
 /***/ }),
-/* 121 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
@@ -23520,7 +16889,7 @@ function write(key, options, type) {
 // If you have no idea what ASN.1 or BER is, see this:
 // ftp://ftp.rsa.com/pub/pkcs/ascii/layman.asc
 
-var Ber = __webpack_require__(122);
+var Ber = __webpack_require__(68);
 
 
 
@@ -23538,16 +16907,16 @@ module.exports = {
 
 
 /***/ }),
-/* 122 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
-var errors = __webpack_require__(123);
-var types = __webpack_require__(124);
+var errors = __webpack_require__(69);
+var types = __webpack_require__(70);
 
-var Reader = __webpack_require__(125);
-var Writer = __webpack_require__(126);
+var Reader = __webpack_require__(71);
+var Writer = __webpack_require__(72);
 
 
 ///--- Exports
@@ -23571,7 +16940,7 @@ for (var e in errors) {
 
 
 /***/ }),
-/* 123 */
+/* 69 */
 /***/ (function(module, exports) {
 
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
@@ -23590,7 +16959,7 @@ module.exports = {
 
 
 /***/ }),
-/* 124 */
+/* 70 */
 /***/ (function(module, exports) {
 
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
@@ -23632,15 +17001,15 @@ module.exports = {
 
 
 /***/ }),
-/* 125 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
-var assert = __webpack_require__(101);
+var assert = __webpack_require__(47);
 
-var ASN1 = __webpack_require__(124);
-var errors = __webpack_require__(123);
+var ASN1 = __webpack_require__(70);
+var errors = __webpack_require__(69);
 
 
 ///--- Globals
@@ -23899,14 +17268,14 @@ module.exports = Reader;
 
 
 /***/ }),
-/* 126 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2011 Mark Cavage <mcavage@gmail.com> All rights reserved.
 
-var assert = __webpack_require__(101);
-var ASN1 = __webpack_require__(124);
-var errors = __webpack_require__(123);
+var assert = __webpack_require__(47);
+var ASN1 = __webpack_require__(70);
+var errors = __webpack_require__(69);
 
 
 ///--- Globals
@@ -24221,7 +17590,7 @@ module.exports = Writer;
 
 
 /***/ }),
-/* 127 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
@@ -24233,16 +17602,16 @@ module.exports = {
 	writePkcs1: writePkcs1
 };
 
-var assert = __webpack_require__(100);
-var asn1 = __webpack_require__(121);
-var algs = __webpack_require__(105);
-var utils = __webpack_require__(110);
+var assert = __webpack_require__(46);
+var asn1 = __webpack_require__(67);
+var algs = __webpack_require__(51);
+var utils = __webpack_require__(56);
 
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
-var pem = __webpack_require__(120);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
+var pem = __webpack_require__(66);
 
-var pkcs8 = __webpack_require__(128);
+var pkcs8 = __webpack_require__(74);
 var readECDSACurve = pkcs8.readECDSACurve;
 
 function read(buf, options) {
@@ -24603,7 +17972,7 @@ function writePkcs1EdDSAPublic(der, key) {
 
 
 /***/ }),
-/* 128 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
@@ -24618,13 +17987,13 @@ module.exports = {
 	writeECDSACurve: writeECDSACurve
 };
 
-var assert = __webpack_require__(100);
-var asn1 = __webpack_require__(121);
-var algs = __webpack_require__(105);
-var utils = __webpack_require__(110);
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
-var pem = __webpack_require__(120);
+var assert = __webpack_require__(46);
+var asn1 = __webpack_require__(67);
+var algs = __webpack_require__(51);
+var utils = __webpack_require__(56);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
+var pem = __webpack_require__(66);
 
 function read(buf, options) {
 	return (pem.read(buf, options, 'pkcs8'));
@@ -25225,7 +18594,7 @@ function writePkcs8EdDSAPrivate(key, der) {
 
 
 /***/ }),
-/* 129 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
@@ -25236,18 +18605,18 @@ module.exports = {
 	write: write
 };
 
-var assert = __webpack_require__(100);
-var asn1 = __webpack_require__(121);
-var algs = __webpack_require__(105);
-var utils = __webpack_require__(110);
-var crypto = __webpack_require__(71);
+var assert = __webpack_require__(46);
+var asn1 = __webpack_require__(67);
+var algs = __webpack_require__(51);
+var utils = __webpack_require__(56);
+var crypto = __webpack_require__(17);
 
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
-var pem = __webpack_require__(120);
-var rfc4253 = __webpack_require__(130);
-var SSHBuffer = __webpack_require__(131);
-var errors = __webpack_require__(107);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
+var pem = __webpack_require__(66);
+var rfc4253 = __webpack_require__(76);
+var SSHBuffer = __webpack_require__(77);
+var errors = __webpack_require__(53);
 
 var bcrypt;
 
@@ -25296,7 +18665,7 @@ function readSSHPrivate(type, buf, options) {
 		var rounds = kdfOptsBuf.readInt();
 		var cinf = utils.opensshCipherInfo(cipher);
 		if (bcrypt === undefined) {
-			bcrypt = __webpack_require__(132);
+			bcrypt = __webpack_require__(78);
 		}
 
 		if (typeof (options.passphrase) === 'string') {
@@ -25417,7 +18786,7 @@ function write(key, options) {
 		kdfopts = kdfssh.toBuffer();
 
 		if (bcrypt === undefined) {
-			bcrypt = __webpack_require__(132);
+			bcrypt = __webpack_require__(78);
 		}
 		var pass = new Uint8Array(passphrase);
 		var salti = new Uint8Array(salt);
@@ -25492,7 +18861,7 @@ function write(key, options) {
 
 
 /***/ }),
-/* 130 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
@@ -25510,12 +18879,12 @@ module.exports = {
 	algToKeyType: algToKeyType
 };
 
-var assert = __webpack_require__(100);
-var algs = __webpack_require__(105);
-var utils = __webpack_require__(110);
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
-var SSHBuffer = __webpack_require__(131);
+var assert = __webpack_require__(46);
+var algs = __webpack_require__(51);
+var utils = __webpack_require__(56);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
+var SSHBuffer = __webpack_require__(77);
 
 function algToKeyType(alg) {
 	assert.string(alg);
@@ -25663,14 +19032,14 @@ function write(key, options) {
 
 
 /***/ }),
-/* 131 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
 
 module.exports = SSHBuffer;
 
-var assert = __webpack_require__(100);
+var assert = __webpack_require__(46);
 
 function SSHBuffer(opts) {
 	assert.object(opts, 'options');
@@ -25817,13 +19186,13 @@ SSHBuffer.prototype.write = function (buf) {
 
 
 /***/ }),
-/* 132 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var crypto_hash_sha512 = __webpack_require__(117).lowlevel.crypto_hash;
+var crypto_hash_sha512 = __webpack_require__(63).lowlevel.crypto_hash;
 
 /*
  * This file is a 1:1 port from the OpenBSD blowfish.c and bcrypt_pbkdf.c. As a
@@ -26380,7 +19749,7 @@ module.exports = {
 
 
 /***/ }),
-/* 133 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
@@ -26390,13 +19759,13 @@ module.exports = {
 	write: write
 };
 
-var assert = __webpack_require__(100);
-var rfc4253 = __webpack_require__(130);
-var utils = __webpack_require__(110);
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
+var assert = __webpack_require__(46);
+var rfc4253 = __webpack_require__(76);
+var utils = __webpack_require__(56);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
 
-var sshpriv = __webpack_require__(129);
+var sshpriv = __webpack_require__(75);
 
 /*JSSTYLED*/
 var SSHKEY_RE = /^([a-z0-9-]+)[ \t]+([a-zA-Z0-9+\/]+[=]*)([ \t]+([^ \t][^\n]*[\n]*)?)?$/;
@@ -26500,7 +19869,7 @@ function write(key, options) {
 
 
 /***/ }),
-/* 134 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2017 Joyent, Inc.
@@ -26510,12 +19879,12 @@ module.exports = {
 	write: write
 };
 
-var assert = __webpack_require__(100);
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
-var utils = __webpack_require__(110);
-var SSHBuffer = __webpack_require__(131);
-var Dhe = __webpack_require__(112);
+var assert = __webpack_require__(46);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
+var utils = __webpack_require__(56);
+var SSHBuffer = __webpack_require__(77);
+var Dhe = __webpack_require__(58);
 
 var supportedAlgos = {
 	'rsa-sha1' : 5,
@@ -26792,22 +20161,22 @@ function write(key, options) {
 
 
 /***/ }),
-/* 135 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2017 Joyent, Inc.
 
 module.exports = Identity;
 
-var assert = __webpack_require__(100);
-var algs = __webpack_require__(105);
-var crypto = __webpack_require__(71);
-var Fingerprint = __webpack_require__(106);
-var Signature = __webpack_require__(109);
-var errs = __webpack_require__(107);
-var util = __webpack_require__(67);
-var utils = __webpack_require__(110);
-var asn1 = __webpack_require__(121);
+var assert = __webpack_require__(46);
+var algs = __webpack_require__(51);
+var crypto = __webpack_require__(17);
+var Fingerprint = __webpack_require__(52);
+var Signature = __webpack_require__(55);
+var errs = __webpack_require__(53);
+var util = __webpack_require__(13);
+var utils = __webpack_require__(56);
+var asn1 = __webpack_require__(67);
 
 /*JSSTYLED*/
 var DNS_NAME_RE = /^([*]|[a-z0-9][a-z0-9\-]{0,62})(?:\.([*]|[a-z0-9][a-z0-9\-]{0,62}))*$/i;
@@ -27086,7 +20455,7 @@ Identity._oldVersionDetect = function (obj) {
 
 
 /***/ }),
-/* 136 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2017 Joyent, Inc.
@@ -27103,17 +20472,17 @@ module.exports = {
 	toBuffer: toBuffer
 };
 
-var assert = __webpack_require__(100);
-var SSHBuffer = __webpack_require__(131);
-var crypto = __webpack_require__(71);
-var algs = __webpack_require__(105);
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
-var Identity = __webpack_require__(135);
-var rfc4253 = __webpack_require__(130);
-var Signature = __webpack_require__(109);
-var utils = __webpack_require__(110);
-var Certificate = __webpack_require__(108);
+var assert = __webpack_require__(46);
+var SSHBuffer = __webpack_require__(77);
+var crypto = __webpack_require__(17);
+var algs = __webpack_require__(51);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
+var Identity = __webpack_require__(81);
+var rfc4253 = __webpack_require__(76);
+var Signature = __webpack_require__(55);
+var utils = __webpack_require__(56);
+var Certificate = __webpack_require__(54);
 
 function verify(cert, key) {
 	/*
@@ -27414,7 +20783,7 @@ function getCertType(key) {
 
 
 /***/ }),
-/* 137 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2017 Joyent, Inc.
@@ -27427,17 +20796,17 @@ module.exports = {
 	write: write
 };
 
-var assert = __webpack_require__(100);
-var asn1 = __webpack_require__(121);
-var algs = __webpack_require__(105);
-var utils = __webpack_require__(110);
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
-var pem = __webpack_require__(120);
-var Identity = __webpack_require__(135);
-var Signature = __webpack_require__(109);
-var Certificate = __webpack_require__(108);
-var pkcs8 = __webpack_require__(128);
+var assert = __webpack_require__(46);
+var asn1 = __webpack_require__(67);
+var algs = __webpack_require__(51);
+var utils = __webpack_require__(56);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
+var pem = __webpack_require__(66);
+var Identity = __webpack_require__(81);
+var Signature = __webpack_require__(55);
+var Certificate = __webpack_require__(54);
+var pkcs8 = __webpack_require__(74);
 
 /*
  * This file is based on RFC5280 (X.509).
@@ -28149,12 +21518,12 @@ function writeBitField(setBits, bitIndex) {
 
 
 /***/ }),
-/* 138 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2016 Joyent, Inc.
 
-var x509 = __webpack_require__(137);
+var x509 = __webpack_require__(83);
 
 module.exports = {
 	read: read,
@@ -28163,16 +21532,16 @@ module.exports = {
 	write: write
 };
 
-var assert = __webpack_require__(100);
-var asn1 = __webpack_require__(121);
-var algs = __webpack_require__(105);
-var utils = __webpack_require__(110);
-var Key = __webpack_require__(104);
-var PrivateKey = __webpack_require__(111);
-var pem = __webpack_require__(120);
-var Identity = __webpack_require__(135);
-var Signature = __webpack_require__(109);
-var Certificate = __webpack_require__(108);
+var assert = __webpack_require__(46);
+var asn1 = __webpack_require__(67);
+var algs = __webpack_require__(51);
+var utils = __webpack_require__(56);
+var Key = __webpack_require__(50);
+var PrivateKey = __webpack_require__(57);
+var pem = __webpack_require__(66);
+var Identity = __webpack_require__(81);
+var Signature = __webpack_require__(55);
+var Certificate = __webpack_require__(54);
 
 function read(buf, options) {
 	if (typeof (buf) !== 'string') {
@@ -28232,20 +21601,20 @@ function write(cert, options) {
 
 
 /***/ }),
-/* 139 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2012 Joyent, Inc.  All rights reserved.
 
-var assert = __webpack_require__(100);
-var crypto = __webpack_require__(71);
-var http = __webpack_require__(75);
-var util = __webpack_require__(67);
-var sshpk = __webpack_require__(103);
-var jsprim = __webpack_require__(140);
-var utils = __webpack_require__(102);
+var assert = __webpack_require__(46);
+var crypto = __webpack_require__(17);
+var http = __webpack_require__(21);
+var util = __webpack_require__(13);
+var sshpk = __webpack_require__(49);
+var jsprim = __webpack_require__(86);
+var utils = __webpack_require__(48);
 
-var sprintf = __webpack_require__(67).format;
+var sprintf = __webpack_require__(13).format;
 
 var HASH_ALGOS = utils.HASH_ALGOS;
 var PK_ALGOS = utils.PK_ALGOS;
@@ -28639,19 +22008,19 @@ module.exports = {
 
 
 /***/ }),
-/* 140 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
  * lib/jsprim.js: utilities for primitive JavaScript types
  */
 
-var mod_assert = __webpack_require__(100);
-var mod_util = __webpack_require__(67);
+var mod_assert = __webpack_require__(46);
+var mod_util = __webpack_require__(13);
 
-var mod_extsprintf = __webpack_require__(141);
-var mod_verror = __webpack_require__(142);
-var mod_jsonschema = __webpack_require__(145);
+var mod_extsprintf = __webpack_require__(87);
+var mod_verror = __webpack_require__(88);
+var mod_jsonschema = __webpack_require__(91);
 
 /*
  * Public interface
@@ -29380,15 +22749,15 @@ function mergeObjects(provided, overrides, defaults)
 
 
 /***/ }),
-/* 141 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
  * extsprintf.js: extended POSIX-style sprintf
  */
 
-var mod_assert = __webpack_require__(101);
-var mod_util = __webpack_require__(67);
+var mod_assert = __webpack_require__(47);
+var mod_util = __webpack_require__(13);
 
 /*
  * Public interface
@@ -29569,18 +22938,18 @@ function dumpException(ex)
 
 
 /***/ }),
-/* 142 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
  * verror.js: richer JavaScript errors
  */
 
-var mod_assertplus = __webpack_require__(100);
-var mod_util = __webpack_require__(67);
+var mod_assertplus = __webpack_require__(46);
+var mod_util = __webpack_require__(13);
 
-var mod_extsprintf = __webpack_require__(143);
-var mod_isError = __webpack_require__(144).isError;
+var mod_extsprintf = __webpack_require__(89);
+var mod_isError = __webpack_require__(90).isError;
 var sprintf = mod_extsprintf.sprintf;
 
 /*
@@ -30026,15 +23395,15 @@ WError.prototype.cause = function we_cause(c)
 
 
 /***/ }),
-/* 143 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
  * extsprintf.js: extended POSIX-style sprintf
  */
 
-var mod_assert = __webpack_require__(101);
-var mod_util = __webpack_require__(67);
+var mod_assert = __webpack_require__(47);
+var mod_util = __webpack_require__(13);
 
 /*
  * Public interface
@@ -30257,7 +23626,7 @@ function dumpException(ex)
 
 
 /***/ }),
-/* 144 */
+/* 90 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -30370,7 +23739,7 @@ function objectToString(o) {
 
 
 /***/ }),
-/* 145 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -30642,15 +24011,15 @@ return exports;
 
 
 /***/ }),
-/* 146 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Copyright 2015 Joyent, Inc.
 
-var assert = __webpack_require__(100);
-var crypto = __webpack_require__(71);
-var sshpk = __webpack_require__(103);
-var utils = __webpack_require__(102);
+var assert = __webpack_require__(46);
+var crypto = __webpack_require__(17);
+var sshpk = __webpack_require__(49);
+var utils = __webpack_require__(48);
 
 var HASH_ALGOS = utils.HASH_ALGOS;
 var PK_ALGOS = utils.PK_ALGOS;
@@ -30736,7 +24105,7 @@ module.exports = {
 
 
 /***/ }),
-/* 147 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -30754,8 +24123,8 @@ module.exports = {
  * @private
  */
 
-var db = __webpack_require__(148)
-var extname = __webpack_require__(82).extname
+var db = __webpack_require__(94)
+var extname = __webpack_require__(28).extname
 
 /**
  * Module variables.
@@ -30931,7 +24300,7 @@ function populateMaps (extensions, types) {
 
 
 /***/ }),
-/* 148 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*!
@@ -30944,22 +24313,22 @@ function populateMaps (extensions, types) {
  * Module exports.
  */
 
-module.exports = __webpack_require__(149)
+module.exports = __webpack_require__(95)
 
 
 /***/ }),
-/* 149 */
+/* 95 */
 /***/ (function(module) {
 
 module.exports = {"application/1d-interleaved-parityfec":{"source":"iana"},"application/3gpdash-qoe-report+xml":{"source":"iana"},"application/3gpp-ims+xml":{"source":"iana"},"application/a2l":{"source":"iana"},"application/activemessage":{"source":"iana"},"application/alto-costmap+json":{"source":"iana","compressible":true},"application/alto-costmapfilter+json":{"source":"iana","compressible":true},"application/alto-directory+json":{"source":"iana","compressible":true},"application/alto-endpointcost+json":{"source":"iana","compressible":true},"application/alto-endpointcostparams+json":{"source":"iana","compressible":true},"application/alto-endpointprop+json":{"source":"iana","compressible":true},"application/alto-endpointpropparams+json":{"source":"iana","compressible":true},"application/alto-error+json":{"source":"iana","compressible":true},"application/alto-networkmap+json":{"source":"iana","compressible":true},"application/alto-networkmapfilter+json":{"source":"iana","compressible":true},"application/aml":{"source":"iana"},"application/andrew-inset":{"source":"iana","extensions":["ez"]},"application/applefile":{"source":"iana"},"application/applixware":{"source":"apache","extensions":["aw"]},"application/atf":{"source":"iana"},"application/atfx":{"source":"iana"},"application/atom+xml":{"source":"iana","compressible":true,"extensions":["atom"]},"application/atomcat+xml":{"source":"iana","extensions":["atomcat"]},"application/atomdeleted+xml":{"source":"iana"},"application/atomicmail":{"source":"iana"},"application/atomsvc+xml":{"source":"iana","extensions":["atomsvc"]},"application/atxml":{"source":"iana"},"application/auth-policy+xml":{"source":"iana"},"application/bacnet-xdd+zip":{"source":"iana"},"application/batch-smtp":{"source":"iana"},"application/bdoc":{"compressible":false,"extensions":["bdoc"]},"application/beep+xml":{"source":"iana"},"application/calendar+json":{"source":"iana","compressible":true},"application/calendar+xml":{"source":"iana"},"application/call-completion":{"source":"iana"},"application/cals-1840":{"source":"iana"},"application/cbor":{"source":"iana"},"application/cccex":{"source":"iana"},"application/ccmp+xml":{"source":"iana"},"application/ccxml+xml":{"source":"iana","extensions":["ccxml"]},"application/cdfx+xml":{"source":"iana"},"application/cdmi-capability":{"source":"iana","extensions":["cdmia"]},"application/cdmi-container":{"source":"iana","extensions":["cdmic"]},"application/cdmi-domain":{"source":"iana","extensions":["cdmid"]},"application/cdmi-object":{"source":"iana","extensions":["cdmio"]},"application/cdmi-queue":{"source":"iana","extensions":["cdmiq"]},"application/cdni":{"source":"iana"},"application/cea":{"source":"iana"},"application/cea-2018+xml":{"source":"iana"},"application/cellml+xml":{"source":"iana"},"application/cfw":{"source":"iana"},"application/clue_info+xml":{"source":"iana"},"application/cms":{"source":"iana"},"application/cnrp+xml":{"source":"iana"},"application/coap-group+json":{"source":"iana","compressible":true},"application/coap-payload":{"source":"iana"},"application/commonground":{"source":"iana"},"application/conference-info+xml":{"source":"iana"},"application/cose":{"source":"iana"},"application/cose-key":{"source":"iana"},"application/cose-key-set":{"source":"iana"},"application/cpl+xml":{"source":"iana"},"application/csrattrs":{"source":"iana"},"application/csta+xml":{"source":"iana"},"application/cstadata+xml":{"source":"iana"},"application/csvm+json":{"source":"iana","compressible":true},"application/cu-seeme":{"source":"apache","extensions":["cu"]},"application/cybercash":{"source":"iana"},"application/dart":{"compressible":true},"application/dash+xml":{"source":"iana","extensions":["mpd"]},"application/dashdelta":{"source":"iana"},"application/davmount+xml":{"source":"iana","extensions":["davmount"]},"application/dca-rft":{"source":"iana"},"application/dcd":{"source":"iana"},"application/dec-dx":{"source":"iana"},"application/dialog-info+xml":{"source":"iana"},"application/dicom":{"source":"iana"},"application/dicom+json":{"source":"iana","compressible":true},"application/dicom+xml":{"source":"iana"},"application/dii":{"source":"iana"},"application/dit":{"source":"iana"},"application/dns":{"source":"iana"},"application/docbook+xml":{"source":"apache","extensions":["dbk"]},"application/dskpp+xml":{"source":"iana"},"application/dssc+der":{"source":"iana","extensions":["dssc"]},"application/dssc+xml":{"source":"iana","extensions":["xdssc"]},"application/dvcs":{"source":"iana"},"application/ecmascript":{"source":"iana","compressible":true,"extensions":["ecma"]},"application/edi-consent":{"source":"iana"},"application/edi-x12":{"source":"iana","compressible":false},"application/edifact":{"source":"iana","compressible":false},"application/efi":{"source":"iana"},"application/emergencycalldata.comment+xml":{"source":"iana"},"application/emergencycalldata.control+xml":{"source":"iana"},"application/emergencycalldata.deviceinfo+xml":{"source":"iana"},"application/emergencycalldata.ecall.msd":{"source":"iana"},"application/emergencycalldata.providerinfo+xml":{"source":"iana"},"application/emergencycalldata.serviceinfo+xml":{"source":"iana"},"application/emergencycalldata.subscriberinfo+xml":{"source":"iana"},"application/emergencycalldata.veds+xml":{"source":"iana"},"application/emma+xml":{"source":"iana","extensions":["emma"]},"application/emotionml+xml":{"source":"iana"},"application/encaprtp":{"source":"iana"},"application/epp+xml":{"source":"iana"},"application/epub+zip":{"source":"iana","extensions":["epub"]},"application/eshop":{"source":"iana"},"application/exi":{"source":"iana","extensions":["exi"]},"application/fastinfoset":{"source":"iana"},"application/fastsoap":{"source":"iana"},"application/fdt+xml":{"source":"iana"},"application/fhir+xml":{"source":"iana"},"application/fido.trusted-apps+json":{"compressible":true},"application/fits":{"source":"iana"},"application/font-sfnt":{"source":"iana"},"application/font-tdpfr":{"source":"iana","extensions":["pfr"]},"application/font-woff":{"source":"iana","compressible":false,"extensions":["woff"]},"application/framework-attributes+xml":{"source":"iana"},"application/geo+json":{"source":"iana","compressible":true,"extensions":["geojson"]},"application/geo+json-seq":{"source":"iana"},"application/geoxacml+xml":{"source":"iana"},"application/gml+xml":{"source":"iana","extensions":["gml"]},"application/gpx+xml":{"source":"apache","extensions":["gpx"]},"application/gxf":{"source":"apache","extensions":["gxf"]},"application/gzip":{"source":"iana","compressible":false,"extensions":["gz"]},"application/h224":{"source":"iana"},"application/held+xml":{"source":"iana"},"application/hjson":{"extensions":["hjson"]},"application/http":{"source":"iana"},"application/hyperstudio":{"source":"iana","extensions":["stk"]},"application/ibe-key-request+xml":{"source":"iana"},"application/ibe-pkg-reply+xml":{"source":"iana"},"application/ibe-pp-data":{"source":"iana"},"application/iges":{"source":"iana"},"application/im-iscomposing+xml":{"source":"iana"},"application/index":{"source":"iana"},"application/index.cmd":{"source":"iana"},"application/index.obj":{"source":"iana"},"application/index.response":{"source":"iana"},"application/index.vnd":{"source":"iana"},"application/inkml+xml":{"source":"iana","extensions":["ink","inkml"]},"application/iotp":{"source":"iana"},"application/ipfix":{"source":"iana","extensions":["ipfix"]},"application/ipp":{"source":"iana"},"application/isup":{"source":"iana"},"application/its+xml":{"source":"iana"},"application/java-archive":{"source":"apache","compressible":false,"extensions":["jar","war","ear"]},"application/java-serialized-object":{"source":"apache","compressible":false,"extensions":["ser"]},"application/java-vm":{"source":"apache","compressible":false,"extensions":["class"]},"application/javascript":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["js","mjs"]},"application/jf2feed+json":{"source":"iana","compressible":true},"application/jose":{"source":"iana"},"application/jose+json":{"source":"iana","compressible":true},"application/jrd+json":{"source":"iana","compressible":true},"application/json":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["json","map"]},"application/json-patch+json":{"source":"iana","compressible":true},"application/json-seq":{"source":"iana"},"application/json5":{"extensions":["json5"]},"application/jsonml+json":{"source":"apache","compressible":true,"extensions":["jsonml"]},"application/jwk+json":{"source":"iana","compressible":true},"application/jwk-set+json":{"source":"iana","compressible":true},"application/jwt":{"source":"iana"},"application/kpml-request+xml":{"source":"iana"},"application/kpml-response+xml":{"source":"iana"},"application/ld+json":{"source":"iana","compressible":true,"extensions":["jsonld"]},"application/lgr+xml":{"source":"iana"},"application/link-format":{"source":"iana"},"application/load-control+xml":{"source":"iana"},"application/lost+xml":{"source":"iana","extensions":["lostxml"]},"application/lostsync+xml":{"source":"iana"},"application/lxf":{"source":"iana"},"application/mac-binhex40":{"source":"iana","extensions":["hqx"]},"application/mac-compactpro":{"source":"apache","extensions":["cpt"]},"application/macwriteii":{"source":"iana"},"application/mads+xml":{"source":"iana","extensions":["mads"]},"application/manifest+json":{"charset":"UTF-8","compressible":true,"extensions":["webmanifest"]},"application/marc":{"source":"iana","extensions":["mrc"]},"application/marcxml+xml":{"source":"iana","extensions":["mrcx"]},"application/mathematica":{"source":"iana","extensions":["ma","nb","mb"]},"application/mathml+xml":{"source":"iana","extensions":["mathml"]},"application/mathml-content+xml":{"source":"iana"},"application/mathml-presentation+xml":{"source":"iana"},"application/mbms-associated-procedure-description+xml":{"source":"iana"},"application/mbms-deregister+xml":{"source":"iana"},"application/mbms-envelope+xml":{"source":"iana"},"application/mbms-msk+xml":{"source":"iana"},"application/mbms-msk-response+xml":{"source":"iana"},"application/mbms-protection-description+xml":{"source":"iana"},"application/mbms-reception-report+xml":{"source":"iana"},"application/mbms-register+xml":{"source":"iana"},"application/mbms-register-response+xml":{"source":"iana"},"application/mbms-schedule+xml":{"source":"iana"},"application/mbms-user-service-description+xml":{"source":"iana"},"application/mbox":{"source":"iana","extensions":["mbox"]},"application/media-policy-dataset+xml":{"source":"iana"},"application/media_control+xml":{"source":"iana"},"application/mediaservercontrol+xml":{"source":"iana","extensions":["mscml"]},"application/merge-patch+json":{"source":"iana","compressible":true},"application/metalink+xml":{"source":"apache","extensions":["metalink"]},"application/metalink4+xml":{"source":"iana","extensions":["meta4"]},"application/mets+xml":{"source":"iana","extensions":["mets"]},"application/mf4":{"source":"iana"},"application/mikey":{"source":"iana"},"application/mmt-usd+xml":{"source":"iana"},"application/mods+xml":{"source":"iana","extensions":["mods"]},"application/moss-keys":{"source":"iana"},"application/moss-signature":{"source":"iana"},"application/mosskey-data":{"source":"iana"},"application/mosskey-request":{"source":"iana"},"application/mp21":{"source":"iana","extensions":["m21","mp21"]},"application/mp4":{"source":"iana","extensions":["mp4s","m4p"]},"application/mpeg4-generic":{"source":"iana"},"application/mpeg4-iod":{"source":"iana"},"application/mpeg4-iod-xmt":{"source":"iana"},"application/mrb-consumer+xml":{"source":"iana"},"application/mrb-publish+xml":{"source":"iana"},"application/msc-ivr+xml":{"source":"iana"},"application/msc-mixer+xml":{"source":"iana"},"application/msword":{"source":"iana","compressible":false,"extensions":["doc","dot"]},"application/mud+json":{"source":"iana","compressible":true},"application/mxf":{"source":"iana","extensions":["mxf"]},"application/n-quads":{"source":"iana"},"application/n-triples":{"source":"iana"},"application/nasdata":{"source":"iana"},"application/news-checkgroups":{"source":"iana"},"application/news-groupinfo":{"source":"iana"},"application/news-transmission":{"source":"iana"},"application/nlsml+xml":{"source":"iana"},"application/node":{"source":"iana"},"application/nss":{"source":"iana"},"application/ocsp-request":{"source":"iana"},"application/ocsp-response":{"source":"iana"},"application/octet-stream":{"source":"iana","compressible":false,"extensions":["bin","dms","lrf","mar","so","dist","distz","pkg","bpk","dump","elc","deploy","exe","dll","deb","dmg","iso","img","msi","msp","msm","buffer"]},"application/oda":{"source":"iana","extensions":["oda"]},"application/odx":{"source":"iana"},"application/oebps-package+xml":{"source":"iana","extensions":["opf"]},"application/ogg":{"source":"iana","compressible":false,"extensions":["ogx"]},"application/omdoc+xml":{"source":"apache","extensions":["omdoc"]},"application/onenote":{"source":"apache","extensions":["onetoc","onetoc2","onetmp","onepkg"]},"application/oxps":{"source":"iana","extensions":["oxps"]},"application/p2p-overlay+xml":{"source":"iana"},"application/parityfec":{"source":"iana"},"application/passport":{"source":"iana"},"application/patch-ops-error+xml":{"source":"iana","extensions":["xer"]},"application/pdf":{"source":"iana","compressible":false,"extensions":["pdf"]},"application/pdx":{"source":"iana"},"application/pgp-encrypted":{"source":"iana","compressible":false,"extensions":["pgp"]},"application/pgp-keys":{"source":"iana"},"application/pgp-signature":{"source":"iana","extensions":["asc","sig"]},"application/pics-rules":{"source":"apache","extensions":["prf"]},"application/pidf+xml":{"source":"iana"},"application/pidf-diff+xml":{"source":"iana"},"application/pkcs10":{"source":"iana","extensions":["p10"]},"application/pkcs12":{"source":"iana"},"application/pkcs7-mime":{"source":"iana","extensions":["p7m","p7c"]},"application/pkcs7-signature":{"source":"iana","extensions":["p7s"]},"application/pkcs8":{"source":"iana","extensions":["p8"]},"application/pkcs8-encrypted":{"source":"iana"},"application/pkix-attr-cert":{"source":"iana","extensions":["ac"]},"application/pkix-cert":{"source":"iana","extensions":["cer"]},"application/pkix-crl":{"source":"iana","extensions":["crl"]},"application/pkix-pkipath":{"source":"iana","extensions":["pkipath"]},"application/pkixcmp":{"source":"iana","extensions":["pki"]},"application/pls+xml":{"source":"iana","extensions":["pls"]},"application/poc-settings+xml":{"source":"iana"},"application/postscript":{"source":"iana","compressible":true,"extensions":["ai","eps","ps"]},"application/ppsp-tracker+json":{"source":"iana","compressible":true},"application/problem+json":{"source":"iana","compressible":true},"application/problem+xml":{"source":"iana"},"application/provenance+xml":{"source":"iana"},"application/prs.alvestrand.titrax-sheet":{"source":"iana"},"application/prs.cww":{"source":"iana","extensions":["cww"]},"application/prs.hpub+zip":{"source":"iana"},"application/prs.nprend":{"source":"iana"},"application/prs.plucker":{"source":"iana"},"application/prs.rdf-xml-crypt":{"source":"iana"},"application/prs.xsf+xml":{"source":"iana"},"application/pskc+xml":{"source":"iana","extensions":["pskcxml"]},"application/qsig":{"source":"iana"},"application/raml+yaml":{"compressible":true,"extensions":["raml"]},"application/raptorfec":{"source":"iana"},"application/rdap+json":{"source":"iana","compressible":true},"application/rdf+xml":{"source":"iana","compressible":true,"extensions":["rdf"]},"application/reginfo+xml":{"source":"iana","extensions":["rif"]},"application/relax-ng-compact-syntax":{"source":"iana","extensions":["rnc"]},"application/remote-printing":{"source":"iana"},"application/reputon+json":{"source":"iana","compressible":true},"application/resource-lists+xml":{"source":"iana","extensions":["rl"]},"application/resource-lists-diff+xml":{"source":"iana","extensions":["rld"]},"application/rfc+xml":{"source":"iana"},"application/riscos":{"source":"iana"},"application/rlmi+xml":{"source":"iana"},"application/rls-services+xml":{"source":"iana","extensions":["rs"]},"application/route-apd+xml":{"source":"iana"},"application/route-s-tsid+xml":{"source":"iana"},"application/route-usd+xml":{"source":"iana"},"application/rpki-ghostbusters":{"source":"iana","extensions":["gbr"]},"application/rpki-manifest":{"source":"iana","extensions":["mft"]},"application/rpki-publication":{"source":"iana"},"application/rpki-roa":{"source":"iana","extensions":["roa"]},"application/rpki-updown":{"source":"iana"},"application/rsd+xml":{"source":"apache","extensions":["rsd"]},"application/rss+xml":{"source":"apache","compressible":true,"extensions":["rss"]},"application/rtf":{"source":"iana","compressible":true,"extensions":["rtf"]},"application/rtploopback":{"source":"iana"},"application/rtx":{"source":"iana"},"application/samlassertion+xml":{"source":"iana"},"application/samlmetadata+xml":{"source":"iana"},"application/sbml+xml":{"source":"iana","extensions":["sbml"]},"application/scaip+xml":{"source":"iana"},"application/scim+json":{"source":"iana","compressible":true},"application/scvp-cv-request":{"source":"iana","extensions":["scq"]},"application/scvp-cv-response":{"source":"iana","extensions":["scs"]},"application/scvp-vp-request":{"source":"iana","extensions":["spq"]},"application/scvp-vp-response":{"source":"iana","extensions":["spp"]},"application/sdp":{"source":"iana","extensions":["sdp"]},"application/sep+xml":{"source":"iana"},"application/sep-exi":{"source":"iana"},"application/session-info":{"source":"iana"},"application/set-payment":{"source":"iana"},"application/set-payment-initiation":{"source":"iana","extensions":["setpay"]},"application/set-registration":{"source":"iana"},"application/set-registration-initiation":{"source":"iana","extensions":["setreg"]},"application/sgml":{"source":"iana"},"application/sgml-open-catalog":{"source":"iana"},"application/shf+xml":{"source":"iana","extensions":["shf"]},"application/sieve":{"source":"iana"},"application/simple-filter+xml":{"source":"iana"},"application/simple-message-summary":{"source":"iana"},"application/simplesymbolcontainer":{"source":"iana"},"application/slate":{"source":"iana"},"application/smil":{"source":"iana"},"application/smil+xml":{"source":"iana","extensions":["smi","smil"]},"application/smpte336m":{"source":"iana"},"application/soap+fastinfoset":{"source":"iana"},"application/soap+xml":{"source":"iana","compressible":true},"application/sparql-query":{"source":"iana","extensions":["rq"]},"application/sparql-results+xml":{"source":"iana","extensions":["srx"]},"application/spirits-event+xml":{"source":"iana"},"application/sql":{"source":"iana"},"application/srgs":{"source":"iana","extensions":["gram"]},"application/srgs+xml":{"source":"iana","extensions":["grxml"]},"application/sru+xml":{"source":"iana","extensions":["sru"]},"application/ssdl+xml":{"source":"apache","extensions":["ssdl"]},"application/ssml+xml":{"source":"iana","extensions":["ssml"]},"application/tamp-apex-update":{"source":"iana"},"application/tamp-apex-update-confirm":{"source":"iana"},"application/tamp-community-update":{"source":"iana"},"application/tamp-community-update-confirm":{"source":"iana"},"application/tamp-error":{"source":"iana"},"application/tamp-sequence-adjust":{"source":"iana"},"application/tamp-sequence-adjust-confirm":{"source":"iana"},"application/tamp-status-query":{"source":"iana"},"application/tamp-status-response":{"source":"iana"},"application/tamp-update":{"source":"iana"},"application/tamp-update-confirm":{"source":"iana"},"application/tar":{"compressible":true},"application/tei+xml":{"source":"iana","extensions":["tei","teicorpus"]},"application/thraud+xml":{"source":"iana","extensions":["tfi"]},"application/timestamp-query":{"source":"iana"},"application/timestamp-reply":{"source":"iana"},"application/timestamped-data":{"source":"iana","extensions":["tsd"]},"application/tnauthlist":{"source":"iana"},"application/trig":{"source":"iana"},"application/ttml+xml":{"source":"iana"},"application/tve-trigger":{"source":"iana"},"application/ulpfec":{"source":"iana"},"application/urc-grpsheet+xml":{"source":"iana"},"application/urc-ressheet+xml":{"source":"iana"},"application/urc-targetdesc+xml":{"source":"iana"},"application/urc-uisocketdesc+xml":{"source":"iana"},"application/vcard+json":{"source":"iana","compressible":true},"application/vcard+xml":{"source":"iana"},"application/vemmi":{"source":"iana"},"application/vividence.scriptfile":{"source":"apache"},"application/vnd.1000minds.decision-model+xml":{"source":"iana"},"application/vnd.3gpp-prose+xml":{"source":"iana"},"application/vnd.3gpp-prose-pc3ch+xml":{"source":"iana"},"application/vnd.3gpp-v2x-local-service-information":{"source":"iana"},"application/vnd.3gpp.access-transfer-events+xml":{"source":"iana"},"application/vnd.3gpp.bsf+xml":{"source":"iana"},"application/vnd.3gpp.gmop+xml":{"source":"iana"},"application/vnd.3gpp.mcptt-affiliation-command+xml":{"source":"iana"},"application/vnd.3gpp.mcptt-floor-request+xml":{"source":"iana"},"application/vnd.3gpp.mcptt-info+xml":{"source":"iana"},"application/vnd.3gpp.mcptt-location-info+xml":{"source":"iana"},"application/vnd.3gpp.mcptt-mbms-usage-info+xml":{"source":"iana"},"application/vnd.3gpp.mcptt-signed+xml":{"source":"iana"},"application/vnd.3gpp.mid-call+xml":{"source":"iana"},"application/vnd.3gpp.pic-bw-large":{"source":"iana","extensions":["plb"]},"application/vnd.3gpp.pic-bw-small":{"source":"iana","extensions":["psb"]},"application/vnd.3gpp.pic-bw-var":{"source":"iana","extensions":["pvb"]},"application/vnd.3gpp.sms":{"source":"iana"},"application/vnd.3gpp.sms+xml":{"source":"iana"},"application/vnd.3gpp.srvcc-ext+xml":{"source":"iana"},"application/vnd.3gpp.srvcc-info+xml":{"source":"iana"},"application/vnd.3gpp.state-and-event-info+xml":{"source":"iana"},"application/vnd.3gpp.ussd+xml":{"source":"iana"},"application/vnd.3gpp2.bcmcsinfo+xml":{"source":"iana"},"application/vnd.3gpp2.sms":{"source":"iana"},"application/vnd.3gpp2.tcap":{"source":"iana","extensions":["tcap"]},"application/vnd.3lightssoftware.imagescal":{"source":"iana"},"application/vnd.3m.post-it-notes":{"source":"iana","extensions":["pwn"]},"application/vnd.accpac.simply.aso":{"source":"iana","extensions":["aso"]},"application/vnd.accpac.simply.imp":{"source":"iana","extensions":["imp"]},"application/vnd.acucobol":{"source":"iana","extensions":["acu"]},"application/vnd.acucorp":{"source":"iana","extensions":["atc","acutc"]},"application/vnd.adobe.air-application-installer-package+zip":{"source":"apache","extensions":["air"]},"application/vnd.adobe.flash.movie":{"source":"iana"},"application/vnd.adobe.formscentral.fcdt":{"source":"iana","extensions":["fcdt"]},"application/vnd.adobe.fxp":{"source":"iana","extensions":["fxp","fxpl"]},"application/vnd.adobe.partial-upload":{"source":"iana"},"application/vnd.adobe.xdp+xml":{"source":"iana","extensions":["xdp"]},"application/vnd.adobe.xfdf":{"source":"iana","extensions":["xfdf"]},"application/vnd.aether.imp":{"source":"iana"},"application/vnd.ah-barcode":{"source":"iana"},"application/vnd.ahead.space":{"source":"iana","extensions":["ahead"]},"application/vnd.airzip.filesecure.azf":{"source":"iana","extensions":["azf"]},"application/vnd.airzip.filesecure.azs":{"source":"iana","extensions":["azs"]},"application/vnd.amadeus+json":{"source":"iana","compressible":true},"application/vnd.amazon.ebook":{"source":"apache","extensions":["azw"]},"application/vnd.amazon.mobi8-ebook":{"source":"iana"},"application/vnd.americandynamics.acc":{"source":"iana","extensions":["acc"]},"application/vnd.amiga.ami":{"source":"iana","extensions":["ami"]},"application/vnd.amundsen.maze+xml":{"source":"iana"},"application/vnd.android.package-archive":{"source":"apache","compressible":false,"extensions":["apk"]},"application/vnd.anki":{"source":"iana"},"application/vnd.anser-web-certificate-issue-initiation":{"source":"iana","extensions":["cii"]},"application/vnd.anser-web-funds-transfer-initiation":{"source":"apache","extensions":["fti"]},"application/vnd.antix.game-component":{"source":"iana","extensions":["atx"]},"application/vnd.apache.thrift.binary":{"source":"iana"},"application/vnd.apache.thrift.compact":{"source":"iana"},"application/vnd.apache.thrift.json":{"source":"iana"},"application/vnd.api+json":{"source":"iana","compressible":true},"application/vnd.apothekende.reservation+json":{"source":"iana","compressible":true},"application/vnd.apple.installer+xml":{"source":"iana","extensions":["mpkg"]},"application/vnd.apple.mpegurl":{"source":"iana","extensions":["m3u8"]},"application/vnd.apple.pkpass":{"compressible":false,"extensions":["pkpass"]},"application/vnd.arastra.swi":{"source":"iana"},"application/vnd.aristanetworks.swi":{"source":"iana","extensions":["swi"]},"application/vnd.artsquare":{"source":"iana"},"application/vnd.astraea-software.iota":{"source":"iana","extensions":["iota"]},"application/vnd.audiograph":{"source":"iana","extensions":["aep"]},"application/vnd.autopackage":{"source":"iana"},"application/vnd.avalon+json":{"source":"iana","compressible":true},"application/vnd.avistar+xml":{"source":"iana"},"application/vnd.balsamiq.bmml+xml":{"source":"iana"},"application/vnd.balsamiq.bmpr":{"source":"iana"},"application/vnd.bbf.usp.msg":{"source":"iana"},"application/vnd.bbf.usp.msg+json":{"source":"iana","compressible":true},"application/vnd.bekitzur-stech+json":{"source":"iana","compressible":true},"application/vnd.bint.med-content":{"source":"iana"},"application/vnd.biopax.rdf+xml":{"source":"iana"},"application/vnd.blink-idb-value-wrapper":{"source":"iana"},"application/vnd.blueice.multipass":{"source":"iana","extensions":["mpm"]},"application/vnd.bluetooth.ep.oob":{"source":"iana"},"application/vnd.bluetooth.le.oob":{"source":"iana"},"application/vnd.bmi":{"source":"iana","extensions":["bmi"]},"application/vnd.businessobjects":{"source":"iana","extensions":["rep"]},"application/vnd.cab-jscript":{"source":"iana"},"application/vnd.canon-cpdl":{"source":"iana"},"application/vnd.canon-lips":{"source":"iana"},"application/vnd.capasystems-pg+json":{"source":"iana","compressible":true},"application/vnd.cendio.thinlinc.clientconf":{"source":"iana"},"application/vnd.century-systems.tcp_stream":{"source":"iana"},"application/vnd.chemdraw+xml":{"source":"iana","extensions":["cdxml"]},"application/vnd.chess-pgn":{"source":"iana"},"application/vnd.chipnuts.karaoke-mmd":{"source":"iana","extensions":["mmd"]},"application/vnd.cinderella":{"source":"iana","extensions":["cdy"]},"application/vnd.cirpack.isdn-ext":{"source":"iana"},"application/vnd.citationstyles.style+xml":{"source":"iana"},"application/vnd.claymore":{"source":"iana","extensions":["cla"]},"application/vnd.cloanto.rp9":{"source":"iana","extensions":["rp9"]},"application/vnd.clonk.c4group":{"source":"iana","extensions":["c4g","c4d","c4f","c4p","c4u"]},"application/vnd.cluetrust.cartomobile-config":{"source":"iana","extensions":["c11amc"]},"application/vnd.cluetrust.cartomobile-config-pkg":{"source":"iana","extensions":["c11amz"]},"application/vnd.coffeescript":{"source":"iana"},"application/vnd.collabio.xodocuments.document":{"source":"iana"},"application/vnd.collabio.xodocuments.document-template":{"source":"iana"},"application/vnd.collabio.xodocuments.presentation":{"source":"iana"},"application/vnd.collabio.xodocuments.presentation-template":{"source":"iana"},"application/vnd.collabio.xodocuments.spreadsheet":{"source":"iana"},"application/vnd.collabio.xodocuments.spreadsheet-template":{"source":"iana"},"application/vnd.collection+json":{"source":"iana","compressible":true},"application/vnd.collection.doc+json":{"source":"iana","compressible":true},"application/vnd.collection.next+json":{"source":"iana","compressible":true},"application/vnd.comicbook+zip":{"source":"iana"},"application/vnd.comicbook-rar":{"source":"iana"},"application/vnd.commerce-battelle":{"source":"iana"},"application/vnd.commonspace":{"source":"iana","extensions":["csp"]},"application/vnd.contact.cmsg":{"source":"iana","extensions":["cdbcmsg"]},"application/vnd.coreos.ignition+json":{"source":"iana","compressible":true},"application/vnd.cosmocaller":{"source":"iana","extensions":["cmc"]},"application/vnd.crick.clicker":{"source":"iana","extensions":["clkx"]},"application/vnd.crick.clicker.keyboard":{"source":"iana","extensions":["clkk"]},"application/vnd.crick.clicker.palette":{"source":"iana","extensions":["clkp"]},"application/vnd.crick.clicker.template":{"source":"iana","extensions":["clkt"]},"application/vnd.crick.clicker.wordbank":{"source":"iana","extensions":["clkw"]},"application/vnd.criticaltools.wbs+xml":{"source":"iana","extensions":["wbs"]},"application/vnd.ctc-posml":{"source":"iana","extensions":["pml"]},"application/vnd.ctct.ws+xml":{"source":"iana"},"application/vnd.cups-pdf":{"source":"iana"},"application/vnd.cups-postscript":{"source":"iana"},"application/vnd.cups-ppd":{"source":"iana","extensions":["ppd"]},"application/vnd.cups-raster":{"source":"iana"},"application/vnd.cups-raw":{"source":"iana"},"application/vnd.curl":{"source":"iana"},"application/vnd.curl.car":{"source":"apache","extensions":["car"]},"application/vnd.curl.pcurl":{"source":"apache","extensions":["pcurl"]},"application/vnd.cyan.dean.root+xml":{"source":"iana"},"application/vnd.cybank":{"source":"iana"},"application/vnd.d2l.coursepackage1p0+zip":{"source":"iana"},"application/vnd.dart":{"source":"iana","compressible":true,"extensions":["dart"]},"application/vnd.data-vision.rdz":{"source":"iana","extensions":["rdz"]},"application/vnd.datapackage+json":{"source":"iana","compressible":true},"application/vnd.dataresource+json":{"source":"iana","compressible":true},"application/vnd.debian.binary-package":{"source":"iana"},"application/vnd.dece.data":{"source":"iana","extensions":["uvf","uvvf","uvd","uvvd"]},"application/vnd.dece.ttml+xml":{"source":"iana","extensions":["uvt","uvvt"]},"application/vnd.dece.unspecified":{"source":"iana","extensions":["uvx","uvvx"]},"application/vnd.dece.zip":{"source":"iana","extensions":["uvz","uvvz"]},"application/vnd.denovo.fcselayout-link":{"source":"iana","extensions":["fe_launch"]},"application/vnd.desmume-movie":{"source":"iana"},"application/vnd.desmume.movie":{"source":"apache"},"application/vnd.dir-bi.plate-dl-nosuffix":{"source":"iana"},"application/vnd.dm.delegation+xml":{"source":"iana"},"application/vnd.dna":{"source":"iana","extensions":["dna"]},"application/vnd.document+json":{"source":"iana","compressible":true},"application/vnd.dolby.mlp":{"source":"apache","extensions":["mlp"]},"application/vnd.dolby.mobile.1":{"source":"iana"},"application/vnd.dolby.mobile.2":{"source":"iana"},"application/vnd.doremir.scorecloud-binary-document":{"source":"iana"},"application/vnd.dpgraph":{"source":"iana","extensions":["dpg"]},"application/vnd.dreamfactory":{"source":"iana","extensions":["dfac"]},"application/vnd.drive+json":{"source":"iana","compressible":true},"application/vnd.ds-keypoint":{"source":"apache","extensions":["kpxx"]},"application/vnd.dtg.local":{"source":"iana"},"application/vnd.dtg.local.flash":{"source":"iana"},"application/vnd.dtg.local.html":{"source":"iana"},"application/vnd.dvb.ait":{"source":"iana","extensions":["ait"]},"application/vnd.dvb.dvbj":{"source":"iana"},"application/vnd.dvb.esgcontainer":{"source":"iana"},"application/vnd.dvb.ipdcdftnotifaccess":{"source":"iana"},"application/vnd.dvb.ipdcesgaccess":{"source":"iana"},"application/vnd.dvb.ipdcesgaccess2":{"source":"iana"},"application/vnd.dvb.ipdcesgpdd":{"source":"iana"},"application/vnd.dvb.ipdcroaming":{"source":"iana"},"application/vnd.dvb.iptv.alfec-base":{"source":"iana"},"application/vnd.dvb.iptv.alfec-enhancement":{"source":"iana"},"application/vnd.dvb.notif-aggregate-root+xml":{"source":"iana"},"application/vnd.dvb.notif-container+xml":{"source":"iana"},"application/vnd.dvb.notif-generic+xml":{"source":"iana"},"application/vnd.dvb.notif-ia-msglist+xml":{"source":"iana"},"application/vnd.dvb.notif-ia-registration-request+xml":{"source":"iana"},"application/vnd.dvb.notif-ia-registration-response+xml":{"source":"iana"},"application/vnd.dvb.notif-init+xml":{"source":"iana"},"application/vnd.dvb.pfr":{"source":"iana"},"application/vnd.dvb.service":{"source":"iana","extensions":["svc"]},"application/vnd.dxr":{"source":"iana"},"application/vnd.dynageo":{"source":"iana","extensions":["geo"]},"application/vnd.dzr":{"source":"iana"},"application/vnd.easykaraoke.cdgdownload":{"source":"iana"},"application/vnd.ecdis-update":{"source":"iana"},"application/vnd.ecip.rlp":{"source":"iana"},"application/vnd.ecowin.chart":{"source":"iana","extensions":["mag"]},"application/vnd.ecowin.filerequest":{"source":"iana"},"application/vnd.ecowin.fileupdate":{"source":"iana"},"application/vnd.ecowin.series":{"source":"iana"},"application/vnd.ecowin.seriesrequest":{"source":"iana"},"application/vnd.ecowin.seriesupdate":{"source":"iana"},"application/vnd.efi.img":{"source":"iana"},"application/vnd.efi.iso":{"source":"iana"},"application/vnd.emclient.accessrequest+xml":{"source":"iana"},"application/vnd.enliven":{"source":"iana","extensions":["nml"]},"application/vnd.enphase.envoy":{"source":"iana"},"application/vnd.eprints.data+xml":{"source":"iana"},"application/vnd.epson.esf":{"source":"iana","extensions":["esf"]},"application/vnd.epson.msf":{"source":"iana","extensions":["msf"]},"application/vnd.epson.quickanime":{"source":"iana","extensions":["qam"]},"application/vnd.epson.salt":{"source":"iana","extensions":["slt"]},"application/vnd.epson.ssf":{"source":"iana","extensions":["ssf"]},"application/vnd.ericsson.quickcall":{"source":"iana"},"application/vnd.espass-espass+zip":{"source":"iana"},"application/vnd.eszigno3+xml":{"source":"iana","extensions":["es3","et3"]},"application/vnd.etsi.aoc+xml":{"source":"iana"},"application/vnd.etsi.asic-e+zip":{"source":"iana"},"application/vnd.etsi.asic-s+zip":{"source":"iana"},"application/vnd.etsi.cug+xml":{"source":"iana"},"application/vnd.etsi.iptvcommand+xml":{"source":"iana"},"application/vnd.etsi.iptvdiscovery+xml":{"source":"iana"},"application/vnd.etsi.iptvprofile+xml":{"source":"iana"},"application/vnd.etsi.iptvsad-bc+xml":{"source":"iana"},"application/vnd.etsi.iptvsad-cod+xml":{"source":"iana"},"application/vnd.etsi.iptvsad-npvr+xml":{"source":"iana"},"application/vnd.etsi.iptvservice+xml":{"source":"iana"},"application/vnd.etsi.iptvsync+xml":{"source":"iana"},"application/vnd.etsi.iptvueprofile+xml":{"source":"iana"},"application/vnd.etsi.mcid+xml":{"source":"iana"},"application/vnd.etsi.mheg5":{"source":"iana"},"application/vnd.etsi.overload-control-policy-dataset+xml":{"source":"iana"},"application/vnd.etsi.pstn+xml":{"source":"iana"},"application/vnd.etsi.sci+xml":{"source":"iana"},"application/vnd.etsi.simservs+xml":{"source":"iana"},"application/vnd.etsi.timestamp-token":{"source":"iana"},"application/vnd.etsi.tsl+xml":{"source":"iana"},"application/vnd.etsi.tsl.der":{"source":"iana"},"application/vnd.eudora.data":{"source":"iana"},"application/vnd.evolv.ecig.profile":{"source":"iana"},"application/vnd.evolv.ecig.settings":{"source":"iana"},"application/vnd.evolv.ecig.theme":{"source":"iana"},"application/vnd.ezpix-album":{"source":"iana","extensions":["ez2"]},"application/vnd.ezpix-package":{"source":"iana","extensions":["ez3"]},"application/vnd.f-secure.mobile":{"source":"iana"},"application/vnd.fastcopy-disk-image":{"source":"iana"},"application/vnd.fdf":{"source":"iana","extensions":["fdf"]},"application/vnd.fdsn.mseed":{"source":"iana","extensions":["mseed"]},"application/vnd.fdsn.seed":{"source":"iana","extensions":["seed","dataless"]},"application/vnd.ffsns":{"source":"iana"},"application/vnd.filmit.zfc":{"source":"iana"},"application/vnd.fints":{"source":"iana"},"application/vnd.firemonkeys.cloudcell":{"source":"iana"},"application/vnd.flographit":{"source":"iana","extensions":["gph"]},"application/vnd.fluxtime.clip":{"source":"iana","extensions":["ftc"]},"application/vnd.font-fontforge-sfd":{"source":"iana"},"application/vnd.framemaker":{"source":"iana","extensions":["fm","frame","maker","book"]},"application/vnd.frogans.fnc":{"source":"iana","extensions":["fnc"]},"application/vnd.frogans.ltf":{"source":"iana","extensions":["ltf"]},"application/vnd.fsc.weblaunch":{"source":"iana","extensions":["fsc"]},"application/vnd.fujitsu.oasys":{"source":"iana","extensions":["oas"]},"application/vnd.fujitsu.oasys2":{"source":"iana","extensions":["oa2"]},"application/vnd.fujitsu.oasys3":{"source":"iana","extensions":["oa3"]},"application/vnd.fujitsu.oasysgp":{"source":"iana","extensions":["fg5"]},"application/vnd.fujitsu.oasysprs":{"source":"iana","extensions":["bh2"]},"application/vnd.fujixerox.art-ex":{"source":"iana"},"application/vnd.fujixerox.art4":{"source":"iana"},"application/vnd.fujixerox.ddd":{"source":"iana","extensions":["ddd"]},"application/vnd.fujixerox.docuworks":{"source":"iana","extensions":["xdw"]},"application/vnd.fujixerox.docuworks.binder":{"source":"iana","extensions":["xbd"]},"application/vnd.fujixerox.docuworks.container":{"source":"iana"},"application/vnd.fujixerox.hbpl":{"source":"iana"},"application/vnd.fut-misnet":{"source":"iana"},"application/vnd.fuzzysheet":{"source":"iana","extensions":["fzs"]},"application/vnd.genomatix.tuxedo":{"source":"iana","extensions":["txd"]},"application/vnd.geo+json":{"source":"iana","compressible":true},"application/vnd.geocube+xml":{"source":"iana"},"application/vnd.geogebra.file":{"source":"iana","extensions":["ggb"]},"application/vnd.geogebra.tool":{"source":"iana","extensions":["ggt"]},"application/vnd.geometry-explorer":{"source":"iana","extensions":["gex","gre"]},"application/vnd.geonext":{"source":"iana","extensions":["gxt"]},"application/vnd.geoplan":{"source":"iana","extensions":["g2w"]},"application/vnd.geospace":{"source":"iana","extensions":["g3w"]},"application/vnd.gerber":{"source":"iana"},"application/vnd.globalplatform.card-content-mgt":{"source":"iana"},"application/vnd.globalplatform.card-content-mgt-response":{"source":"iana"},"application/vnd.gmx":{"source":"iana","extensions":["gmx"]},"application/vnd.google-apps.document":{"compressible":false,"extensions":["gdoc"]},"application/vnd.google-apps.presentation":{"compressible":false,"extensions":["gslides"]},"application/vnd.google-apps.spreadsheet":{"compressible":false,"extensions":["gsheet"]},"application/vnd.google-earth.kml+xml":{"source":"iana","compressible":true,"extensions":["kml"]},"application/vnd.google-earth.kmz":{"source":"iana","compressible":false,"extensions":["kmz"]},"application/vnd.gov.sk.e-form+xml":{"source":"iana"},"application/vnd.gov.sk.e-form+zip":{"source":"iana"},"application/vnd.gov.sk.xmldatacontainer+xml":{"source":"iana"},"application/vnd.grafeq":{"source":"iana","extensions":["gqf","gqs"]},"application/vnd.gridmp":{"source":"iana"},"application/vnd.groove-account":{"source":"iana","extensions":["gac"]},"application/vnd.groove-help":{"source":"iana","extensions":["ghf"]},"application/vnd.groove-identity-message":{"source":"iana","extensions":["gim"]},"application/vnd.groove-injector":{"source":"iana","extensions":["grv"]},"application/vnd.groove-tool-message":{"source":"iana","extensions":["gtm"]},"application/vnd.groove-tool-template":{"source":"iana","extensions":["tpl"]},"application/vnd.groove-vcard":{"source":"iana","extensions":["vcg"]},"application/vnd.hal+json":{"source":"iana","compressible":true},"application/vnd.hal+xml":{"source":"iana","extensions":["hal"]},"application/vnd.handheld-entertainment+xml":{"source":"iana","extensions":["zmm"]},"application/vnd.hbci":{"source":"iana","extensions":["hbci"]},"application/vnd.hc+json":{"source":"iana","compressible":true},"application/vnd.hcl-bireports":{"source":"iana"},"application/vnd.hdt":{"source":"iana"},"application/vnd.heroku+json":{"source":"iana","compressible":true},"application/vnd.hhe.lesson-player":{"source":"iana","extensions":["les"]},"application/vnd.hp-hpgl":{"source":"iana","extensions":["hpgl"]},"application/vnd.hp-hpid":{"source":"iana","extensions":["hpid"]},"application/vnd.hp-hps":{"source":"iana","extensions":["hps"]},"application/vnd.hp-jlyt":{"source":"iana","extensions":["jlt"]},"application/vnd.hp-pcl":{"source":"iana","extensions":["pcl"]},"application/vnd.hp-pclxl":{"source":"iana","extensions":["pclxl"]},"application/vnd.httphone":{"source":"iana"},"application/vnd.hydrostatix.sof-data":{"source":"iana","extensions":["sfd-hdstx"]},"application/vnd.hyper-item+json":{"source":"iana","compressible":true},"application/vnd.hyperdrive+json":{"source":"iana","compressible":true},"application/vnd.hzn-3d-crossword":{"source":"iana"},"application/vnd.ibm.afplinedata":{"source":"iana"},"application/vnd.ibm.electronic-media":{"source":"iana"},"application/vnd.ibm.minipay":{"source":"iana","extensions":["mpy"]},"application/vnd.ibm.modcap":{"source":"iana","extensions":["afp","listafp","list3820"]},"application/vnd.ibm.rights-management":{"source":"iana","extensions":["irm"]},"application/vnd.ibm.secure-container":{"source":"iana","extensions":["sc"]},"application/vnd.iccprofile":{"source":"iana","extensions":["icc","icm"]},"application/vnd.ieee.1905":{"source":"iana"},"application/vnd.igloader":{"source":"iana","extensions":["igl"]},"application/vnd.imagemeter.folder+zip":{"source":"iana"},"application/vnd.imagemeter.image+zip":{"source":"iana"},"application/vnd.immervision-ivp":{"source":"iana","extensions":["ivp"]},"application/vnd.immervision-ivu":{"source":"iana","extensions":["ivu"]},"application/vnd.ims.imsccv1p1":{"source":"iana"},"application/vnd.ims.imsccv1p2":{"source":"iana"},"application/vnd.ims.imsccv1p3":{"source":"iana"},"application/vnd.ims.lis.v2.result+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolconsumerprofile+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolproxy+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolproxy.id+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolsettings+json":{"source":"iana","compressible":true},"application/vnd.ims.lti.v2.toolsettings.simple+json":{"source":"iana","compressible":true},"application/vnd.informedcontrol.rms+xml":{"source":"iana"},"application/vnd.informix-visionary":{"source":"iana"},"application/vnd.infotech.project":{"source":"iana"},"application/vnd.infotech.project+xml":{"source":"iana"},"application/vnd.innopath.wamp.notification":{"source":"iana"},"application/vnd.insors.igm":{"source":"iana","extensions":["igm"]},"application/vnd.intercon.formnet":{"source":"iana","extensions":["xpw","xpx"]},"application/vnd.intergeo":{"source":"iana","extensions":["i2g"]},"application/vnd.intertrust.digibox":{"source":"iana"},"application/vnd.intertrust.nncp":{"source":"iana"},"application/vnd.intu.qbo":{"source":"iana","extensions":["qbo"]},"application/vnd.intu.qfx":{"source":"iana","extensions":["qfx"]},"application/vnd.iptc.g2.catalogitem+xml":{"source":"iana"},"application/vnd.iptc.g2.conceptitem+xml":{"source":"iana"},"application/vnd.iptc.g2.knowledgeitem+xml":{"source":"iana"},"application/vnd.iptc.g2.newsitem+xml":{"source":"iana"},"application/vnd.iptc.g2.newsmessage+xml":{"source":"iana"},"application/vnd.iptc.g2.packageitem+xml":{"source":"iana"},"application/vnd.iptc.g2.planningitem+xml":{"source":"iana"},"application/vnd.ipunplugged.rcprofile":{"source":"iana","extensions":["rcprofile"]},"application/vnd.irepository.package+xml":{"source":"iana","extensions":["irp"]},"application/vnd.is-xpr":{"source":"iana","extensions":["xpr"]},"application/vnd.isac.fcs":{"source":"iana","extensions":["fcs"]},"application/vnd.jam":{"source":"iana","extensions":["jam"]},"application/vnd.japannet-directory-service":{"source":"iana"},"application/vnd.japannet-jpnstore-wakeup":{"source":"iana"},"application/vnd.japannet-payment-wakeup":{"source":"iana"},"application/vnd.japannet-registration":{"source":"iana"},"application/vnd.japannet-registration-wakeup":{"source":"iana"},"application/vnd.japannet-setstore-wakeup":{"source":"iana"},"application/vnd.japannet-verification":{"source":"iana"},"application/vnd.japannet-verification-wakeup":{"source":"iana"},"application/vnd.jcp.javame.midlet-rms":{"source":"iana","extensions":["rms"]},"application/vnd.jisp":{"source":"iana","extensions":["jisp"]},"application/vnd.joost.joda-archive":{"source":"iana","extensions":["joda"]},"application/vnd.jsk.isdn-ngn":{"source":"iana"},"application/vnd.kahootz":{"source":"iana","extensions":["ktz","ktr"]},"application/vnd.kde.karbon":{"source":"iana","extensions":["karbon"]},"application/vnd.kde.kchart":{"source":"iana","extensions":["chrt"]},"application/vnd.kde.kformula":{"source":"iana","extensions":["kfo"]},"application/vnd.kde.kivio":{"source":"iana","extensions":["flw"]},"application/vnd.kde.kontour":{"source":"iana","extensions":["kon"]},"application/vnd.kde.kpresenter":{"source":"iana","extensions":["kpr","kpt"]},"application/vnd.kde.kspread":{"source":"iana","extensions":["ksp"]},"application/vnd.kde.kword":{"source":"iana","extensions":["kwd","kwt"]},"application/vnd.kenameaapp":{"source":"iana","extensions":["htke"]},"application/vnd.kidspiration":{"source":"iana","extensions":["kia"]},"application/vnd.kinar":{"source":"iana","extensions":["kne","knp"]},"application/vnd.koan":{"source":"iana","extensions":["skp","skd","skt","skm"]},"application/vnd.kodak-descriptor":{"source":"iana","extensions":["sse"]},"application/vnd.las.las+json":{"source":"iana","compressible":true},"application/vnd.las.las+xml":{"source":"iana","extensions":["lasxml"]},"application/vnd.liberty-request+xml":{"source":"iana"},"application/vnd.llamagraphics.life-balance.desktop":{"source":"iana","extensions":["lbd"]},"application/vnd.llamagraphics.life-balance.exchange+xml":{"source":"iana","extensions":["lbe"]},"application/vnd.lotus-1-2-3":{"source":"iana","extensions":["123"]},"application/vnd.lotus-approach":{"source":"iana","extensions":["apr"]},"application/vnd.lotus-freelance":{"source":"iana","extensions":["pre"]},"application/vnd.lotus-notes":{"source":"iana","extensions":["nsf"]},"application/vnd.lotus-organizer":{"source":"iana","extensions":["org"]},"application/vnd.lotus-screencam":{"source":"iana","extensions":["scm"]},"application/vnd.lotus-wordpro":{"source":"iana","extensions":["lwp"]},"application/vnd.macports.portpkg":{"source":"iana","extensions":["portpkg"]},"application/vnd.mapbox-vector-tile":{"source":"iana"},"application/vnd.marlin.drm.actiontoken+xml":{"source":"iana"},"application/vnd.marlin.drm.conftoken+xml":{"source":"iana"},"application/vnd.marlin.drm.license+xml":{"source":"iana"},"application/vnd.marlin.drm.mdcf":{"source":"iana"},"application/vnd.mason+json":{"source":"iana","compressible":true},"application/vnd.maxmind.maxmind-db":{"source":"iana"},"application/vnd.mcd":{"source":"iana","extensions":["mcd"]},"application/vnd.medcalcdata":{"source":"iana","extensions":["mc1"]},"application/vnd.mediastation.cdkey":{"source":"iana","extensions":["cdkey"]},"application/vnd.meridian-slingshot":{"source":"iana"},"application/vnd.mfer":{"source":"iana","extensions":["mwf"]},"application/vnd.mfmp":{"source":"iana","extensions":["mfm"]},"application/vnd.micro+json":{"source":"iana","compressible":true},"application/vnd.micrografx.flo":{"source":"iana","extensions":["flo"]},"application/vnd.micrografx.igx":{"source":"iana","extensions":["igx"]},"application/vnd.microsoft.portable-executable":{"source":"iana"},"application/vnd.microsoft.windows.thumbnail-cache":{"source":"iana"},"application/vnd.miele+json":{"source":"iana","compressible":true},"application/vnd.mif":{"source":"iana","extensions":["mif"]},"application/vnd.minisoft-hp3000-save":{"source":"iana"},"application/vnd.mitsubishi.misty-guard.trustweb":{"source":"iana"},"application/vnd.mobius.daf":{"source":"iana","extensions":["daf"]},"application/vnd.mobius.dis":{"source":"iana","extensions":["dis"]},"application/vnd.mobius.mbk":{"source":"iana","extensions":["mbk"]},"application/vnd.mobius.mqy":{"source":"iana","extensions":["mqy"]},"application/vnd.mobius.msl":{"source":"iana","extensions":["msl"]},"application/vnd.mobius.plc":{"source":"iana","extensions":["plc"]},"application/vnd.mobius.txf":{"source":"iana","extensions":["txf"]},"application/vnd.mophun.application":{"source":"iana","extensions":["mpn"]},"application/vnd.mophun.certificate":{"source":"iana","extensions":["mpc"]},"application/vnd.motorola.flexsuite":{"source":"iana"},"application/vnd.motorola.flexsuite.adsi":{"source":"iana"},"application/vnd.motorola.flexsuite.fis":{"source":"iana"},"application/vnd.motorola.flexsuite.gotap":{"source":"iana"},"application/vnd.motorola.flexsuite.kmr":{"source":"iana"},"application/vnd.motorola.flexsuite.ttc":{"source":"iana"},"application/vnd.motorola.flexsuite.wem":{"source":"iana"},"application/vnd.motorola.iprm":{"source":"iana"},"application/vnd.mozilla.xul+xml":{"source":"iana","compressible":true,"extensions":["xul"]},"application/vnd.ms-3mfdocument":{"source":"iana"},"application/vnd.ms-artgalry":{"source":"iana","extensions":["cil"]},"application/vnd.ms-asf":{"source":"iana"},"application/vnd.ms-cab-compressed":{"source":"iana","extensions":["cab"]},"application/vnd.ms-color.iccprofile":{"source":"apache"},"application/vnd.ms-excel":{"source":"iana","compressible":false,"extensions":["xls","xlm","xla","xlc","xlt","xlw"]},"application/vnd.ms-excel.addin.macroenabled.12":{"source":"iana","extensions":["xlam"]},"application/vnd.ms-excel.sheet.binary.macroenabled.12":{"source":"iana","extensions":["xlsb"]},"application/vnd.ms-excel.sheet.macroenabled.12":{"source":"iana","extensions":["xlsm"]},"application/vnd.ms-excel.template.macroenabled.12":{"source":"iana","extensions":["xltm"]},"application/vnd.ms-fontobject":{"source":"iana","compressible":true,"extensions":["eot"]},"application/vnd.ms-htmlhelp":{"source":"iana","extensions":["chm"]},"application/vnd.ms-ims":{"source":"iana","extensions":["ims"]},"application/vnd.ms-lrm":{"source":"iana","extensions":["lrm"]},"application/vnd.ms-office.activex+xml":{"source":"iana"},"application/vnd.ms-officetheme":{"source":"iana","extensions":["thmx"]},"application/vnd.ms-opentype":{"source":"apache","compressible":true},"application/vnd.ms-outlook":{"compressible":false,"extensions":["msg"]},"application/vnd.ms-package.obfuscated-opentype":{"source":"apache"},"application/vnd.ms-pki.seccat":{"source":"apache","extensions":["cat"]},"application/vnd.ms-pki.stl":{"source":"apache","extensions":["stl"]},"application/vnd.ms-playready.initiator+xml":{"source":"iana"},"application/vnd.ms-powerpoint":{"source":"iana","compressible":false,"extensions":["ppt","pps","pot"]},"application/vnd.ms-powerpoint.addin.macroenabled.12":{"source":"iana","extensions":["ppam"]},"application/vnd.ms-powerpoint.presentation.macroenabled.12":{"source":"iana","extensions":["pptm"]},"application/vnd.ms-powerpoint.slide.macroenabled.12":{"source":"iana","extensions":["sldm"]},"application/vnd.ms-powerpoint.slideshow.macroenabled.12":{"source":"iana","extensions":["ppsm"]},"application/vnd.ms-powerpoint.template.macroenabled.12":{"source":"iana","extensions":["potm"]},"application/vnd.ms-printdevicecapabilities+xml":{"source":"iana"},"application/vnd.ms-printing.printticket+xml":{"source":"apache"},"application/vnd.ms-printschematicket+xml":{"source":"iana"},"application/vnd.ms-project":{"source":"iana","extensions":["mpp","mpt"]},"application/vnd.ms-tnef":{"source":"iana"},"application/vnd.ms-windows.devicepairing":{"source":"iana"},"application/vnd.ms-windows.nwprinting.oob":{"source":"iana"},"application/vnd.ms-windows.printerpairing":{"source":"iana"},"application/vnd.ms-windows.wsd.oob":{"source":"iana"},"application/vnd.ms-wmdrm.lic-chlg-req":{"source":"iana"},"application/vnd.ms-wmdrm.lic-resp":{"source":"iana"},"application/vnd.ms-wmdrm.meter-chlg-req":{"source":"iana"},"application/vnd.ms-wmdrm.meter-resp":{"source":"iana"},"application/vnd.ms-word.document.macroenabled.12":{"source":"iana","extensions":["docm"]},"application/vnd.ms-word.template.macroenabled.12":{"source":"iana","extensions":["dotm"]},"application/vnd.ms-works":{"source":"iana","extensions":["wps","wks","wcm","wdb"]},"application/vnd.ms-wpl":{"source":"iana","extensions":["wpl"]},"application/vnd.ms-xpsdocument":{"source":"iana","compressible":false,"extensions":["xps"]},"application/vnd.msa-disk-image":{"source":"iana"},"application/vnd.mseq":{"source":"iana","extensions":["mseq"]},"application/vnd.msign":{"source":"iana"},"application/vnd.multiad.creator":{"source":"iana"},"application/vnd.multiad.creator.cif":{"source":"iana"},"application/vnd.music-niff":{"source":"iana"},"application/vnd.musician":{"source":"iana","extensions":["mus"]},"application/vnd.muvee.style":{"source":"iana","extensions":["msty"]},"application/vnd.mynfc":{"source":"iana","extensions":["taglet"]},"application/vnd.ncd.control":{"source":"iana"},"application/vnd.ncd.reference":{"source":"iana"},"application/vnd.nearst.inv+json":{"source":"iana","compressible":true},"application/vnd.nervana":{"source":"iana"},"application/vnd.netfpx":{"source":"iana"},"application/vnd.neurolanguage.nlu":{"source":"iana","extensions":["nlu"]},"application/vnd.nintendo.nitro.rom":{"source":"iana"},"application/vnd.nintendo.snes.rom":{"source":"iana"},"application/vnd.nitf":{"source":"iana","extensions":["ntf","nitf"]},"application/vnd.noblenet-directory":{"source":"iana","extensions":["nnd"]},"application/vnd.noblenet-sealer":{"source":"iana","extensions":["nns"]},"application/vnd.noblenet-web":{"source":"iana","extensions":["nnw"]},"application/vnd.nokia.catalogs":{"source":"iana"},"application/vnd.nokia.conml+wbxml":{"source":"iana"},"application/vnd.nokia.conml+xml":{"source":"iana"},"application/vnd.nokia.iptv.config+xml":{"source":"iana"},"application/vnd.nokia.isds-radio-presets":{"source":"iana"},"application/vnd.nokia.landmark+wbxml":{"source":"iana"},"application/vnd.nokia.landmark+xml":{"source":"iana"},"application/vnd.nokia.landmarkcollection+xml":{"source":"iana"},"application/vnd.nokia.n-gage.ac+xml":{"source":"iana"},"application/vnd.nokia.n-gage.data":{"source":"iana","extensions":["ngdat"]},"application/vnd.nokia.n-gage.symbian.install":{"source":"iana","extensions":["n-gage"]},"application/vnd.nokia.ncd":{"source":"iana"},"application/vnd.nokia.pcd+wbxml":{"source":"iana"},"application/vnd.nokia.pcd+xml":{"source":"iana"},"application/vnd.nokia.radio-preset":{"source":"iana","extensions":["rpst"]},"application/vnd.nokia.radio-presets":{"source":"iana","extensions":["rpss"]},"application/vnd.novadigm.edm":{"source":"iana","extensions":["edm"]},"application/vnd.novadigm.edx":{"source":"iana","extensions":["edx"]},"application/vnd.novadigm.ext":{"source":"iana","extensions":["ext"]},"application/vnd.ntt-local.content-share":{"source":"iana"},"application/vnd.ntt-local.file-transfer":{"source":"iana"},"application/vnd.ntt-local.ogw_remote-access":{"source":"iana"},"application/vnd.ntt-local.sip-ta_remote":{"source":"iana"},"application/vnd.ntt-local.sip-ta_tcp_stream":{"source":"iana"},"application/vnd.oasis.opendocument.chart":{"source":"iana","extensions":["odc"]},"application/vnd.oasis.opendocument.chart-template":{"source":"iana","extensions":["otc"]},"application/vnd.oasis.opendocument.database":{"source":"iana","extensions":["odb"]},"application/vnd.oasis.opendocument.formula":{"source":"iana","extensions":["odf"]},"application/vnd.oasis.opendocument.formula-template":{"source":"iana","extensions":["odft"]},"application/vnd.oasis.opendocument.graphics":{"source":"iana","compressible":false,"extensions":["odg"]},"application/vnd.oasis.opendocument.graphics-template":{"source":"iana","extensions":["otg"]},"application/vnd.oasis.opendocument.image":{"source":"iana","extensions":["odi"]},"application/vnd.oasis.opendocument.image-template":{"source":"iana","extensions":["oti"]},"application/vnd.oasis.opendocument.presentation":{"source":"iana","compressible":false,"extensions":["odp"]},"application/vnd.oasis.opendocument.presentation-template":{"source":"iana","extensions":["otp"]},"application/vnd.oasis.opendocument.spreadsheet":{"source":"iana","compressible":false,"extensions":["ods"]},"application/vnd.oasis.opendocument.spreadsheet-template":{"source":"iana","extensions":["ots"]},"application/vnd.oasis.opendocument.text":{"source":"iana","compressible":false,"extensions":["odt"]},"application/vnd.oasis.opendocument.text-master":{"source":"iana","extensions":["odm"]},"application/vnd.oasis.opendocument.text-template":{"source":"iana","extensions":["ott"]},"application/vnd.oasis.opendocument.text-web":{"source":"iana","extensions":["oth"]},"application/vnd.obn":{"source":"iana"},"application/vnd.ocf+cbor":{"source":"iana"},"application/vnd.oftn.l10n+json":{"source":"iana","compressible":true},"application/vnd.oipf.contentaccessdownload+xml":{"source":"iana"},"application/vnd.oipf.contentaccessstreaming+xml":{"source":"iana"},"application/vnd.oipf.cspg-hexbinary":{"source":"iana"},"application/vnd.oipf.dae.svg+xml":{"source":"iana"},"application/vnd.oipf.dae.xhtml+xml":{"source":"iana"},"application/vnd.oipf.mippvcontrolmessage+xml":{"source":"iana"},"application/vnd.oipf.pae.gem":{"source":"iana"},"application/vnd.oipf.spdiscovery+xml":{"source":"iana"},"application/vnd.oipf.spdlist+xml":{"source":"iana"},"application/vnd.oipf.ueprofile+xml":{"source":"iana"},"application/vnd.oipf.userprofile+xml":{"source":"iana"},"application/vnd.olpc-sugar":{"source":"iana","extensions":["xo"]},"application/vnd.oma-scws-config":{"source":"iana"},"application/vnd.oma-scws-http-request":{"source":"iana"},"application/vnd.oma-scws-http-response":{"source":"iana"},"application/vnd.oma.bcast.associated-procedure-parameter+xml":{"source":"iana"},"application/vnd.oma.bcast.drm-trigger+xml":{"source":"iana"},"application/vnd.oma.bcast.imd+xml":{"source":"iana"},"application/vnd.oma.bcast.ltkm":{"source":"iana"},"application/vnd.oma.bcast.notification+xml":{"source":"iana"},"application/vnd.oma.bcast.provisioningtrigger":{"source":"iana"},"application/vnd.oma.bcast.sgboot":{"source":"iana"},"application/vnd.oma.bcast.sgdd+xml":{"source":"iana"},"application/vnd.oma.bcast.sgdu":{"source":"iana"},"application/vnd.oma.bcast.simple-symbol-container":{"source":"iana"},"application/vnd.oma.bcast.smartcard-trigger+xml":{"source":"iana"},"application/vnd.oma.bcast.sprov+xml":{"source":"iana"},"application/vnd.oma.bcast.stkm":{"source":"iana"},"application/vnd.oma.cab-address-book+xml":{"source":"iana"},"application/vnd.oma.cab-feature-handler+xml":{"source":"iana"},"application/vnd.oma.cab-pcc+xml":{"source":"iana"},"application/vnd.oma.cab-subs-invite+xml":{"source":"iana"},"application/vnd.oma.cab-user-prefs+xml":{"source":"iana"},"application/vnd.oma.dcd":{"source":"iana"},"application/vnd.oma.dcdc":{"source":"iana"},"application/vnd.oma.dd2+xml":{"source":"iana","extensions":["dd2"]},"application/vnd.oma.drm.risd+xml":{"source":"iana"},"application/vnd.oma.group-usage-list+xml":{"source":"iana"},"application/vnd.oma.lwm2m+json":{"source":"iana","compressible":true},"application/vnd.oma.lwm2m+tlv":{"source":"iana"},"application/vnd.oma.pal+xml":{"source":"iana"},"application/vnd.oma.poc.detailed-progress-report+xml":{"source":"iana"},"application/vnd.oma.poc.final-report+xml":{"source":"iana"},"application/vnd.oma.poc.groups+xml":{"source":"iana"},"application/vnd.oma.poc.invocation-descriptor+xml":{"source":"iana"},"application/vnd.oma.poc.optimized-progress-report+xml":{"source":"iana"},"application/vnd.oma.push":{"source":"iana"},"application/vnd.oma.scidm.messages+xml":{"source":"iana"},"application/vnd.oma.xcap-directory+xml":{"source":"iana"},"application/vnd.omads-email+xml":{"source":"iana"},"application/vnd.omads-file+xml":{"source":"iana"},"application/vnd.omads-folder+xml":{"source":"iana"},"application/vnd.omaloc-supl-init":{"source":"iana"},"application/vnd.onepager":{"source":"iana"},"application/vnd.onepagertamp":{"source":"iana"},"application/vnd.onepagertamx":{"source":"iana"},"application/vnd.onepagertat":{"source":"iana"},"application/vnd.onepagertatp":{"source":"iana"},"application/vnd.onepagertatx":{"source":"iana"},"application/vnd.openblox.game+xml":{"source":"iana"},"application/vnd.openblox.game-binary":{"source":"iana"},"application/vnd.openeye.oeb":{"source":"iana"},"application/vnd.openofficeorg.extension":{"source":"apache","extensions":["oxt"]},"application/vnd.openstreetmap.data+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.custom-properties+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.customxmlproperties+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.drawing+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.drawingml.chart+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.drawingml.chartshapes+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.drawingml.diagramcolors+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.drawingml.diagramdata+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.drawingml.diagramlayout+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.drawingml.diagramstyle+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.extended-properties+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.commentauthors+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.comments+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.handoutmaster+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.notesmaster+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.notesslide+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.presentation":{"source":"iana","compressible":false,"extensions":["pptx"]},"application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.presprops+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.slide":{"source":"iana","extensions":["sldx"]},"application/vnd.openxmlformats-officedocument.presentationml.slide+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.slidelayout+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.slidemaster+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.slideshow":{"source":"iana","extensions":["ppsx"]},"application/vnd.openxmlformats-officedocument.presentationml.slideshow.main+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.slideupdateinfo+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.tablestyles+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.tags+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.template":{"source":"iana","extensions":["potx"]},"application/vnd.openxmlformats-officedocument.presentationml.template.main+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.presentationml.viewprops+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.calcchain+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.chartsheet+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.connections+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.dialogsheet+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.externallink+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcachedefinition+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.pivotcacherecords+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.pivottable+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.querytable+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.revisionheaders+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.revisionlog+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.sharedstrings+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":{"source":"iana","compressible":false,"extensions":["xlsx"]},"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.sheetmetadata+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.table+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.tablesinglecells+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.template":{"source":"iana","extensions":["xltx"]},"application/vnd.openxmlformats-officedocument.spreadsheetml.template.main+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.usernames+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.volatiledependencies+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.theme+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.themeoverride+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.vmldrawing":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.document":{"source":"iana","compressible":false,"extensions":["docx"]},"application/vnd.openxmlformats-officedocument.wordprocessingml.document.glossary+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.endnotes+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.fonttable+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.template":{"source":"iana","extensions":["dotx"]},"application/vnd.openxmlformats-officedocument.wordprocessingml.template.main+xml":{"source":"iana"},"application/vnd.openxmlformats-officedocument.wordprocessingml.websettings+xml":{"source":"iana"},"application/vnd.openxmlformats-package.core-properties+xml":{"source":"iana"},"application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml":{"source":"iana"},"application/vnd.openxmlformats-package.relationships+xml":{"source":"iana"},"application/vnd.oracle.resource+json":{"source":"iana","compressible":true},"application/vnd.orange.indata":{"source":"iana"},"application/vnd.osa.netdeploy":{"source":"iana"},"application/vnd.osgeo.mapguide.package":{"source":"iana","extensions":["mgp"]},"application/vnd.osgi.bundle":{"source":"iana"},"application/vnd.osgi.dp":{"source":"iana","extensions":["dp"]},"application/vnd.osgi.subsystem":{"source":"iana","extensions":["esa"]},"application/vnd.otps.ct-kip+xml":{"source":"iana"},"application/vnd.oxli.countgraph":{"source":"iana"},"application/vnd.pagerduty+json":{"source":"iana","compressible":true},"application/vnd.palm":{"source":"iana","extensions":["pdb","pqa","oprc"]},"application/vnd.panoply":{"source":"iana"},"application/vnd.paos+xml":{"source":"iana"},"application/vnd.paos.xml":{"source":"apache"},"application/vnd.patentdive":{"source":"iana"},"application/vnd.pawaafile":{"source":"iana","extensions":["paw"]},"application/vnd.pcos":{"source":"iana"},"application/vnd.pg.format":{"source":"iana","extensions":["str"]},"application/vnd.pg.osasli":{"source":"iana","extensions":["ei6"]},"application/vnd.piaccess.application-licence":{"source":"iana"},"application/vnd.picsel":{"source":"iana","extensions":["efif"]},"application/vnd.pmi.widget":{"source":"iana","extensions":["wg"]},"application/vnd.poc.group-advertisement+xml":{"source":"iana"},"application/vnd.pocketlearn":{"source":"iana","extensions":["plf"]},"application/vnd.powerbuilder6":{"source":"iana","extensions":["pbd"]},"application/vnd.powerbuilder6-s":{"source":"iana"},"application/vnd.powerbuilder7":{"source":"iana"},"application/vnd.powerbuilder7-s":{"source":"iana"},"application/vnd.powerbuilder75":{"source":"iana"},"application/vnd.powerbuilder75-s":{"source":"iana"},"application/vnd.preminet":{"source":"iana"},"application/vnd.previewsystems.box":{"source":"iana","extensions":["box"]},"application/vnd.proteus.magazine":{"source":"iana","extensions":["mgz"]},"application/vnd.publishare-delta-tree":{"source":"iana","extensions":["qps"]},"application/vnd.pvi.ptid1":{"source":"iana","extensions":["ptid"]},"application/vnd.pwg-multiplexed":{"source":"iana"},"application/vnd.pwg-xhtml-print+xml":{"source":"iana"},"application/vnd.qualcomm.brew-app-res":{"source":"iana"},"application/vnd.quarantainenet":{"source":"iana"},"application/vnd.quark.quarkxpress":{"source":"iana","extensions":["qxd","qxt","qwd","qwt","qxl","qxb"]},"application/vnd.quobject-quoxdocument":{"source":"iana"},"application/vnd.radisys.moml+xml":{"source":"iana"},"application/vnd.radisys.msml+xml":{"source":"iana"},"application/vnd.radisys.msml-audit+xml":{"source":"iana"},"application/vnd.radisys.msml-audit-conf+xml":{"source":"iana"},"application/vnd.radisys.msml-audit-conn+xml":{"source":"iana"},"application/vnd.radisys.msml-audit-dialog+xml":{"source":"iana"},"application/vnd.radisys.msml-audit-stream+xml":{"source":"iana"},"application/vnd.radisys.msml-conf+xml":{"source":"iana"},"application/vnd.radisys.msml-dialog+xml":{"source":"iana"},"application/vnd.radisys.msml-dialog-base+xml":{"source":"iana"},"application/vnd.radisys.msml-dialog-fax-detect+xml":{"source":"iana"},"application/vnd.radisys.msml-dialog-fax-sendrecv+xml":{"source":"iana"},"application/vnd.radisys.msml-dialog-group+xml":{"source":"iana"},"application/vnd.radisys.msml-dialog-speech+xml":{"source":"iana"},"application/vnd.radisys.msml-dialog-transform+xml":{"source":"iana"},"application/vnd.rainstor.data":{"source":"iana"},"application/vnd.rapid":{"source":"iana"},"application/vnd.rar":{"source":"iana"},"application/vnd.realvnc.bed":{"source":"iana","extensions":["bed"]},"application/vnd.recordare.musicxml":{"source":"iana","extensions":["mxl"]},"application/vnd.recordare.musicxml+xml":{"source":"iana","extensions":["musicxml"]},"application/vnd.renlearn.rlprint":{"source":"iana"},"application/vnd.restful+json":{"source":"iana","compressible":true},"application/vnd.rig.cryptonote":{"source":"iana","extensions":["cryptonote"]},"application/vnd.rim.cod":{"source":"apache","extensions":["cod"]},"application/vnd.rn-realmedia":{"source":"apache","extensions":["rm"]},"application/vnd.rn-realmedia-vbr":{"source":"apache","extensions":["rmvb"]},"application/vnd.route66.link66+xml":{"source":"iana","extensions":["link66"]},"application/vnd.rs-274x":{"source":"iana"},"application/vnd.ruckus.download":{"source":"iana"},"application/vnd.s3sms":{"source":"iana"},"application/vnd.sailingtracker.track":{"source":"iana","extensions":["st"]},"application/vnd.sbm.cid":{"source":"iana"},"application/vnd.sbm.mid2":{"source":"iana"},"application/vnd.scribus":{"source":"iana"},"application/vnd.sealed.3df":{"source":"iana"},"application/vnd.sealed.csf":{"source":"iana"},"application/vnd.sealed.doc":{"source":"iana"},"application/vnd.sealed.eml":{"source":"iana"},"application/vnd.sealed.mht":{"source":"iana"},"application/vnd.sealed.net":{"source":"iana"},"application/vnd.sealed.ppt":{"source":"iana"},"application/vnd.sealed.tiff":{"source":"iana"},"application/vnd.sealed.xls":{"source":"iana"},"application/vnd.sealedmedia.softseal.html":{"source":"iana"},"application/vnd.sealedmedia.softseal.pdf":{"source":"iana"},"application/vnd.seemail":{"source":"iana","extensions":["see"]},"application/vnd.sema":{"source":"iana","extensions":["sema"]},"application/vnd.semd":{"source":"iana","extensions":["semd"]},"application/vnd.semf":{"source":"iana","extensions":["semf"]},"application/vnd.shana.informed.formdata":{"source":"iana","extensions":["ifm"]},"application/vnd.shana.informed.formtemplate":{"source":"iana","extensions":["itp"]},"application/vnd.shana.informed.interchange":{"source":"iana","extensions":["iif"]},"application/vnd.shana.informed.package":{"source":"iana","extensions":["ipk"]},"application/vnd.sigrok.session":{"source":"iana"},"application/vnd.simtech-mindmapper":{"source":"iana","extensions":["twd","twds"]},"application/vnd.siren+json":{"source":"iana","compressible":true},"application/vnd.smaf":{"source":"iana","extensions":["mmf"]},"application/vnd.smart.notebook":{"source":"iana"},"application/vnd.smart.teacher":{"source":"iana","extensions":["teacher"]},"application/vnd.software602.filler.form+xml":{"source":"iana"},"application/vnd.software602.filler.form-xml-zip":{"source":"iana"},"application/vnd.solent.sdkm+xml":{"source":"iana","extensions":["sdkm","sdkd"]},"application/vnd.spotfire.dxp":{"source":"iana","extensions":["dxp"]},"application/vnd.spotfire.sfs":{"source":"iana","extensions":["sfs"]},"application/vnd.sqlite3":{"source":"iana"},"application/vnd.sss-cod":{"source":"iana"},"application/vnd.sss-dtf":{"source":"iana"},"application/vnd.sss-ntf":{"source":"iana"},"application/vnd.stardivision.calc":{"source":"apache","extensions":["sdc"]},"application/vnd.stardivision.draw":{"source":"apache","extensions":["sda"]},"application/vnd.stardivision.impress":{"source":"apache","extensions":["sdd"]},"application/vnd.stardivision.math":{"source":"apache","extensions":["smf"]},"application/vnd.stardivision.writer":{"source":"apache","extensions":["sdw","vor"]},"application/vnd.stardivision.writer-global":{"source":"apache","extensions":["sgl"]},"application/vnd.stepmania.package":{"source":"iana","extensions":["smzip"]},"application/vnd.stepmania.stepchart":{"source":"iana","extensions":["sm"]},"application/vnd.street-stream":{"source":"iana"},"application/vnd.sun.wadl+xml":{"source":"iana","compressible":true,"extensions":["wadl"]},"application/vnd.sun.xml.calc":{"source":"apache","extensions":["sxc"]},"application/vnd.sun.xml.calc.template":{"source":"apache","extensions":["stc"]},"application/vnd.sun.xml.draw":{"source":"apache","extensions":["sxd"]},"application/vnd.sun.xml.draw.template":{"source":"apache","extensions":["std"]},"application/vnd.sun.xml.impress":{"source":"apache","extensions":["sxi"]},"application/vnd.sun.xml.impress.template":{"source":"apache","extensions":["sti"]},"application/vnd.sun.xml.math":{"source":"apache","extensions":["sxm"]},"application/vnd.sun.xml.writer":{"source":"apache","extensions":["sxw"]},"application/vnd.sun.xml.writer.global":{"source":"apache","extensions":["sxg"]},"application/vnd.sun.xml.writer.template":{"source":"apache","extensions":["stw"]},"application/vnd.sus-calendar":{"source":"iana","extensions":["sus","susp"]},"application/vnd.svd":{"source":"iana","extensions":["svd"]},"application/vnd.swiftview-ics":{"source":"iana"},"application/vnd.symbian.install":{"source":"apache","extensions":["sis","sisx"]},"application/vnd.syncml+xml":{"source":"iana","extensions":["xsm"]},"application/vnd.syncml.dm+wbxml":{"source":"iana","extensions":["bdm"]},"application/vnd.syncml.dm+xml":{"source":"iana","extensions":["xdm"]},"application/vnd.syncml.dm.notification":{"source":"iana"},"application/vnd.syncml.dmddf+wbxml":{"source":"iana"},"application/vnd.syncml.dmddf+xml":{"source":"iana"},"application/vnd.syncml.dmtnds+wbxml":{"source":"iana"},"application/vnd.syncml.dmtnds+xml":{"source":"iana"},"application/vnd.syncml.ds.notification":{"source":"iana"},"application/vnd.tableschema+json":{"source":"iana","compressible":true},"application/vnd.tao.intent-module-archive":{"source":"iana","extensions":["tao"]},"application/vnd.tcpdump.pcap":{"source":"iana","extensions":["pcap","cap","dmp"]},"application/vnd.tmd.mediaflex.api+xml":{"source":"iana"},"application/vnd.tml":{"source":"iana"},"application/vnd.tmobile-livetv":{"source":"iana","extensions":["tmo"]},"application/vnd.tri.onesource":{"source":"iana"},"application/vnd.trid.tpt":{"source":"iana","extensions":["tpt"]},"application/vnd.triscape.mxs":{"source":"iana","extensions":["mxs"]},"application/vnd.trueapp":{"source":"iana","extensions":["tra"]},"application/vnd.truedoc":{"source":"iana"},"application/vnd.ubisoft.webplayer":{"source":"iana"},"application/vnd.ufdl":{"source":"iana","extensions":["ufd","ufdl"]},"application/vnd.uiq.theme":{"source":"iana","extensions":["utz"]},"application/vnd.umajin":{"source":"iana","extensions":["umj"]},"application/vnd.unity":{"source":"iana","extensions":["unityweb"]},"application/vnd.uoml+xml":{"source":"iana","extensions":["uoml"]},"application/vnd.uplanet.alert":{"source":"iana"},"application/vnd.uplanet.alert-wbxml":{"source":"iana"},"application/vnd.uplanet.bearer-choice":{"source":"iana"},"application/vnd.uplanet.bearer-choice-wbxml":{"source":"iana"},"application/vnd.uplanet.cacheop":{"source":"iana"},"application/vnd.uplanet.cacheop-wbxml":{"source":"iana"},"application/vnd.uplanet.channel":{"source":"iana"},"application/vnd.uplanet.channel-wbxml":{"source":"iana"},"application/vnd.uplanet.list":{"source":"iana"},"application/vnd.uplanet.list-wbxml":{"source":"iana"},"application/vnd.uplanet.listcmd":{"source":"iana"},"application/vnd.uplanet.listcmd-wbxml":{"source":"iana"},"application/vnd.uplanet.signal":{"source":"iana"},"application/vnd.uri-map":{"source":"iana"},"application/vnd.valve.source.material":{"source":"iana"},"application/vnd.vcx":{"source":"iana","extensions":["vcx"]},"application/vnd.vd-study":{"source":"iana"},"application/vnd.vectorworks":{"source":"iana"},"application/vnd.vel+json":{"source":"iana","compressible":true},"application/vnd.verimatrix.vcas":{"source":"iana"},"application/vnd.vidsoft.vidconference":{"source":"iana"},"application/vnd.visio":{"source":"iana","extensions":["vsd","vst","vss","vsw"]},"application/vnd.visionary":{"source":"iana","extensions":["vis"]},"application/vnd.vividence.scriptfile":{"source":"iana"},"application/vnd.vsf":{"source":"iana","extensions":["vsf"]},"application/vnd.wap.sic":{"source":"iana"},"application/vnd.wap.slc":{"source":"iana"},"application/vnd.wap.wbxml":{"source":"iana","extensions":["wbxml"]},"application/vnd.wap.wmlc":{"source":"iana","extensions":["wmlc"]},"application/vnd.wap.wmlscriptc":{"source":"iana","extensions":["wmlsc"]},"application/vnd.webturbo":{"source":"iana","extensions":["wtb"]},"application/vnd.wfa.p2p":{"source":"iana"},"application/vnd.wfa.wsc":{"source":"iana"},"application/vnd.windows.devicepairing":{"source":"iana"},"application/vnd.wmc":{"source":"iana"},"application/vnd.wmf.bootstrap":{"source":"iana"},"application/vnd.wolfram.mathematica":{"source":"iana"},"application/vnd.wolfram.mathematica.package":{"source":"iana"},"application/vnd.wolfram.player":{"source":"iana","extensions":["nbp"]},"application/vnd.wordperfect":{"source":"iana","extensions":["wpd"]},"application/vnd.wqd":{"source":"iana","extensions":["wqd"]},"application/vnd.wrq-hp3000-labelled":{"source":"iana"},"application/vnd.wt.stf":{"source":"iana","extensions":["stf"]},"application/vnd.wv.csp+wbxml":{"source":"iana"},"application/vnd.wv.csp+xml":{"source":"iana"},"application/vnd.wv.ssp+xml":{"source":"iana"},"application/vnd.xacml+json":{"source":"iana","compressible":true},"application/vnd.xara":{"source":"iana","extensions":["xar"]},"application/vnd.xfdl":{"source":"iana","extensions":["xfdl"]},"application/vnd.xfdl.webform":{"source":"iana"},"application/vnd.xmi+xml":{"source":"iana"},"application/vnd.xmpie.cpkg":{"source":"iana"},"application/vnd.xmpie.dpkg":{"source":"iana"},"application/vnd.xmpie.plan":{"source":"iana"},"application/vnd.xmpie.ppkg":{"source":"iana"},"application/vnd.xmpie.xlim":{"source":"iana"},"application/vnd.yamaha.hv-dic":{"source":"iana","extensions":["hvd"]},"application/vnd.yamaha.hv-script":{"source":"iana","extensions":["hvs"]},"application/vnd.yamaha.hv-voice":{"source":"iana","extensions":["hvp"]},"application/vnd.yamaha.openscoreformat":{"source":"iana","extensions":["osf"]},"application/vnd.yamaha.openscoreformat.osfpvg+xml":{"source":"iana","extensions":["osfpvg"]},"application/vnd.yamaha.remote-setup":{"source":"iana"},"application/vnd.yamaha.smaf-audio":{"source":"iana","extensions":["saf"]},"application/vnd.yamaha.smaf-phrase":{"source":"iana","extensions":["spf"]},"application/vnd.yamaha.through-ngn":{"source":"iana"},"application/vnd.yamaha.tunnel-udpencap":{"source":"iana"},"application/vnd.yaoweme":{"source":"iana"},"application/vnd.yellowriver-custom-menu":{"source":"iana","extensions":["cmp"]},"application/vnd.youtube.yt":{"source":"iana"},"application/vnd.zul":{"source":"iana","extensions":["zir","zirz"]},"application/vnd.zzazz.deck+xml":{"source":"iana","extensions":["zaz"]},"application/voicexml+xml":{"source":"iana","extensions":["vxml"]},"application/voucher-cms+json":{"source":"iana","compressible":true},"application/vq-rtcpxr":{"source":"iana"},"application/wasm":{"compressible":true,"extensions":["wasm"]},"application/watcherinfo+xml":{"source":"iana"},"application/webpush-options+json":{"source":"iana","compressible":true},"application/whoispp-query":{"source":"iana"},"application/whoispp-response":{"source":"iana"},"application/widget":{"source":"iana","extensions":["wgt"]},"application/winhlp":{"source":"apache","extensions":["hlp"]},"application/wita":{"source":"iana"},"application/wordperfect5.1":{"source":"iana"},"application/wsdl+xml":{"source":"iana","extensions":["wsdl"]},"application/wspolicy+xml":{"source":"iana","extensions":["wspolicy"]},"application/x-7z-compressed":{"source":"apache","compressible":false,"extensions":["7z"]},"application/x-abiword":{"source":"apache","extensions":["abw"]},"application/x-ace-compressed":{"source":"apache","extensions":["ace"]},"application/x-amf":{"source":"apache"},"application/x-apple-diskimage":{"source":"apache","extensions":["dmg"]},"application/x-arj":{"compressible":false,"extensions":["arj"]},"application/x-authorware-bin":{"source":"apache","extensions":["aab","x32","u32","vox"]},"application/x-authorware-map":{"source":"apache","extensions":["aam"]},"application/x-authorware-seg":{"source":"apache","extensions":["aas"]},"application/x-bcpio":{"source":"apache","extensions":["bcpio"]},"application/x-bdoc":{"compressible":false,"extensions":["bdoc"]},"application/x-bittorrent":{"source":"apache","extensions":["torrent"]},"application/x-blorb":{"source":"apache","extensions":["blb","blorb"]},"application/x-bzip":{"source":"apache","compressible":false,"extensions":["bz"]},"application/x-bzip2":{"source":"apache","compressible":false,"extensions":["bz2","boz"]},"application/x-cbr":{"source":"apache","extensions":["cbr","cba","cbt","cbz","cb7"]},"application/x-cdlink":{"source":"apache","extensions":["vcd"]},"application/x-cfs-compressed":{"source":"apache","extensions":["cfs"]},"application/x-chat":{"source":"apache","extensions":["chat"]},"application/x-chess-pgn":{"source":"apache","extensions":["pgn"]},"application/x-chrome-extension":{"extensions":["crx"]},"application/x-cocoa":{"source":"nginx","extensions":["cco"]},"application/x-compress":{"source":"apache"},"application/x-conference":{"source":"apache","extensions":["nsc"]},"application/x-cpio":{"source":"apache","extensions":["cpio"]},"application/x-csh":{"source":"apache","extensions":["csh"]},"application/x-deb":{"compressible":false},"application/x-debian-package":{"source":"apache","extensions":["deb","udeb"]},"application/x-dgc-compressed":{"source":"apache","extensions":["dgc"]},"application/x-director":{"source":"apache","extensions":["dir","dcr","dxr","cst","cct","cxt","w3d","fgd","swa"]},"application/x-doom":{"source":"apache","extensions":["wad"]},"application/x-dtbncx+xml":{"source":"apache","extensions":["ncx"]},"application/x-dtbook+xml":{"source":"apache","extensions":["dtb"]},"application/x-dtbresource+xml":{"source":"apache","extensions":["res"]},"application/x-dvi":{"source":"apache","compressible":false,"extensions":["dvi"]},"application/x-envoy":{"source":"apache","extensions":["evy"]},"application/x-eva":{"source":"apache","extensions":["eva"]},"application/x-font-bdf":{"source":"apache","extensions":["bdf"]},"application/x-font-dos":{"source":"apache"},"application/x-font-framemaker":{"source":"apache"},"application/x-font-ghostscript":{"source":"apache","extensions":["gsf"]},"application/x-font-libgrx":{"source":"apache"},"application/x-font-linux-psf":{"source":"apache","extensions":["psf"]},"application/x-font-pcf":{"source":"apache","extensions":["pcf"]},"application/x-font-snf":{"source":"apache","extensions":["snf"]},"application/x-font-speedo":{"source":"apache"},"application/x-font-sunos-news":{"source":"apache"},"application/x-font-type1":{"source":"apache","extensions":["pfa","pfb","pfm","afm"]},"application/x-font-vfont":{"source":"apache"},"application/x-freearc":{"source":"apache","extensions":["arc"]},"application/x-futuresplash":{"source":"apache","extensions":["spl"]},"application/x-gca-compressed":{"source":"apache","extensions":["gca"]},"application/x-glulx":{"source":"apache","extensions":["ulx"]},"application/x-gnumeric":{"source":"apache","extensions":["gnumeric"]},"application/x-gramps-xml":{"source":"apache","extensions":["gramps"]},"application/x-gtar":{"source":"apache","extensions":["gtar"]},"application/x-gzip":{"source":"apache"},"application/x-hdf":{"source":"apache","extensions":["hdf"]},"application/x-httpd-php":{"compressible":true,"extensions":["php"]},"application/x-install-instructions":{"source":"apache","extensions":["install"]},"application/x-iso9660-image":{"source":"apache","extensions":["iso"]},"application/x-java-archive-diff":{"source":"nginx","extensions":["jardiff"]},"application/x-java-jnlp-file":{"source":"apache","compressible":false,"extensions":["jnlp"]},"application/x-javascript":{"compressible":true},"application/x-latex":{"source":"apache","compressible":false,"extensions":["latex"]},"application/x-lua-bytecode":{"extensions":["luac"]},"application/x-lzh-compressed":{"source":"apache","extensions":["lzh","lha"]},"application/x-makeself":{"source":"nginx","extensions":["run"]},"application/x-mie":{"source":"apache","extensions":["mie"]},"application/x-mobipocket-ebook":{"source":"apache","extensions":["prc","mobi"]},"application/x-mpegurl":{"compressible":false},"application/x-ms-application":{"source":"apache","extensions":["application"]},"application/x-ms-shortcut":{"source":"apache","extensions":["lnk"]},"application/x-ms-wmd":{"source":"apache","extensions":["wmd"]},"application/x-ms-wmz":{"source":"apache","extensions":["wmz"]},"application/x-ms-xbap":{"source":"apache","extensions":["xbap"]},"application/x-msaccess":{"source":"apache","extensions":["mdb"]},"application/x-msbinder":{"source":"apache","extensions":["obd"]},"application/x-mscardfile":{"source":"apache","extensions":["crd"]},"application/x-msclip":{"source":"apache","extensions":["clp"]},"application/x-msdos-program":{"extensions":["exe"]},"application/x-msdownload":{"source":"apache","extensions":["exe","dll","com","bat","msi"]},"application/x-msmediaview":{"source":"apache","extensions":["mvb","m13","m14"]},"application/x-msmetafile":{"source":"apache","extensions":["wmf","wmz","emf","emz"]},"application/x-msmoney":{"source":"apache","extensions":["mny"]},"application/x-mspublisher":{"source":"apache","extensions":["pub"]},"application/x-msschedule":{"source":"apache","extensions":["scd"]},"application/x-msterminal":{"source":"apache","extensions":["trm"]},"application/x-mswrite":{"source":"apache","extensions":["wri"]},"application/x-netcdf":{"source":"apache","extensions":["nc","cdf"]},"application/x-ns-proxy-autoconfig":{"compressible":true,"extensions":["pac"]},"application/x-nzb":{"source":"apache","extensions":["nzb"]},"application/x-perl":{"source":"nginx","extensions":["pl","pm"]},"application/x-pilot":{"source":"nginx","extensions":["prc","pdb"]},"application/x-pkcs12":{"source":"apache","compressible":false,"extensions":["p12","pfx"]},"application/x-pkcs7-certificates":{"source":"apache","extensions":["p7b","spc"]},"application/x-pkcs7-certreqresp":{"source":"apache","extensions":["p7r"]},"application/x-rar-compressed":{"source":"apache","compressible":false,"extensions":["rar"]},"application/x-redhat-package-manager":{"source":"nginx","extensions":["rpm"]},"application/x-research-info-systems":{"source":"apache","extensions":["ris"]},"application/x-sea":{"source":"nginx","extensions":["sea"]},"application/x-sh":{"source":"apache","compressible":true,"extensions":["sh"]},"application/x-shar":{"source":"apache","extensions":["shar"]},"application/x-shockwave-flash":{"source":"apache","compressible":false,"extensions":["swf"]},"application/x-silverlight-app":{"source":"apache","extensions":["xap"]},"application/x-sql":{"source":"apache","extensions":["sql"]},"application/x-stuffit":{"source":"apache","compressible":false,"extensions":["sit"]},"application/x-stuffitx":{"source":"apache","extensions":["sitx"]},"application/x-subrip":{"source":"apache","extensions":["srt"]},"application/x-sv4cpio":{"source":"apache","extensions":["sv4cpio"]},"application/x-sv4crc":{"source":"apache","extensions":["sv4crc"]},"application/x-t3vm-image":{"source":"apache","extensions":["t3"]},"application/x-tads":{"source":"apache","extensions":["gam"]},"application/x-tar":{"source":"apache","compressible":true,"extensions":["tar"]},"application/x-tcl":{"source":"apache","extensions":["tcl","tk"]},"application/x-tex":{"source":"apache","extensions":["tex"]},"application/x-tex-tfm":{"source":"apache","extensions":["tfm"]},"application/x-texinfo":{"source":"apache","extensions":["texinfo","texi"]},"application/x-tgif":{"source":"apache","extensions":["obj"]},"application/x-ustar":{"source":"apache","extensions":["ustar"]},"application/x-virtualbox-hdd":{"compressible":true,"extensions":["hdd"]},"application/x-virtualbox-ova":{"compressible":true,"extensions":["ova"]},"application/x-virtualbox-ovf":{"compressible":true,"extensions":["ovf"]},"application/x-virtualbox-vbox":{"compressible":true,"extensions":["vbox"]},"application/x-virtualbox-vbox-extpack":{"compressible":false,"extensions":["vbox-extpack"]},"application/x-virtualbox-vdi":{"compressible":true,"extensions":["vdi"]},"application/x-virtualbox-vhd":{"compressible":true,"extensions":["vhd"]},"application/x-virtualbox-vmdk":{"compressible":true,"extensions":["vmdk"]},"application/x-wais-source":{"source":"apache","extensions":["src"]},"application/x-web-app-manifest+json":{"compressible":true,"extensions":["webapp"]},"application/x-www-form-urlencoded":{"source":"iana","compressible":true},"application/x-x509-ca-cert":{"source":"apache","extensions":["der","crt","pem"]},"application/x-xfig":{"source":"apache","extensions":["fig"]},"application/x-xliff+xml":{"source":"apache","extensions":["xlf"]},"application/x-xpinstall":{"source":"apache","compressible":false,"extensions":["xpi"]},"application/x-xz":{"source":"apache","extensions":["xz"]},"application/x-zmachine":{"source":"apache","extensions":["z1","z2","z3","z4","z5","z6","z7","z8"]},"application/x400-bp":{"source":"iana"},"application/xacml+xml":{"source":"iana"},"application/xaml+xml":{"source":"apache","extensions":["xaml"]},"application/xcap-att+xml":{"source":"iana"},"application/xcap-caps+xml":{"source":"iana"},"application/xcap-diff+xml":{"source":"iana","extensions":["xdf"]},"application/xcap-el+xml":{"source":"iana"},"application/xcap-error+xml":{"source":"iana"},"application/xcap-ns+xml":{"source":"iana"},"application/xcon-conference-info+xml":{"source":"iana"},"application/xcon-conference-info-diff+xml":{"source":"iana"},"application/xenc+xml":{"source":"iana","extensions":["xenc"]},"application/xhtml+xml":{"source":"iana","compressible":true,"extensions":["xhtml","xht"]},"application/xhtml-voice+xml":{"source":"apache"},"application/xml":{"source":"iana","compressible":true,"extensions":["xml","xsl","xsd","rng"]},"application/xml-dtd":{"source":"iana","compressible":true,"extensions":["dtd"]},"application/xml-external-parsed-entity":{"source":"iana"},"application/xml-patch+xml":{"source":"iana"},"application/xmpp+xml":{"source":"iana"},"application/xop+xml":{"source":"iana","compressible":true,"extensions":["xop"]},"application/xproc+xml":{"source":"apache","extensions":["xpl"]},"application/xslt+xml":{"source":"iana","extensions":["xslt"]},"application/xspf+xml":{"source":"apache","extensions":["xspf"]},"application/xv+xml":{"source":"iana","extensions":["mxml","xhvml","xvml","xvm"]},"application/yang":{"source":"iana","extensions":["yang"]},"application/yang-data+json":{"source":"iana","compressible":true},"application/yang-data+xml":{"source":"iana"},"application/yang-patch+json":{"source":"iana","compressible":true},"application/yang-patch+xml":{"source":"iana"},"application/yin+xml":{"source":"iana","extensions":["yin"]},"application/zip":{"source":"iana","compressible":false,"extensions":["zip"]},"application/zlib":{"source":"iana"},"audio/1d-interleaved-parityfec":{"source":"iana"},"audio/32kadpcm":{"source":"iana"},"audio/3gpp":{"source":"iana","compressible":false,"extensions":["3gpp"]},"audio/3gpp2":{"source":"iana"},"audio/ac3":{"source":"iana"},"audio/adpcm":{"source":"apache","extensions":["adp"]},"audio/amr":{"source":"iana"},"audio/amr-wb":{"source":"iana"},"audio/amr-wb+":{"source":"iana"},"audio/aptx":{"source":"iana"},"audio/asc":{"source":"iana"},"audio/atrac-advanced-lossless":{"source":"iana"},"audio/atrac-x":{"source":"iana"},"audio/atrac3":{"source":"iana"},"audio/basic":{"source":"iana","compressible":false,"extensions":["au","snd"]},"audio/bv16":{"source":"iana"},"audio/bv32":{"source":"iana"},"audio/clearmode":{"source":"iana"},"audio/cn":{"source":"iana"},"audio/dat12":{"source":"iana"},"audio/dls":{"source":"iana"},"audio/dsr-es201108":{"source":"iana"},"audio/dsr-es202050":{"source":"iana"},"audio/dsr-es202211":{"source":"iana"},"audio/dsr-es202212":{"source":"iana"},"audio/dv":{"source":"iana"},"audio/dvi4":{"source":"iana"},"audio/eac3":{"source":"iana"},"audio/encaprtp":{"source":"iana"},"audio/evrc":{"source":"iana"},"audio/evrc-qcp":{"source":"iana"},"audio/evrc0":{"source":"iana"},"audio/evrc1":{"source":"iana"},"audio/evrcb":{"source":"iana"},"audio/evrcb0":{"source":"iana"},"audio/evrcb1":{"source":"iana"},"audio/evrcnw":{"source":"iana"},"audio/evrcnw0":{"source":"iana"},"audio/evrcnw1":{"source":"iana"},"audio/evrcwb":{"source":"iana"},"audio/evrcwb0":{"source":"iana"},"audio/evrcwb1":{"source":"iana"},"audio/evs":{"source":"iana"},"audio/fwdred":{"source":"iana"},"audio/g711-0":{"source":"iana"},"audio/g719":{"source":"iana"},"audio/g722":{"source":"iana"},"audio/g7221":{"source":"iana"},"audio/g723":{"source":"iana"},"audio/g726-16":{"source":"iana"},"audio/g726-24":{"source":"iana"},"audio/g726-32":{"source":"iana"},"audio/g726-40":{"source":"iana"},"audio/g728":{"source":"iana"},"audio/g729":{"source":"iana"},"audio/g7291":{"source":"iana"},"audio/g729d":{"source":"iana"},"audio/g729e":{"source":"iana"},"audio/gsm":{"source":"iana"},"audio/gsm-efr":{"source":"iana"},"audio/gsm-hr-08":{"source":"iana"},"audio/ilbc":{"source":"iana"},"audio/ip-mr_v2.5":{"source":"iana"},"audio/isac":{"source":"apache"},"audio/l16":{"source":"iana"},"audio/l20":{"source":"iana"},"audio/l24":{"source":"iana","compressible":false},"audio/l8":{"source":"iana"},"audio/lpc":{"source":"iana"},"audio/melp":{"source":"iana"},"audio/melp1200":{"source":"iana"},"audio/melp2400":{"source":"iana"},"audio/melp600":{"source":"iana"},"audio/midi":{"source":"apache","extensions":["mid","midi","kar","rmi"]},"audio/mobile-xmf":{"source":"iana"},"audio/mp3":{"compressible":false,"extensions":["mp3"]},"audio/mp4":{"source":"iana","compressible":false,"extensions":["m4a","mp4a"]},"audio/mp4a-latm":{"source":"iana"},"audio/mpa":{"source":"iana"},"audio/mpa-robust":{"source":"iana"},"audio/mpeg":{"source":"iana","compressible":false,"extensions":["mpga","mp2","mp2a","mp3","m2a","m3a"]},"audio/mpeg4-generic":{"source":"iana"},"audio/musepack":{"source":"apache"},"audio/ogg":{"source":"iana","compressible":false,"extensions":["oga","ogg","spx"]},"audio/opus":{"source":"iana"},"audio/parityfec":{"source":"iana"},"audio/pcma":{"source":"iana"},"audio/pcma-wb":{"source":"iana"},"audio/pcmu":{"source":"iana"},"audio/pcmu-wb":{"source":"iana"},"audio/prs.sid":{"source":"iana"},"audio/qcelp":{"source":"iana"},"audio/raptorfec":{"source":"iana"},"audio/red":{"source":"iana"},"audio/rtp-enc-aescm128":{"source":"iana"},"audio/rtp-midi":{"source":"iana"},"audio/rtploopback":{"source":"iana"},"audio/rtx":{"source":"iana"},"audio/s3m":{"source":"apache","extensions":["s3m"]},"audio/silk":{"source":"apache","extensions":["sil"]},"audio/smv":{"source":"iana"},"audio/smv-qcp":{"source":"iana"},"audio/smv0":{"source":"iana"},"audio/sp-midi":{"source":"iana"},"audio/speex":{"source":"iana"},"audio/t140c":{"source":"iana"},"audio/t38":{"source":"iana"},"audio/telephone-event":{"source":"iana"},"audio/tone":{"source":"iana"},"audio/uemclip":{"source":"iana"},"audio/ulpfec":{"source":"iana"},"audio/vdvi":{"source":"iana"},"audio/vmr-wb":{"source":"iana"},"audio/vnd.3gpp.iufp":{"source":"iana"},"audio/vnd.4sb":{"source":"iana"},"audio/vnd.audiokoz":{"source":"iana"},"audio/vnd.celp":{"source":"iana"},"audio/vnd.cisco.nse":{"source":"iana"},"audio/vnd.cmles.radio-events":{"source":"iana"},"audio/vnd.cns.anp1":{"source":"iana"},"audio/vnd.cns.inf1":{"source":"iana"},"audio/vnd.dece.audio":{"source":"iana","extensions":["uva","uvva"]},"audio/vnd.digital-winds":{"source":"iana","extensions":["eol"]},"audio/vnd.dlna.adts":{"source":"iana"},"audio/vnd.dolby.heaac.1":{"source":"iana"},"audio/vnd.dolby.heaac.2":{"source":"iana"},"audio/vnd.dolby.mlp":{"source":"iana"},"audio/vnd.dolby.mps":{"source":"iana"},"audio/vnd.dolby.pl2":{"source":"iana"},"audio/vnd.dolby.pl2x":{"source":"iana"},"audio/vnd.dolby.pl2z":{"source":"iana"},"audio/vnd.dolby.pulse.1":{"source":"iana"},"audio/vnd.dra":{"source":"iana","extensions":["dra"]},"audio/vnd.dts":{"source":"iana","extensions":["dts"]},"audio/vnd.dts.hd":{"source":"iana","extensions":["dtshd"]},"audio/vnd.dvb.file":{"source":"iana"},"audio/vnd.everad.plj":{"source":"iana"},"audio/vnd.hns.audio":{"source":"iana"},"audio/vnd.lucent.voice":{"source":"iana","extensions":["lvp"]},"audio/vnd.ms-playready.media.pya":{"source":"iana","extensions":["pya"]},"audio/vnd.nokia.mobile-xmf":{"source":"iana"},"audio/vnd.nortel.vbk":{"source":"iana"},"audio/vnd.nuera.ecelp4800":{"source":"iana","extensions":["ecelp4800"]},"audio/vnd.nuera.ecelp7470":{"source":"iana","extensions":["ecelp7470"]},"audio/vnd.nuera.ecelp9600":{"source":"iana","extensions":["ecelp9600"]},"audio/vnd.octel.sbc":{"source":"iana"},"audio/vnd.presonus.multitrack":{"source":"iana"},"audio/vnd.qcelp":{"source":"iana"},"audio/vnd.rhetorex.32kadpcm":{"source":"iana"},"audio/vnd.rip":{"source":"iana","extensions":["rip"]},"audio/vnd.rn-realaudio":{"compressible":false},"audio/vnd.sealedmedia.softseal.mpeg":{"source":"iana"},"audio/vnd.vmx.cvsd":{"source":"iana"},"audio/vnd.wave":{"compressible":false},"audio/vorbis":{"source":"iana","compressible":false},"audio/vorbis-config":{"source":"iana"},"audio/wav":{"compressible":false,"extensions":["wav"]},"audio/wave":{"compressible":false,"extensions":["wav"]},"audio/webm":{"source":"apache","compressible":false,"extensions":["weba"]},"audio/x-aac":{"source":"apache","compressible":false,"extensions":["aac"]},"audio/x-aiff":{"source":"apache","extensions":["aif","aiff","aifc"]},"audio/x-caf":{"source":"apache","compressible":false,"extensions":["caf"]},"audio/x-flac":{"source":"apache","extensions":["flac"]},"audio/x-m4a":{"source":"nginx","extensions":["m4a"]},"audio/x-matroska":{"source":"apache","extensions":["mka"]},"audio/x-mpegurl":{"source":"apache","extensions":["m3u"]},"audio/x-ms-wax":{"source":"apache","extensions":["wax"]},"audio/x-ms-wma":{"source":"apache","extensions":["wma"]},"audio/x-pn-realaudio":{"source":"apache","extensions":["ram","ra"]},"audio/x-pn-realaudio-plugin":{"source":"apache","extensions":["rmp"]},"audio/x-realaudio":{"source":"nginx","extensions":["ra"]},"audio/x-tta":{"source":"apache"},"audio/x-wav":{"source":"apache","extensions":["wav"]},"audio/xm":{"source":"apache","extensions":["xm"]},"chemical/x-cdx":{"source":"apache","extensions":["cdx"]},"chemical/x-cif":{"source":"apache","extensions":["cif"]},"chemical/x-cmdf":{"source":"apache","extensions":["cmdf"]},"chemical/x-cml":{"source":"apache","extensions":["cml"]},"chemical/x-csml":{"source":"apache","extensions":["csml"]},"chemical/x-pdb":{"source":"apache"},"chemical/x-xyz":{"source":"apache","extensions":["xyz"]},"font/collection":{"source":"iana","extensions":["ttc"]},"font/otf":{"source":"iana","compressible":true,"extensions":["otf"]},"font/sfnt":{"source":"iana"},"font/ttf":{"source":"iana","extensions":["ttf"]},"font/woff":{"source":"iana","extensions":["woff"]},"font/woff2":{"source":"iana","extensions":["woff2"]},"image/aces":{"source":"iana"},"image/apng":{"compressible":false,"extensions":["apng"]},"image/bmp":{"source":"iana","compressible":true,"extensions":["bmp"]},"image/cgm":{"source":"iana","extensions":["cgm"]},"image/dicom-rle":{"source":"iana"},"image/emf":{"source":"iana"},"image/fits":{"source":"iana"},"image/g3fax":{"source":"iana","extensions":["g3"]},"image/gif":{"source":"iana","compressible":false,"extensions":["gif"]},"image/ief":{"source":"iana","extensions":["ief"]},"image/jls":{"source":"iana"},"image/jp2":{"source":"iana","compressible":false,"extensions":["jp2","jpg2"]},"image/jpeg":{"source":"iana","compressible":false,"extensions":["jpeg","jpg","jpe"]},"image/jpm":{"source":"iana","compressible":false,"extensions":["jpm"]},"image/jpx":{"source":"iana","compressible":false,"extensions":["jpx","jpf"]},"image/ktx":{"source":"iana","extensions":["ktx"]},"image/naplps":{"source":"iana"},"image/pjpeg":{"compressible":false},"image/png":{"source":"iana","compressible":false,"extensions":["png"]},"image/prs.btif":{"source":"iana","extensions":["btif"]},"image/prs.pti":{"source":"iana"},"image/pwg-raster":{"source":"iana"},"image/sgi":{"source":"apache","extensions":["sgi"]},"image/svg+xml":{"source":"iana","compressible":true,"extensions":["svg","svgz"]},"image/t38":{"source":"iana"},"image/tiff":{"source":"iana","compressible":false,"extensions":["tiff","tif"]},"image/tiff-fx":{"source":"iana"},"image/vnd.adobe.photoshop":{"source":"iana","compressible":true,"extensions":["psd"]},"image/vnd.airzip.accelerator.azv":{"source":"iana"},"image/vnd.cns.inf2":{"source":"iana"},"image/vnd.dece.graphic":{"source":"iana","extensions":["uvi","uvvi","uvg","uvvg"]},"image/vnd.djvu":{"source":"iana","extensions":["djvu","djv"]},"image/vnd.dvb.subtitle":{"source":"iana","extensions":["sub"]},"image/vnd.dwg":{"source":"iana","extensions":["dwg"]},"image/vnd.dxf":{"source":"iana","extensions":["dxf"]},"image/vnd.fastbidsheet":{"source":"iana","extensions":["fbs"]},"image/vnd.fpx":{"source":"iana","extensions":["fpx"]},"image/vnd.fst":{"source":"iana","extensions":["fst"]},"image/vnd.fujixerox.edmics-mmr":{"source":"iana","extensions":["mmr"]},"image/vnd.fujixerox.edmics-rlc":{"source":"iana","extensions":["rlc"]},"image/vnd.globalgraphics.pgb":{"source":"iana"},"image/vnd.microsoft.icon":{"source":"iana"},"image/vnd.mix":{"source":"iana"},"image/vnd.mozilla.apng":{"source":"iana"},"image/vnd.ms-modi":{"source":"iana","extensions":["mdi"]},"image/vnd.ms-photo":{"source":"apache","extensions":["wdp"]},"image/vnd.net-fpx":{"source":"iana","extensions":["npx"]},"image/vnd.radiance":{"source":"iana"},"image/vnd.sealed.png":{"source":"iana"},"image/vnd.sealedmedia.softseal.gif":{"source":"iana"},"image/vnd.sealedmedia.softseal.jpg":{"source":"iana"},"image/vnd.svf":{"source":"iana"},"image/vnd.tencent.tap":{"source":"iana"},"image/vnd.valve.source.texture":{"source":"iana"},"image/vnd.wap.wbmp":{"source":"iana","extensions":["wbmp"]},"image/vnd.xiff":{"source":"iana","extensions":["xif"]},"image/vnd.zbrush.pcx":{"source":"iana"},"image/webp":{"source":"apache","extensions":["webp"]},"image/wmf":{"source":"iana"},"image/x-3ds":{"source":"apache","extensions":["3ds"]},"image/x-cmu-raster":{"source":"apache","extensions":["ras"]},"image/x-cmx":{"source":"apache","extensions":["cmx"]},"image/x-freehand":{"source":"apache","extensions":["fh","fhc","fh4","fh5","fh7"]},"image/x-icon":{"source":"apache","compressible":true,"extensions":["ico"]},"image/x-jng":{"source":"nginx","extensions":["jng"]},"image/x-mrsid-image":{"source":"apache","extensions":["sid"]},"image/x-ms-bmp":{"source":"nginx","compressible":true,"extensions":["bmp"]},"image/x-pcx":{"source":"apache","extensions":["pcx"]},"image/x-pict":{"source":"apache","extensions":["pic","pct"]},"image/x-portable-anymap":{"source":"apache","extensions":["pnm"]},"image/x-portable-bitmap":{"source":"apache","extensions":["pbm"]},"image/x-portable-graymap":{"source":"apache","extensions":["pgm"]},"image/x-portable-pixmap":{"source":"apache","extensions":["ppm"]},"image/x-rgb":{"source":"apache","extensions":["rgb"]},"image/x-tga":{"source":"apache","extensions":["tga"]},"image/x-xbitmap":{"source":"apache","extensions":["xbm"]},"image/x-xcf":{"compressible":false},"image/x-xpixmap":{"source":"apache","extensions":["xpm"]},"image/x-xwindowdump":{"source":"apache","extensions":["xwd"]},"message/cpim":{"source":"iana"},"message/delivery-status":{"source":"iana"},"message/disposition-notification":{"source":"iana","extensions":["disposition-notification"]},"message/external-body":{"source":"iana"},"message/feedback-report":{"source":"iana"},"message/global":{"source":"iana","extensions":["u8msg"]},"message/global-delivery-status":{"source":"iana","extensions":["u8dsn"]},"message/global-disposition-notification":{"source":"iana","extensions":["u8mdn"]},"message/global-headers":{"source":"iana","extensions":["u8hdr"]},"message/http":{"source":"iana","compressible":false},"message/imdn+xml":{"source":"iana","compressible":true},"message/news":{"source":"iana"},"message/partial":{"source":"iana","compressible":false},"message/rfc822":{"source":"iana","compressible":true,"extensions":["eml","mime"]},"message/s-http":{"source":"iana"},"message/sip":{"source":"iana"},"message/sipfrag":{"source":"iana"},"message/tracking-status":{"source":"iana"},"message/vnd.si.simp":{"source":"iana"},"message/vnd.wfa.wsc":{"source":"iana","extensions":["wsc"]},"model/3mf":{"source":"iana"},"model/gltf+json":{"source":"iana","compressible":true,"extensions":["gltf"]},"model/gltf-binary":{"source":"iana","compressible":true,"extensions":["glb"]},"model/iges":{"source":"iana","compressible":false,"extensions":["igs","iges"]},"model/mesh":{"source":"iana","compressible":false,"extensions":["msh","mesh","silo"]},"model/vnd.collada+xml":{"source":"iana","extensions":["dae"]},"model/vnd.dwf":{"source":"iana","extensions":["dwf"]},"model/vnd.flatland.3dml":{"source":"iana"},"model/vnd.gdl":{"source":"iana","extensions":["gdl"]},"model/vnd.gs-gdl":{"source":"apache"},"model/vnd.gs.gdl":{"source":"iana"},"model/vnd.gtw":{"source":"iana","extensions":["gtw"]},"model/vnd.moml+xml":{"source":"iana"},"model/vnd.mts":{"source":"iana","extensions":["mts"]},"model/vnd.opengex":{"source":"iana"},"model/vnd.parasolid.transmit.binary":{"source":"iana"},"model/vnd.parasolid.transmit.text":{"source":"iana"},"model/vnd.rosette.annotated-data-model":{"source":"iana"},"model/vnd.valve.source.compiled-map":{"source":"iana"},"model/vnd.vtu":{"source":"iana","extensions":["vtu"]},"model/vrml":{"source":"iana","compressible":false,"extensions":["wrl","vrml"]},"model/x3d+binary":{"source":"apache","compressible":false,"extensions":["x3db","x3dbz"]},"model/x3d+fastinfoset":{"source":"iana"},"model/x3d+vrml":{"source":"apache","compressible":false,"extensions":["x3dv","x3dvz"]},"model/x3d+xml":{"source":"iana","compressible":true,"extensions":["x3d","x3dz"]},"model/x3d-vrml":{"source":"iana"},"multipart/alternative":{"source":"iana","compressible":false},"multipart/appledouble":{"source":"iana"},"multipart/byteranges":{"source":"iana"},"multipart/digest":{"source":"iana"},"multipart/encrypted":{"source":"iana","compressible":false},"multipart/form-data":{"source":"iana","compressible":false},"multipart/header-set":{"source":"iana"},"multipart/mixed":{"source":"iana","compressible":false},"multipart/multilingual":{"source":"iana"},"multipart/parallel":{"source":"iana"},"multipart/related":{"source":"iana","compressible":false},"multipart/report":{"source":"iana"},"multipart/signed":{"source":"iana","compressible":false},"multipart/vnd.bint.med-plus":{"source":"iana"},"multipart/voice-message":{"source":"iana"},"multipart/x-mixed-replace":{"source":"iana"},"text/1d-interleaved-parityfec":{"source":"iana"},"text/cache-manifest":{"source":"iana","compressible":true,"extensions":["appcache","manifest"]},"text/calendar":{"source":"iana","extensions":["ics","ifb"]},"text/calender":{"compressible":true},"text/cmd":{"compressible":true},"text/coffeescript":{"extensions":["coffee","litcoffee"]},"text/css":{"source":"iana","charset":"UTF-8","compressible":true,"extensions":["css"]},"text/csv":{"source":"iana","compressible":true,"extensions":["csv"]},"text/csv-schema":{"source":"iana"},"text/directory":{"source":"iana"},"text/dns":{"source":"iana"},"text/ecmascript":{"source":"iana"},"text/encaprtp":{"source":"iana"},"text/enriched":{"source":"iana"},"text/fwdred":{"source":"iana"},"text/grammar-ref-list":{"source":"iana"},"text/html":{"source":"iana","compressible":true,"extensions":["html","htm","shtml"]},"text/jade":{"extensions":["jade"]},"text/javascript":{"source":"iana","compressible":true},"text/jcr-cnd":{"source":"iana"},"text/jsx":{"compressible":true,"extensions":["jsx"]},"text/less":{"extensions":["less"]},"text/markdown":{"source":"iana","compressible":true,"extensions":["markdown","md"]},"text/mathml":{"source":"nginx","extensions":["mml"]},"text/mizar":{"source":"iana"},"text/n3":{"source":"iana","compressible":true,"extensions":["n3"]},"text/parameters":{"source":"iana"},"text/parityfec":{"source":"iana"},"text/plain":{"source":"iana","compressible":true,"extensions":["txt","text","conf","def","list","log","in","ini"]},"text/provenance-notation":{"source":"iana"},"text/prs.fallenstein.rst":{"source":"iana"},"text/prs.lines.tag":{"source":"iana","extensions":["dsc"]},"text/prs.prop.logic":{"source":"iana"},"text/raptorfec":{"source":"iana"},"text/red":{"source":"iana"},"text/rfc822-headers":{"source":"iana"},"text/richtext":{"source":"iana","compressible":true,"extensions":["rtx"]},"text/rtf":{"source":"iana","compressible":true,"extensions":["rtf"]},"text/rtp-enc-aescm128":{"source":"iana"},"text/rtploopback":{"source":"iana"},"text/rtx":{"source":"iana"},"text/sgml":{"source":"iana","extensions":["sgml","sgm"]},"text/shex":{"extensions":["shex"]},"text/slim":{"extensions":["slim","slm"]},"text/strings":{"source":"iana"},"text/stylus":{"extensions":["stylus","styl"]},"text/t140":{"source":"iana"},"text/tab-separated-values":{"source":"iana","compressible":true,"extensions":["tsv"]},"text/troff":{"source":"iana","extensions":["t","tr","roff","man","me","ms"]},"text/turtle":{"source":"iana","extensions":["ttl"]},"text/ulpfec":{"source":"iana"},"text/uri-list":{"source":"iana","compressible":true,"extensions":["uri","uris","urls"]},"text/vcard":{"source":"iana","compressible":true,"extensions":["vcard"]},"text/vnd.a":{"source":"iana"},"text/vnd.abc":{"source":"iana"},"text/vnd.ascii-art":{"source":"iana"},"text/vnd.curl":{"source":"iana","extensions":["curl"]},"text/vnd.curl.dcurl":{"source":"apache","extensions":["dcurl"]},"text/vnd.curl.mcurl":{"source":"apache","extensions":["mcurl"]},"text/vnd.curl.scurl":{"source":"apache","extensions":["scurl"]},"text/vnd.debian.copyright":{"source":"iana"},"text/vnd.dmclientscript":{"source":"iana"},"text/vnd.dvb.subtitle":{"source":"iana","extensions":["sub"]},"text/vnd.esmertec.theme-descriptor":{"source":"iana"},"text/vnd.fly":{"source":"iana","extensions":["fly"]},"text/vnd.fmi.flexstor":{"source":"iana","extensions":["flx"]},"text/vnd.graphviz":{"source":"iana","extensions":["gv"]},"text/vnd.in3d.3dml":{"source":"iana","extensions":["3dml"]},"text/vnd.in3d.spot":{"source":"iana","extensions":["spot"]},"text/vnd.iptc.newsml":{"source":"iana"},"text/vnd.iptc.nitf":{"source":"iana"},"text/vnd.latex-z":{"source":"iana"},"text/vnd.motorola.reflex":{"source":"iana"},"text/vnd.ms-mediapackage":{"source":"iana"},"text/vnd.net2phone.commcenter.command":{"source":"iana"},"text/vnd.radisys.msml-basic-layout":{"source":"iana"},"text/vnd.si.uricatalogue":{"source":"iana"},"text/vnd.sun.j2me.app-descriptor":{"source":"iana","extensions":["jad"]},"text/vnd.trolltech.linguist":{"source":"iana"},"text/vnd.wap.si":{"source":"iana"},"text/vnd.wap.sl":{"source":"iana"},"text/vnd.wap.wml":{"source":"iana","extensions":["wml"]},"text/vnd.wap.wmlscript":{"source":"iana","extensions":["wmls"]},"text/vtt":{"charset":"UTF-8","compressible":true,"extensions":["vtt"]},"text/x-asm":{"source":"apache","extensions":["s","asm"]},"text/x-c":{"source":"apache","extensions":["c","cc","cxx","cpp","h","hh","dic"]},"text/x-component":{"source":"nginx","extensions":["htc"]},"text/x-fortran":{"source":"apache","extensions":["f","for","f77","f90"]},"text/x-gwt-rpc":{"compressible":true},"text/x-handlebars-template":{"extensions":["hbs"]},"text/x-java-source":{"source":"apache","extensions":["java"]},"text/x-jquery-tmpl":{"compressible":true},"text/x-lua":{"extensions":["lua"]},"text/x-markdown":{"compressible":true,"extensions":["mkd"]},"text/x-nfo":{"source":"apache","extensions":["nfo"]},"text/x-opml":{"source":"apache","extensions":["opml"]},"text/x-org":{"compressible":true,"extensions":["org"]},"text/x-pascal":{"source":"apache","extensions":["p","pas"]},"text/x-processing":{"compressible":true,"extensions":["pde"]},"text/x-sass":{"extensions":["sass"]},"text/x-scss":{"extensions":["scss"]},"text/x-setext":{"source":"apache","extensions":["etx"]},"text/x-sfv":{"source":"apache","extensions":["sfv"]},"text/x-suse-ymp":{"compressible":true,"extensions":["ymp"]},"text/x-uuencode":{"source":"apache","extensions":["uu"]},"text/x-vcalendar":{"source":"apache","extensions":["vcs"]},"text/x-vcard":{"source":"apache","extensions":["vcf"]},"text/xml":{"source":"iana","compressible":true,"extensions":["xml"]},"text/xml-external-parsed-entity":{"source":"iana"},"text/yaml":{"extensions":["yaml","yml"]},"video/1d-interleaved-parityfec":{"source":"iana"},"video/3gpp":{"source":"iana","extensions":["3gp","3gpp"]},"video/3gpp-tt":{"source":"iana"},"video/3gpp2":{"source":"iana","extensions":["3g2"]},"video/bmpeg":{"source":"iana"},"video/bt656":{"source":"iana"},"video/celb":{"source":"iana"},"video/dv":{"source":"iana"},"video/encaprtp":{"source":"iana"},"video/h261":{"source":"iana","extensions":["h261"]},"video/h263":{"source":"iana","extensions":["h263"]},"video/h263-1998":{"source":"iana"},"video/h263-2000":{"source":"iana"},"video/h264":{"source":"iana","extensions":["h264"]},"video/h264-rcdo":{"source":"iana"},"video/h264-svc":{"source":"iana"},"video/h265":{"source":"iana"},"video/iso.segment":{"source":"iana"},"video/jpeg":{"source":"iana","extensions":["jpgv"]},"video/jpeg2000":{"source":"iana"},"video/jpm":{"source":"apache","extensions":["jpm","jpgm"]},"video/mj2":{"source":"iana","extensions":["mj2","mjp2"]},"video/mp1s":{"source":"iana"},"video/mp2p":{"source":"iana"},"video/mp2t":{"source":"iana","extensions":["ts"]},"video/mp4":{"source":"iana","compressible":false,"extensions":["mp4","mp4v","mpg4"]},"video/mp4v-es":{"source":"iana"},"video/mpeg":{"source":"iana","compressible":false,"extensions":["mpeg","mpg","mpe","m1v","m2v"]},"video/mpeg4-generic":{"source":"iana"},"video/mpv":{"source":"iana"},"video/nv":{"source":"iana"},"video/ogg":{"source":"iana","compressible":false,"extensions":["ogv"]},"video/parityfec":{"source":"iana"},"video/pointer":{"source":"iana"},"video/quicktime":{"source":"iana","compressible":false,"extensions":["qt","mov"]},"video/raptorfec":{"source":"iana"},"video/raw":{"source":"iana"},"video/rtp-enc-aescm128":{"source":"iana"},"video/rtploopback":{"source":"iana"},"video/rtx":{"source":"iana"},"video/smpte291":{"source":"iana"},"video/smpte292m":{"source":"iana"},"video/ulpfec":{"source":"iana"},"video/vc1":{"source":"iana"},"video/vnd.cctv":{"source":"iana"},"video/vnd.dece.hd":{"source":"iana","extensions":["uvh","uvvh"]},"video/vnd.dece.mobile":{"source":"iana","extensions":["uvm","uvvm"]},"video/vnd.dece.mp4":{"source":"iana"},"video/vnd.dece.pd":{"source":"iana","extensions":["uvp","uvvp"]},"video/vnd.dece.sd":{"source":"iana","extensions":["uvs","uvvs"]},"video/vnd.dece.video":{"source":"iana","extensions":["uvv","uvvv"]},"video/vnd.directv.mpeg":{"source":"iana"},"video/vnd.directv.mpeg-tts":{"source":"iana"},"video/vnd.dlna.mpeg-tts":{"source":"iana"},"video/vnd.dvb.file":{"source":"iana","extensions":["dvb"]},"video/vnd.fvt":{"source":"iana","extensions":["fvt"]},"video/vnd.hns.video":{"source":"iana"},"video/vnd.iptvforum.1dparityfec-1010":{"source":"iana"},"video/vnd.iptvforum.1dparityfec-2005":{"source":"iana"},"video/vnd.iptvforum.2dparityfec-1010":{"source":"iana"},"video/vnd.iptvforum.2dparityfec-2005":{"source":"iana"},"video/vnd.iptvforum.ttsavc":{"source":"iana"},"video/vnd.iptvforum.ttsmpeg2":{"source":"iana"},"video/vnd.motorola.video":{"source":"iana"},"video/vnd.motorola.videop":{"source":"iana"},"video/vnd.mpegurl":{"source":"iana","extensions":["mxu","m4u"]},"video/vnd.ms-playready.media.pyv":{"source":"iana","extensions":["pyv"]},"video/vnd.nokia.interleaved-multimedia":{"source":"iana"},"video/vnd.nokia.mp4vr":{"source":"iana"},"video/vnd.nokia.videovoip":{"source":"iana"},"video/vnd.objectvideo":{"source":"iana"},"video/vnd.radgamettools.bink":{"source":"iana"},"video/vnd.radgamettools.smacker":{"source":"iana"},"video/vnd.sealed.mpeg1":{"source":"iana"},"video/vnd.sealed.mpeg4":{"source":"iana"},"video/vnd.sealed.swf":{"source":"iana"},"video/vnd.sealedmedia.softseal.mov":{"source":"iana"},"video/vnd.uvvu.mp4":{"source":"iana","extensions":["uvu","uvvu"]},"video/vnd.vivo":{"source":"iana","extensions":["viv"]},"video/vp8":{"source":"iana"},"video/webm":{"source":"apache","compressible":false,"extensions":["webm"]},"video/x-f4v":{"source":"apache","extensions":["f4v"]},"video/x-fli":{"source":"apache","extensions":["fli"]},"video/x-flv":{"source":"apache","compressible":false,"extensions":["flv"]},"video/x-m4v":{"source":"apache","extensions":["m4v"]},"video/x-matroska":{"source":"apache","compressible":false,"extensions":["mkv","mk3d","mks"]},"video/x-mng":{"source":"apache","extensions":["mng"]},"video/x-ms-asf":{"source":"apache","extensions":["asf","asx"]},"video/x-ms-vob":{"source":"apache","extensions":["vob"]},"video/x-ms-wm":{"source":"apache","extensions":["wm"]},"video/x-ms-wmv":{"source":"apache","compressible":false,"extensions":["wmv"]},"video/x-ms-wmx":{"source":"apache","extensions":["wmx"]},"video/x-ms-wvx":{"source":"apache","extensions":["wvx"]},"video/x-msvideo":{"source":"apache","extensions":["avi"]},"video/x-sgi-movie":{"source":"apache","extensions":["movie"]},"video/x-smv":{"source":"apache","extensions":["smv"]},"x-conference/x-cooltalk":{"source":"apache","extensions":["ice"]},"x-shader/x-fragment":{"compressible":true},"x-shader/x-vertex":{"compressible":true}};
 
 /***/ }),
-/* 150 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var util = __webpack_require__(67)
-var Stream = __webpack_require__(77)
-var StringDecoder = __webpack_require__(151).StringDecoder
+var util = __webpack_require__(13)
+var Stream = __webpack_require__(23)
+var StringDecoder = __webpack_require__(97).StringDecoder
 
 module.exports = StringStream
 module.exports.AlignedStringDecoder = AlignedStringDecoder
@@ -31062,13 +24431,13 @@ function alignedWrite(buffer) {
 
 
 /***/ }),
-/* 151 */
+/* 97 */
 /***/ (function(module, exports) {
 
 module.exports = require("string_decoder");
 
 /***/ }),
-/* 152 */
+/* 98 */
 /***/ (function(module, exports) {
 
 function Caseless (dict) {
@@ -31141,17 +24510,17 @@ module.exports.httpify = function (resp, headers) {
 
 
 /***/ }),
-/* 153 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = ForeverAgent
 ForeverAgent.SSL = ForeverAgentSSL
 
-var util = __webpack_require__(67)
-  , Agent = __webpack_require__(75).Agent
-  , net = __webpack_require__(59)
-  , tls = __webpack_require__(154)
-  , AgentSSL = __webpack_require__(76).Agent
+var util = __webpack_require__(13)
+  , Agent = __webpack_require__(21).Agent
+  , net = __webpack_require__(5)
+  , tls = __webpack_require__(100)
+  , AgentSSL = __webpack_require__(22).Agent
   
 function getConnectionName(host, port) {  
   var name = ''
@@ -31285,25 +24654,25 @@ function createConnectionSSL (port, host, options) {
 
 
 /***/ }),
-/* 154 */
+/* 100 */
 /***/ (function(module, exports) {
 
 module.exports = require("tls");
 
 /***/ }),
-/* 155 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var CombinedStream = __webpack_require__(156);
-var util = __webpack_require__(67);
-var path = __webpack_require__(82);
-var http = __webpack_require__(75);
-var https = __webpack_require__(76);
-var parseUrl = __webpack_require__(60).parse;
-var fs = __webpack_require__(159);
-var mime = __webpack_require__(147);
-var asynckit = __webpack_require__(160);
-var populate = __webpack_require__(170);
+var CombinedStream = __webpack_require__(102);
+var util = __webpack_require__(13);
+var path = __webpack_require__(28);
+var http = __webpack_require__(21);
+var https = __webpack_require__(22);
+var parseUrl = __webpack_require__(6).parse;
+var fs = __webpack_require__(105);
+var mime = __webpack_require__(93);
+var asynckit = __webpack_require__(106);
+var populate = __webpack_require__(116);
 
 // Public API
 module.exports = FormData;
@@ -31754,13 +25123,13 @@ FormData.prototype.toString = function () {
 
 
 /***/ }),
-/* 156 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var util = __webpack_require__(67);
-var Stream = __webpack_require__(77).Stream;
-var DelayedStream = __webpack_require__(157);
-var defer = __webpack_require__(158);
+var util = __webpack_require__(13);
+var Stream = __webpack_require__(23).Stream;
+var DelayedStream = __webpack_require__(103);
+var defer = __webpack_require__(104);
 
 module.exports = CombinedStream;
 function CombinedStream() {
@@ -31949,11 +25318,11 @@ CombinedStream.prototype._emitError = function(err) {
 
 
 /***/ }),
-/* 157 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Stream = __webpack_require__(77).Stream;
-var util = __webpack_require__(67);
+var Stream = __webpack_require__(23).Stream;
+var util = __webpack_require__(13);
 
 module.exports = DelayedStream;
 function DelayedStream() {
@@ -32062,7 +25431,7 @@ DelayedStream.prototype._checkIfMaxDataSizeExceeded = function() {
 
 
 /***/ }),
-/* 158 */
+/* 104 */
 /***/ (function(module, exports) {
 
 module.exports = defer;
@@ -32094,30 +25463,30 @@ function defer(fn)
 
 
 /***/ }),
-/* 159 */
+/* 105 */
 /***/ (function(module, exports) {
 
 module.exports = require("fs");
 
 /***/ }),
-/* 160 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports =
 {
-  parallel      : __webpack_require__(161),
-  serial        : __webpack_require__(168),
-  serialOrdered : __webpack_require__(169)
+  parallel      : __webpack_require__(107),
+  serial        : __webpack_require__(114),
+  serialOrdered : __webpack_require__(115)
 };
 
 
 /***/ }),
-/* 161 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var iterate    = __webpack_require__(162)
-  , initState  = __webpack_require__(166)
-  , terminator = __webpack_require__(167)
+var iterate    = __webpack_require__(108)
+  , initState  = __webpack_require__(112)
+  , terminator = __webpack_require__(113)
   ;
 
 // Public API
@@ -32161,11 +25530,11 @@ function parallel(list, iterator, callback)
 
 
 /***/ }),
-/* 162 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var async = __webpack_require__(163)
-  , abort = __webpack_require__(165)
+var async = __webpack_require__(109)
+  , abort = __webpack_require__(111)
   ;
 
 // API
@@ -32242,10 +25611,10 @@ function runJob(iterator, key, item, callback)
 
 
 /***/ }),
-/* 163 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var defer = __webpack_require__(164);
+var defer = __webpack_require__(110);
 
 // API
 module.exports = async;
@@ -32282,7 +25651,7 @@ function async(callback)
 
 
 /***/ }),
-/* 164 */
+/* 110 */
 /***/ (function(module, exports) {
 
 module.exports = defer;
@@ -32314,7 +25683,7 @@ function defer(fn)
 
 
 /***/ }),
-/* 165 */
+/* 111 */
 /***/ (function(module, exports) {
 
 // API
@@ -32349,7 +25718,7 @@ function clean(key)
 
 
 /***/ }),
-/* 166 */
+/* 112 */
 /***/ (function(module, exports) {
 
 // API
@@ -32392,11 +25761,11 @@ function state(list, sortMethod)
 
 
 /***/ }),
-/* 167 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var abort = __webpack_require__(165)
-  , async = __webpack_require__(163)
+var abort = __webpack_require__(111)
+  , async = __webpack_require__(109)
   ;
 
 // API
@@ -32427,10 +25796,10 @@ function terminator(callback)
 
 
 /***/ }),
-/* 168 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var serialOrdered = __webpack_require__(169);
+var serialOrdered = __webpack_require__(115);
 
 // Public API
 module.exports = serial;
@@ -32450,12 +25819,12 @@ function serial(list, iterator, callback)
 
 
 /***/ }),
-/* 169 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var iterate    = __webpack_require__(162)
-  , initState  = __webpack_require__(166)
-  , terminator = __webpack_require__(167)
+var iterate    = __webpack_require__(108)
+  , initState  = __webpack_require__(112)
+  , terminator = __webpack_require__(113)
   ;
 
 // Public API
@@ -32531,7 +25900,7 @@ function descending(a, b)
 
 
 /***/ }),
-/* 170 */
+/* 116 */
 /***/ (function(module, exports) {
 
 // populates missing values
@@ -32547,10 +25916,10 @@ module.exports = function(dst, src) {
 
 
 /***/ }),
-/* 171 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var stream = __webpack_require__(77)
+var stream = __webpack_require__(23)
 
 
 function isStream (obj) {
@@ -32580,7 +25949,7 @@ module.exports.isDuplex   = isDuplex
 
 
 /***/ }),
-/* 172 */
+/* 118 */
 /***/ (function(module, exports) {
 
 module.exports      = isTypedArray
@@ -32627,7 +25996,7 @@ function isLooseTypedArray(arr) {
 
 
 /***/ }),
-/* 173 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -32713,14 +26082,14 @@ module.exports = getProxyFromURI
 
 
 /***/ }),
-/* 174 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var qs = __webpack_require__(175)
-var querystring = __webpack_require__(96)
+var qs = __webpack_require__(121)
+var querystring = __webpack_require__(42)
 
 function Querystring (request) {
   this.request = request
@@ -32770,15 +26139,15 @@ exports.Querystring = Querystring
 
 
 /***/ }),
-/* 175 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var stringify = __webpack_require__(176);
-var parse = __webpack_require__(179);
-var formats = __webpack_require__(178);
+var stringify = __webpack_require__(122);
+var parse = __webpack_require__(125);
+var formats = __webpack_require__(124);
 
 module.exports = {
     formats: formats,
@@ -32788,14 +26157,14 @@ module.exports = {
 
 
 /***/ }),
-/* 176 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(177);
-var formats = __webpack_require__(178);
+var utils = __webpack_require__(123);
+var formats = __webpack_require__(124);
 
 var arrayPrefixGenerators = {
     brackets: function brackets(prefix) { // eslint-disable-line func-name-matching
@@ -33005,7 +26374,7 @@ module.exports = function (object, opts) {
 
 
 /***/ }),
-/* 177 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33214,7 +26583,7 @@ exports.isBuffer = function isBuffer(obj) {
 
 
 /***/ }),
-/* 178 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -33239,13 +26608,13 @@ module.exports = {
 
 
 /***/ }),
-/* 179 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(177);
+var utils = __webpack_require__(123);
 
 var has = Object.prototype.hasOwnProperty;
 
@@ -33420,16 +26789,16 @@ module.exports = function (str, opts) {
 
 
 /***/ }),
-/* 180 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var fs = __webpack_require__(159)
-var qs = __webpack_require__(96)
-var validate = __webpack_require__(181)
-var extend = __webpack_require__(56)
+var fs = __webpack_require__(105)
+var qs = __webpack_require__(42)
+var validate = __webpack_require__(127)
+var extend = __webpack_require__(2)
 
 function Har (request) {
   this.request = request
@@ -33632,12 +27001,12 @@ exports.Har = Har
 
 
 /***/ }),
-/* 181 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Ajv = __webpack_require__(182)
-var HARError = __webpack_require__(226)
-var schemas = __webpack_require__(227)
+var Ajv = __webpack_require__(128)
+var HARError = __webpack_require__(172)
+var schemas = __webpack_require__(173)
 
 var ajv
 
@@ -33733,23 +27102,23 @@ exports.timings = function (data) {
 
 
 /***/ }),
-/* 182 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var compileSchema = __webpack_require__(183)
-  , resolve = __webpack_require__(184)
-  , Cache = __webpack_require__(194)
-  , SchemaObject = __webpack_require__(188)
-  , stableStringify = __webpack_require__(191)
-  , formats = __webpack_require__(195)
-  , rules = __webpack_require__(196)
-  , $dataMetaSchema = __webpack_require__(219)
-  , patternGroups = __webpack_require__(220)
-  , util = __webpack_require__(186)
-  , co = __webpack_require__(193);
+var compileSchema = __webpack_require__(129)
+  , resolve = __webpack_require__(130)
+  , Cache = __webpack_require__(140)
+  , SchemaObject = __webpack_require__(134)
+  , stableStringify = __webpack_require__(137)
+  , formats = __webpack_require__(141)
+  , rules = __webpack_require__(142)
+  , $dataMetaSchema = __webpack_require__(165)
+  , patternGroups = __webpack_require__(166)
+  , util = __webpack_require__(132)
+  , co = __webpack_require__(139);
 
 module.exports = Ajv;
 
@@ -33766,13 +27135,13 @@ Ajv.prototype.errorsText = errorsText;
 Ajv.prototype._addSchema = _addSchema;
 Ajv.prototype._compile = _compile;
 
-Ajv.prototype.compileAsync = __webpack_require__(221);
-var customKeyword = __webpack_require__(222);
+Ajv.prototype.compileAsync = __webpack_require__(167);
+var customKeyword = __webpack_require__(168);
 Ajv.prototype.addKeyword = customKeyword.add;
 Ajv.prototype.getKeyword = customKeyword.get;
 Ajv.prototype.removeKeyword = customKeyword.remove;
 
-var errorClasses = __webpack_require__(190);
+var errorClasses = __webpack_require__(136);
 Ajv.ValidationError = errorClasses.Validation;
 Ajv.MissingRefError = errorClasses.MissingRef;
 Ajv.$dataMetaSchema = $dataMetaSchema;
@@ -34184,11 +27553,11 @@ function addFormat(name, format) {
 function addDraft6MetaSchema(self) {
   var $dataSchema;
   if (self._opts.$data) {
-    $dataSchema = __webpack_require__(224);
+    $dataSchema = __webpack_require__(170);
     self.addMetaSchema($dataSchema, $dataSchema.$id, true);
   }
   if (self._opts.meta === false) return;
-  var metaSchema = __webpack_require__(225);
+  var metaSchema = __webpack_require__(171);
   if (self._opts.$data) metaSchema = $dataMetaSchema(metaSchema, META_SUPPORT_DATA);
   self.addMetaSchema(metaSchema, META_SCHEMA_ID, true);
   self._refs['http://json-schema.org/schema'] = META_SCHEMA_ID;
@@ -34242,26 +27611,26 @@ function noop() {}
 
 
 /***/ }),
-/* 183 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var resolve = __webpack_require__(184)
-  , util = __webpack_require__(186)
-  , errorClasses = __webpack_require__(190)
-  , stableStringify = __webpack_require__(191);
+var resolve = __webpack_require__(130)
+  , util = __webpack_require__(132)
+  , errorClasses = __webpack_require__(136)
+  , stableStringify = __webpack_require__(137);
 
-var validateGenerator = __webpack_require__(192);
+var validateGenerator = __webpack_require__(138);
 
 /**
  * Functions below are used inside compiled validations function
  */
 
-var co = __webpack_require__(193);
+var co = __webpack_require__(139);
 var ucs2length = util.ucs2length;
-var equal = __webpack_require__(185);
+var equal = __webpack_require__(131);
 
 // this error is thrown by async schemas to return validation errors via exception
 var ValidationError = errorClasses.Validation;
@@ -34629,17 +27998,17 @@ function vars(arr, statement) {
 
 
 /***/ }),
-/* 184 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var url = __webpack_require__(60)
-  , equal = __webpack_require__(185)
-  , util = __webpack_require__(186)
-  , SchemaObject = __webpack_require__(188)
-  , traverse = __webpack_require__(189);
+var url = __webpack_require__(6)
+  , equal = __webpack_require__(131)
+  , util = __webpack_require__(132)
+  , SchemaObject = __webpack_require__(134)
+  , traverse = __webpack_require__(135);
 
 module.exports = resolve;
 
@@ -34907,7 +28276,7 @@ function resolveIds(schema) {
 
 
 /***/ }),
-/* 185 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34969,7 +28338,7 @@ module.exports = function equal(a, b) {
 
 
 /***/ }),
-/* 186 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -34984,8 +28353,8 @@ module.exports = {
   toHash: toHash,
   getProperty: getProperty,
   escapeQuotes: escapeQuotes,
-  equal: __webpack_require__(185),
-  ucs2length: __webpack_require__(187),
+  equal: __webpack_require__(131),
+  ucs2length: __webpack_require__(133),
   varOccurences: varOccurences,
   varReplace: varReplace,
   cleanUpCode: cleanUpCode,
@@ -35243,7 +28612,7 @@ function unescapeJsonPointer(str) {
 
 
 /***/ }),
-/* 187 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35270,13 +28639,13 @@ module.exports = function ucs2length(str) {
 
 
 /***/ }),
-/* 188 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var util = __webpack_require__(186);
+var util = __webpack_require__(132);
 
 module.exports = SchemaObject;
 
@@ -35286,7 +28655,7 @@ function SchemaObject(obj) {
 
 
 /***/ }),
-/* 189 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35374,13 +28743,13 @@ function escapeJsonPtr(str) {
 
 
 /***/ }),
-/* 190 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var resolve = __webpack_require__(184);
+var resolve = __webpack_require__(130);
 
 module.exports = {
   Validation: errorSubclass(ValidationError),
@@ -35415,7 +28784,7 @@ function errorSubclass(Subclass) {
 
 
 /***/ }),
-/* 191 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35481,7 +28850,7 @@ module.exports = function (data, opts) {
 
 
 /***/ }),
-/* 192 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -35946,7 +29315,7 @@ module.exports = function generate_validate(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 193 */
+/* 139 */
 /***/ (function(module, exports) {
 
 
@@ -36189,7 +29558,7 @@ function isObject(val) {
 
 
 /***/ }),
-/* 194 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36222,13 +29591,13 @@ Cache.prototype.clear = function Cache_clear() {
 
 
 /***/ }),
-/* 195 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var util = __webpack_require__(186);
+var util = __webpack_require__(132);
 
 var DATE = /^\d\d\d\d-(\d\d)-(\d\d)$/;
 var DAYS = [0,31,29,31,30,31,30,31,31,30,31,30,31];
@@ -36364,14 +29733,14 @@ function regex(str) {
 
 
 /***/ }),
-/* 196 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var ruleModules = __webpack_require__(197)
-  , toHash = __webpack_require__(186).toHash;
+var ruleModules = __webpack_require__(143)
+  , toHash = __webpack_require__(132).toHash;
 
 module.exports = function rules() {
   var RULES = [
@@ -36429,7 +29798,7 @@ module.exports = function rules() {
 
 
 /***/ }),
-/* 197 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36437,37 +29806,37 @@ module.exports = function rules() {
 
 //all requires must be explicit because browserify won't work with dynamic requires
 module.exports = {
-  '$ref': __webpack_require__(198),
-  allOf: __webpack_require__(199),
-  anyOf: __webpack_require__(200),
-  const: __webpack_require__(201),
-  contains: __webpack_require__(202),
-  dependencies: __webpack_require__(203),
-  'enum': __webpack_require__(204),
-  format: __webpack_require__(205),
-  items: __webpack_require__(206),
-  maximum: __webpack_require__(207),
-  minimum: __webpack_require__(207),
-  maxItems: __webpack_require__(208),
-  minItems: __webpack_require__(208),
-  maxLength: __webpack_require__(209),
-  minLength: __webpack_require__(209),
-  maxProperties: __webpack_require__(210),
-  minProperties: __webpack_require__(210),
-  multipleOf: __webpack_require__(211),
-  not: __webpack_require__(212),
-  oneOf: __webpack_require__(213),
-  pattern: __webpack_require__(214),
-  properties: __webpack_require__(215),
-  propertyNames: __webpack_require__(216),
-  required: __webpack_require__(217),
-  uniqueItems: __webpack_require__(218),
-  validate: __webpack_require__(192)
+  '$ref': __webpack_require__(144),
+  allOf: __webpack_require__(145),
+  anyOf: __webpack_require__(146),
+  const: __webpack_require__(147),
+  contains: __webpack_require__(148),
+  dependencies: __webpack_require__(149),
+  'enum': __webpack_require__(150),
+  format: __webpack_require__(151),
+  items: __webpack_require__(152),
+  maximum: __webpack_require__(153),
+  minimum: __webpack_require__(153),
+  maxItems: __webpack_require__(154),
+  minItems: __webpack_require__(154),
+  maxLength: __webpack_require__(155),
+  minLength: __webpack_require__(155),
+  maxProperties: __webpack_require__(156),
+  minProperties: __webpack_require__(156),
+  multipleOf: __webpack_require__(157),
+  not: __webpack_require__(158),
+  oneOf: __webpack_require__(159),
+  pattern: __webpack_require__(160),
+  properties: __webpack_require__(161),
+  propertyNames: __webpack_require__(162),
+  required: __webpack_require__(163),
+  uniqueItems: __webpack_require__(164),
+  validate: __webpack_require__(138)
 };
 
 
 /***/ }),
-/* 198 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36597,7 +29966,7 @@ module.exports = function generate_ref(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 199 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36647,7 +30016,7 @@ module.exports = function generate_allOf(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 200 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36727,7 +30096,7 @@ module.exports = function generate_anyOf(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 201 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36789,7 +30158,7 @@ module.exports = function generate_const(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 202 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -36877,7 +30246,7 @@ module.exports = function generate_contains(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 203 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37051,7 +30420,7 @@ module.exports = function generate_dependencies(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 204 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37123,7 +30492,7 @@ module.exports = function generate_enum(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 205 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37279,7 +30648,7 @@ module.exports = function generate_format(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 206 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37426,7 +30795,7 @@ module.exports = function generate_items(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 207 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37582,7 +30951,7 @@ module.exports = function generate__limit(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 208 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37665,7 +31034,7 @@ module.exports = function generate__limitItems(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 209 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37753,7 +31122,7 @@ module.exports = function generate__limitLength(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 210 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37836,7 +31205,7 @@ module.exports = function generate__limitProperties(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 211 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -37919,7 +31288,7 @@ module.exports = function generate_multipleOf(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 212 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38009,7 +31378,7 @@ module.exports = function generate_not(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 213 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38086,7 +31455,7 @@ module.exports = function generate_oneOf(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 214 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38167,7 +31536,7 @@ module.exports = function generate_pattern(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 215 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38642,7 +32011,7 @@ module.exports = function generate_properties(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 216 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38730,7 +32099,7 @@ module.exports = function generate_propertyNames(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 217 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39005,7 +32374,7 @@ module.exports = function generate_required(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 218 */
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39083,7 +32452,7 @@ module.exports = function generate_uniqueItems(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 219 */
+/* 165 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39139,7 +32508,7 @@ module.exports = function (metaSchema, keywordsJsonPointers) {
 
 
 /***/ }),
-/* 220 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39182,13 +32551,13 @@ module.exports = function (ajv) {
 
 
 /***/ }),
-/* 221 */
+/* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var MissingRefError = __webpack_require__(190).MissingRef;
+var MissingRefError = __webpack_require__(136).MissingRef;
 
 module.exports = compileAsync;
 
@@ -39279,14 +32648,14 @@ function compileAsync(schema, meta, callback) {
 
 
 /***/ }),
-/* 222 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var IDENTIFIER = /^[a-z_$][a-z0-9_$-]*$/i;
-var customRuleCode = __webpack_require__(223);
+var customRuleCode = __webpack_require__(169);
 
 module.exports = {
   add: addKeyword,
@@ -39421,7 +32790,7 @@ function removeKeyword(keyword) {
 
 
 /***/ }),
-/* 223 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39654,19 +33023,19 @@ module.exports = function generate_custom(it, $keyword, $ruleType) {
 
 
 /***/ }),
-/* 224 */
+/* 170 */
 /***/ (function(module) {
 
 module.exports = {"$schema":"http://json-schema.org/draft-06/schema#","$id":"https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/$data.json#","description":"Meta-schema for $data reference (JSON-schema extension proposal)","type":"object","required":["$data"],"properties":{"$data":{"type":"string","anyOf":[{"format":"relative-json-pointer"},{"format":"json-pointer"}]}},"additionalProperties":false};
 
 /***/ }),
-/* 225 */
+/* 171 */
 /***/ (function(module) {
 
 module.exports = {"$schema":"http://json-schema.org/draft-06/schema#","$id":"http://json-schema.org/draft-06/schema#","title":"Core schema meta-schema","definitions":{"schemaArray":{"type":"array","minItems":1,"items":{"$ref":"#"}},"nonNegativeInteger":{"type":"integer","minimum":0},"nonNegativeIntegerDefault0":{"allOf":[{"$ref":"#/definitions/nonNegativeInteger"},{"default":0}]},"simpleTypes":{"enum":["array","boolean","integer","null","number","object","string"]},"stringArray":{"type":"array","items":{"type":"string"},"uniqueItems":true,"default":[]}},"type":["object","boolean"],"properties":{"$id":{"type":"string","format":"uri-reference"},"$schema":{"type":"string","format":"uri"},"$ref":{"type":"string","format":"uri-reference"},"title":{"type":"string"},"description":{"type":"string"},"default":{},"examples":{"type":"array","items":{}},"multipleOf":{"type":"number","exclusiveMinimum":0},"maximum":{"type":"number"},"exclusiveMaximum":{"type":"number"},"minimum":{"type":"number"},"exclusiveMinimum":{"type":"number"},"maxLength":{"$ref":"#/definitions/nonNegativeInteger"},"minLength":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"pattern":{"type":"string","format":"regex"},"additionalItems":{"$ref":"#"},"items":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/schemaArray"}],"default":{}},"maxItems":{"$ref":"#/definitions/nonNegativeInteger"},"minItems":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"uniqueItems":{"type":"boolean","default":false},"contains":{"$ref":"#"},"maxProperties":{"$ref":"#/definitions/nonNegativeInteger"},"minProperties":{"$ref":"#/definitions/nonNegativeIntegerDefault0"},"required":{"$ref":"#/definitions/stringArray"},"additionalProperties":{"$ref":"#"},"definitions":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"properties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"patternProperties":{"type":"object","additionalProperties":{"$ref":"#"},"default":{}},"dependencies":{"type":"object","additionalProperties":{"anyOf":[{"$ref":"#"},{"$ref":"#/definitions/stringArray"}]}},"propertyNames":{"$ref":"#"},"const":{},"enum":{"type":"array","minItems":1,"uniqueItems":true},"type":{"anyOf":[{"$ref":"#/definitions/simpleTypes"},{"type":"array","items":{"$ref":"#/definitions/simpleTypes"},"minItems":1,"uniqueItems":true}]},"format":{"type":"string"},"allOf":{"$ref":"#/definitions/schemaArray"},"anyOf":{"$ref":"#/definitions/schemaArray"},"oneOf":{"$ref":"#/definitions/schemaArray"},"not":{"$ref":"#"}},"default":{}};
 
 /***/ }),
-/* 226 */
+/* 172 */
 /***/ (function(module, exports) {
 
 function HARError (errors) {
@@ -39689,152 +33058,152 @@ module.exports = HARError
 
 
 /***/ }),
-/* 227 */
+/* 173 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 module.exports = {
-  afterRequest: __webpack_require__(228),
-  beforeRequest: __webpack_require__(229),
-  browser: __webpack_require__(230),
-  cache: __webpack_require__(231),
-  content: __webpack_require__(232),
-  cookie: __webpack_require__(233),
-  creator: __webpack_require__(234),
-  entry: __webpack_require__(235),
-  har: __webpack_require__(236),
-  header: __webpack_require__(237),
-  log: __webpack_require__(238),
-  page: __webpack_require__(239),
-  pageTimings: __webpack_require__(240),
-  postData: __webpack_require__(241),
-  query: __webpack_require__(242),
-  request: __webpack_require__(243),
-  response: __webpack_require__(244),
-  timings: __webpack_require__(245)
+  afterRequest: __webpack_require__(174),
+  beforeRequest: __webpack_require__(175),
+  browser: __webpack_require__(176),
+  cache: __webpack_require__(177),
+  content: __webpack_require__(178),
+  cookie: __webpack_require__(179),
+  creator: __webpack_require__(180),
+  entry: __webpack_require__(181),
+  har: __webpack_require__(182),
+  header: __webpack_require__(183),
+  log: __webpack_require__(184),
+  page: __webpack_require__(185),
+  pageTimings: __webpack_require__(186),
+  postData: __webpack_require__(187),
+  query: __webpack_require__(188),
+  request: __webpack_require__(189),
+  response: __webpack_require__(190),
+  timings: __webpack_require__(191)
 }
 
 
 /***/ }),
-/* 228 */
+/* 174 */
 /***/ (function(module) {
 
 module.exports = {"$id":"afterRequest.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","optional":true,"required":["lastAccess","eTag","hitCount"],"properties":{"expires":{"type":"string","pattern":"^(\\d{4})(-)?(\\d\\d)(-)?(\\d\\d)(T)?(\\d\\d)(:)?(\\d\\d)(:)?(\\d\\d)(\\.\\d+)?(Z|([+-])(\\d\\d)(:)?(\\d\\d))?"},"lastAccess":{"type":"string","pattern":"^(\\d{4})(-)?(\\d\\d)(-)?(\\d\\d)(T)?(\\d\\d)(:)?(\\d\\d)(:)?(\\d\\d)(\\.\\d+)?(Z|([+-])(\\d\\d)(:)?(\\d\\d))?"},"eTag":{"type":"string"},"hitCount":{"type":"integer"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 229 */
+/* 175 */
 /***/ (function(module) {
 
 module.exports = {"$id":"beforeRequest.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","optional":true,"required":["lastAccess","eTag","hitCount"],"properties":{"expires":{"type":"string","pattern":"^(\\d{4})(-)?(\\d\\d)(-)?(\\d\\d)(T)?(\\d\\d)(:)?(\\d\\d)(:)?(\\d\\d)(\\.\\d+)?(Z|([+-])(\\d\\d)(:)?(\\d\\d))?"},"lastAccess":{"type":"string","pattern":"^(\\d{4})(-)?(\\d\\d)(-)?(\\d\\d)(T)?(\\d\\d)(:)?(\\d\\d)(:)?(\\d\\d)(\\.\\d+)?(Z|([+-])(\\d\\d)(:)?(\\d\\d))?"},"eTag":{"type":"string"},"hitCount":{"type":"integer"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 230 */
+/* 176 */
 /***/ (function(module) {
 
 module.exports = {"$id":"browser.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["name","version"],"properties":{"name":{"type":"string"},"version":{"type":"string"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 231 */
+/* 177 */
 /***/ (function(module) {
 
 module.exports = {"$id":"cache.json#","$schema":"http://json-schema.org/draft-06/schema#","properties":{"beforeRequest":{"oneOf":[{"type":"null"},{"$ref":"beforeRequest.json#"}]},"afterRequest":{"oneOf":[{"type":"null"},{"$ref":"afterRequest.json#"}]},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 232 */
+/* 178 */
 /***/ (function(module) {
 
 module.exports = {"$id":"content.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["size","mimeType"],"properties":{"size":{"type":"integer"},"compression":{"type":"integer"},"mimeType":{"type":"string"},"text":{"type":"string"},"encoding":{"type":"string"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 233 */
+/* 179 */
 /***/ (function(module) {
 
 module.exports = {"$id":"cookie.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["name","value"],"properties":{"name":{"type":"string"},"value":{"type":"string"},"path":{"type":"string"},"domain":{"type":"string"},"expires":{"type":["string","null"],"format":"date-time"},"httpOnly":{"type":"boolean"},"secure":{"type":"boolean"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 234 */
+/* 180 */
 /***/ (function(module) {
 
 module.exports = {"$id":"creator.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["name","version"],"properties":{"name":{"type":"string"},"version":{"type":"string"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 235 */
+/* 181 */
 /***/ (function(module) {
 
 module.exports = {"$id":"entry.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","optional":true,"required":["startedDateTime","time","request","response","cache","timings"],"properties":{"pageref":{"type":"string"},"startedDateTime":{"type":"string","format":"date-time","pattern":"^(\\d{4})(-)?(\\d\\d)(-)?(\\d\\d)(T)?(\\d\\d)(:)?(\\d\\d)(:)?(\\d\\d)(\\.\\d+)?(Z|([+-])(\\d\\d)(:)?(\\d\\d))"},"time":{"type":"number","min":0},"request":{"$ref":"request.json#"},"response":{"$ref":"response.json#"},"cache":{"$ref":"cache.json#"},"timings":{"$ref":"timings.json#"},"serverIPAddress":{"type":"string","oneOf":[{"format":"ipv4"},{"format":"ipv6"}]},"connection":{"type":"string"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 236 */
+/* 182 */
 /***/ (function(module) {
 
 module.exports = {"$id":"har.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["log"],"properties":{"log":{"$ref":"log.json#"}}};
 
 /***/ }),
-/* 237 */
+/* 183 */
 /***/ (function(module) {
 
 module.exports = {"$id":"header.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["name","value"],"properties":{"name":{"type":"string"},"value":{"type":"string"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 238 */
+/* 184 */
 /***/ (function(module) {
 
 module.exports = {"$id":"log.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["version","creator","entries"],"properties":{"version":{"type":"string"},"creator":{"$ref":"creator.json#"},"browser":{"$ref":"browser.json#"},"pages":{"type":"array","items":{"$ref":"page.json#"}},"entries":{"type":"array","items":{"$ref":"entry.json#"}},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 239 */
+/* 185 */
 /***/ (function(module) {
 
 module.exports = {"$id":"page.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","optional":true,"required":["startedDateTime","id","title","pageTimings"],"properties":{"startedDateTime":{"type":"string","format":"date-time","pattern":"^(\\d{4})(-)?(\\d\\d)(-)?(\\d\\d)(T)?(\\d\\d)(:)?(\\d\\d)(:)?(\\d\\d)(\\.\\d+)?(Z|([+-])(\\d\\d)(:)?(\\d\\d))"},"id":{"type":"string","unique":true},"title":{"type":"string"},"pageTimings":{"$ref":"pageTimings.json#"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 240 */
+/* 186 */
 /***/ (function(module) {
 
 module.exports = {"$id":"pageTimings.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","properties":{"onContentLoad":{"type":"number","min":-1},"onLoad":{"type":"number","min":-1},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 241 */
+/* 187 */
 /***/ (function(module) {
 
 module.exports = {"$id":"postData.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","optional":true,"required":["mimeType"],"properties":{"mimeType":{"type":"string"},"text":{"type":"string"},"params":{"type":"array","required":["name"],"properties":{"name":{"type":"string"},"value":{"type":"string"},"fileName":{"type":"string"},"contentType":{"type":"string"},"comment":{"type":"string"}}},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 242 */
+/* 188 */
 /***/ (function(module) {
 
 module.exports = {"$id":"query.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["name","value"],"properties":{"name":{"type":"string"},"value":{"type":"string"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 243 */
+/* 189 */
 /***/ (function(module) {
 
 module.exports = {"$id":"request.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["method","url","httpVersion","cookies","headers","queryString","headersSize","bodySize"],"properties":{"method":{"type":"string"},"url":{"type":"string","format":"uri"},"httpVersion":{"type":"string"},"cookies":{"type":"array","items":{"$ref":"cookie.json#"}},"headers":{"type":"array","items":{"$ref":"header.json#"}},"queryString":{"type":"array","items":{"$ref":"query.json#"}},"postData":{"$ref":"postData.json#"},"headersSize":{"type":"integer"},"bodySize":{"type":"integer"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 244 */
+/* 190 */
 /***/ (function(module) {
 
 module.exports = {"$id":"response.json#","$schema":"http://json-schema.org/draft-06/schema#","type":"object","required":["status","statusText","httpVersion","cookies","headers","content","redirectURL","headersSize","bodySize"],"properties":{"status":{"type":"integer"},"statusText":{"type":"string"},"httpVersion":{"type":"string"},"cookies":{"type":"array","items":{"$ref":"cookie.json#"}},"headers":{"type":"array","items":{"$ref":"header.json#"}},"content":{"$ref":"content.json#"},"redirectURL":{"type":"string"},"headersSize":{"type":"integer"},"bodySize":{"type":"integer"},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 245 */
+/* 191 */
 /***/ (function(module) {
 
 module.exports = {"$id":"timings.json#","$schema":"http://json-schema.org/draft-06/schema#","required":["send","wait","receive"],"properties":{"dns":{"type":"number","min":-1},"connect":{"type":"number","min":-1},"blocked":{"type":"number","min":-1},"send":{"type":"number","min":-1},"wait":{"type":"number","min":-1},"receive":{"type":"number","min":-1},"ssl":{"type":"number","min":-1},"comment":{"type":"string"}}};
 
 /***/ }),
-/* 246 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var caseless = __webpack_require__(152)
-var uuid = __webpack_require__(247)
-var helpers = __webpack_require__(69)
+var caseless = __webpack_require__(98)
+var uuid = __webpack_require__(193)
+var helpers = __webpack_require__(15)
 
 var md5 = helpers.md5
 var toBase64 = helpers.toBase64
@@ -40000,11 +33369,11 @@ exports.Auth = Auth
 
 
 /***/ }),
-/* 247 */
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var v1 = __webpack_require__(248);
-var v4 = __webpack_require__(251);
+var v1 = __webpack_require__(194);
+var v4 = __webpack_require__(197);
 
 var uuid = v4;
 uuid.v1 = v1;
@@ -40014,11 +33383,11 @@ module.exports = uuid;
 
 
 /***/ }),
-/* 248 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var rng = __webpack_require__(249);
-var bytesToUuid = __webpack_require__(250);
+var rng = __webpack_require__(195);
+var bytesToUuid = __webpack_require__(196);
 
 // **`v1()` - Generate time-based UUID**
 //
@@ -40129,13 +33498,13 @@ module.exports = v1;
 
 
 /***/ }),
-/* 249 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // Unique ID creation requires a high quality random # generator.  In node.js
 // this is pretty straight-forward - we use the crypto API.
 
-var crypto = __webpack_require__(71);
+var crypto = __webpack_require__(17);
 
 module.exports = function nodeRNG() {
   return crypto.randomBytes(16);
@@ -40143,7 +33512,7 @@ module.exports = function nodeRNG() {
 
 
 /***/ }),
-/* 250 */
+/* 196 */
 /***/ (function(module, exports) {
 
 /**
@@ -40172,11 +33541,11 @@ module.exports = bytesToUuid;
 
 
 /***/ }),
-/* 251 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var rng = __webpack_require__(249);
-var bytesToUuid = __webpack_require__(250);
+var rng = __webpack_require__(195);
+var bytesToUuid = __webpack_require__(196);
 
 function v4(options, buf, offset) {
   var i = buf && offset || 0;
@@ -40207,19 +33576,19 @@ module.exports = v4;
 
 
 /***/ }),
-/* 252 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var url = __webpack_require__(60)
-var qs = __webpack_require__(175)
-var caseless = __webpack_require__(152)
-var uuid = __webpack_require__(247)
-var oauth = __webpack_require__(253)
-var crypto = __webpack_require__(71)
-var Buffer = __webpack_require__(72).Buffer
+var url = __webpack_require__(6)
+var qs = __webpack_require__(121)
+var caseless = __webpack_require__(98)
+var uuid = __webpack_require__(193)
+var oauth = __webpack_require__(199)
+var crypto = __webpack_require__(17)
+var Buffer = __webpack_require__(18).Buffer
 
 function OAuth (request) {
   this.request = request
@@ -40362,11 +33731,11 @@ exports.OAuth = OAuth
 
 
 /***/ }),
-/* 253 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var crypto = __webpack_require__(71)
-  , qs = __webpack_require__(96)
+var crypto = __webpack_require__(17)
+  , qs = __webpack_require__(42)
   ;
 
 function sha1 (key, body) {
@@ -40504,16 +33873,16 @@ exports.generateBase = generateBase
 
 
 /***/ }),
-/* 254 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var uuid = __webpack_require__(247)
-var CombinedStream = __webpack_require__(156)
-var isstream = __webpack_require__(171)
-var Buffer = __webpack_require__(72).Buffer
+var uuid = __webpack_require__(193)
+var CombinedStream = __webpack_require__(102)
+var isstream = __webpack_require__(117)
+var Buffer = __webpack_require__(18).Buffer
 
 function Multipart (request) {
   this.request = request
@@ -40623,13 +33992,13 @@ exports.Multipart = Multipart
 
 
 /***/ }),
-/* 255 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var url = __webpack_require__(60)
+var url = __webpack_require__(6)
 var isUrl = /^https?:/
 
 function Redirect (request) {
@@ -40784,14 +34153,14 @@ exports.Redirect = Redirect
 
 
 /***/ }),
-/* 256 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var url = __webpack_require__(60)
-var tunnel = __webpack_require__(257)
+var url = __webpack_require__(6)
+var tunnel = __webpack_require__(203)
 
 var defaultProxyHeaderWhiteList = [
   'accept',
@@ -40966,20 +34335,20 @@ exports.Tunnel = Tunnel
 
 
 /***/ }),
-/* 257 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var net = __webpack_require__(59)
-  , tls = __webpack_require__(154)
-  , http = __webpack_require__(75)
-  , https = __webpack_require__(76)
-  , events = __webpack_require__(258)
-  , assert = __webpack_require__(101)
-  , util = __webpack_require__(67)
-  , Buffer = __webpack_require__(72).Buffer
+var net = __webpack_require__(5)
+  , tls = __webpack_require__(100)
+  , http = __webpack_require__(21)
+  , https = __webpack_require__(22)
+  , events = __webpack_require__(204)
+  , assert = __webpack_require__(47)
+  , util = __webpack_require__(13)
+  , Buffer = __webpack_require__(18).Buffer
   ;
 
 exports.httpOverHttp = httpOverHttp
@@ -41217,13 +34586,13 @@ exports.debug = debug // for test
 
 
 /***/ }),
-/* 258 */
+/* 204 */
 /***/ (function(module, exports) {
 
 module.exports = require("events");
 
 /***/ }),
-/* 259 */
+/* 205 */
 /***/ (function(module, exports) {
 
 // Generated by CoffeeScript 1.12.2
@@ -41263,12 +34632,6 @@ module.exports = require("events");
 
 //# sourceMappingURL=performance-now.js.map
 
-
-/***/ }),
-/* 260 */
-/***/ (function(module, exports) {
-
-module.exports = require("os");
 
 /***/ })
 /******/ ]);
