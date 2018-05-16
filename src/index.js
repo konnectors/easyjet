@@ -58,7 +58,8 @@ async function fetchAndParseDetails(reservation) {
     method: 'POST',
     url: `${baseUrl}/FR/secure/MyEasyJet.mvc/ViewBooking?bookingReference=${
       reservation.bookingRef
-    }`
+    }`,
+    timeout: 1000
   })
   const details = scrape($('article'), {
     title: 'header > div > h1',
@@ -95,25 +96,30 @@ function parseReservationsList($) {
 }
 
 function fetchAllReservations() {
-  return request(
-    `${baseUrl}/FR/secure/MyEasyJet.mvc/ShowAllBookingsAjaxCall?sortByMode=FlightDate&showMode=AllFlights&pageIndex=0`
-  )
+  return request({
+    url: `${baseUrl}/FR/secure/MyEasyJet.mvc/ShowAllBookingsAjaxCall?sortByMode=FlightDate&showMode=AllFlights&pageIndex=0`,
+    timeout: 1000
+  })
 }
 
 async function authenticate(login, password) {
   // get the cookies
-  await request(`${baseUrl}/fr`)
+  await request({
+    url: `${baseUrl}/fr/`,
+    timeout: 1000
+  })
   try {
     await request({
       method: 'POST',
-      url: `${baseUrl}/ejrebooking/api/v16/account/login`,
+      url: `${baseUrl}/ejrebooking/api/v17/account/login`,
       form: {
         Username: login,
         Password: password,
         KeepMeSignedIn: true,
         KeepMeSignedInMinutes: 10080
       },
-      resolveWithFullResponse: true
+      resolveWithFullResponse: true,
+      timeout: 1000
     })
   } catch (err) {
     if (err.statusCode === 401) {
@@ -128,7 +134,10 @@ async function makePDF(item) {
   const url = `${baseUrl}/FR/secure/BookingConfirmationPrint.mvc/BookingConfirmationPrintReference?bookingNumber=${
     item.bookingRef
   }`
-  const $ = await request(url)
+  const $ = await request({
+    url,
+    timeout: 1000
+  })
   var doc = new pdf.Document({ font: helveticaFont })
   makeCell(doc, `Réservation easyJet ${item.bookingRef}:`)
   makeCell(

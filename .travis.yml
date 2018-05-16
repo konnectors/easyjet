@@ -1,39 +1,38 @@
 language: node_js
 node_js:
-  - '8'
+- '8'
 env:
   global:
-    # cozy-bot GITHUB_TOKEN
-    # to generate yours : travis encrypt GITHUB_TOKEN=<your_GITHUB_TOKEN>
-    - secure: "YBO5Z+JofCiQImewsWM58lcFRLba2OQ231bOtJptKkENaRQ5gbCPcbKjhHGkWaExhkde+UU6PMuhlPnxpIrRQkNnlBoiWY9mHtE2Qnnr6rsrgvJdJwu4mCk2tPJTQsa0fu1CNLwJ+kgWHvbHyBtDXpgmMEyoDPnql3x16ZjIAvML82dduM+CybOGPEAUpgljjVKiDgGRiEAndT9ge1r5DSjIjiEpN5ljoXYk4uMDAJnJEMZbpNygtDsgdgw6vk1Rgk173s0vSV21CjyseVpsQ5rTG4SjLZnpgX+LIN4TUpawOh1RW09k6uHMvEd3OZwLKa49ljFiUKGDhQJCVMG4lAFc9BfrR2l+/8xPIdPjEMxHAUx49qlX3hRDQbEm8cLKL7jTiLF5YSQK+RmA2yI4d2/tJOBE8RF//jXlG2FCOTjXqTuJyKC8BWr4aqg6ltpjxT/DxLBimCocwiqhGlukDMh5glbFPiQ1gjJj5D4Oeeu/ch4iPCUpBu91/eUz3vJwY8xNHjGvkDStvfxVgn8Gsz9R//zxb6Nwfkq41+gtj9Wjujqjpj+e3/qlgbk1Du6SS+8dBPXmRmvJ3leqf3JcYzZ83r2ptOjPBQcJEjfgONz+tkW+/iF5zkS2lhnlubCCHaZUVMLgBBPTfWW+imedSrwjECdKj2v69Eayj8vN9ps="
-    # Cozy REGISTRY_TOKEN
-    - secure: "VlDWXissl5mdiz5JesNosjzDNr3NHpS0qJZDYEIXSKOsUiKiI4tpzFsybG59cdeLEx11U7hVvyWzWrO9ZqeK4PN92LsLHiVmguURbZlu9zdNIRk3CIVhwXmi7+Ke4TTkhXvv5XfxPdilDGCKk/1LR9H+oRBUYF8URgBbs72XwMjExnXxAqjcH8wPvSA28NlqHr+FWD6rkPeGSEty0nD4XOAjHDjMj4zb0kYaPMLLx7aIYnWLzSvAa8zBBHvnRULHDarEPu5mEvGgWF7EdPry/QDpZ1C9BgSnF2y2K7qn8VzswxVICyV/C+xAkguPobEnvnwUoO769HgQ5MqGWveoAUGH9IeCBpOLcJqlEecSTI7AdLVWfFjef+z3QfJPSVhmrJrysUzJJtqyCJ5MzbfTvW/L62K/a3VDa1/wiaGOLWTtZIbmTh0fKlbTNnM3RS+7B5EE8Ljtz42yxl1AzCoKripSEJkR5wji3222TCgKqDiniiquIhLTrsKRVDqB7N+pJ7XqFErOgoCpDNYjiVgvoJfyqnNUMMNUutHDJRYUygmlHCgpfbjkcS6tHlcjfHTIVgVCsF6Qx3GTtjEZaaIVZvG3E0c1Cd9Z57/wkPDb+98RwgUMLbOcZ4+hgqHKaUrxgjguMCxkAoZrzGOrvnFdErW4Z0wN6MEtTPXLTw8AJP4="
+  - GH_USER_EMAIL="travis@example.org"
+  - GH_USER_NAME="cozy-bot"
+  - DEPLOY_REPOSITORY="git@github.com:konnectors/easyjet.git"
+  - secure: WFeiBUBw+1R7H/+uPoYmYaYyoPqLuvVRlTdaq3QtCM0oKz7z0dTjnWVbifeKpqbj9HdE+l8nK6LG158iwitmP3FjpS0eghKZHWNDi015Gcgq4/KVPpA++2LD5VkHszZsKWtDDoNaNBzHtreMLNFPqhoHh0BETDA2KvfmlKhEFU2Ml6h0lBZAu3W9cAJ27i5Vh/6cz6BKJoGFOMO0mow6ZPMzQEYkFbn59FSSDV26jp1OjvZTYiNzMvoFGGPr69WiPEVFV8e9Rr6i6snQhwRXyE3hO7e+ldfMpCjKQvpT8t5R6C+H3TKt9szhQPPN25iUu8TDk8WhFGnzjZJ8QlF2fMqGCeYOwvtfzMB5pX/QKfVEOY1nW7e15+Ps9Vzj292gWsvajCkAqWwbcuzmP/DhtMJH6Dm8ed/pOIlk9dUXc9KBIWP/ePNrQnrnV95a40vDoq4eCWYg7crDiIRIt1OxNU9H1IkfVFSzn2HoPAkaFrqwoKR8p1yO5A4eZ9+z/norj0KxqBhxl6jF5DMUJ3zFdgtk28DuPVoO0i2l0zyFXrQxEnV+hyRVGMeBvYI5S6N/zSc+lZDBXULkU7/WxStOqkUhYELlihHeaVRQQdQ9CEueVFmhYKN1KHSVw0yDyzoEcipptbYR8lE30OCYPP5YrRct00DHeAYVbzolBs/hdfw=
 cache:
   yarn: true
   directories:
-    - node_modules
+  - node_modules
 script:
-  - yarn lint
-  - yarn build
+- yarn lint
+- yarn build
 deploy:
-  # publish dev versions
-  - provider: script
-    repo: konnectors/easyjet
-    skip-cleanup: true
-    script: DEPLOY_BRANCH=build yarn deploy && yarn cozyPublish
-    on:
-      branch: master
-  # publish on latest branch (will be removed when collect will use only the registry
-  - provider: script
-    repo: konnectors/easyjet
-    skip-cleanup: true
-    script: DEPLOY_BRANCH=latest yarn deploy
-    on:
-      branch: prod
-  # publish stable versions and beta versions based on tags
-  - provider: script
-    repo: konnectors/easyjet
-    skip-cleanup: true
-    script: DEPLOY_BRANCH=build yarn deploy && yarn cozyPublish
-    on:
-      tags: true
+- provider: script
+  skip-cleanup: true
+  script: DEPLOY_BRANCH=build yarn deploy && yarn cozyPublish
+  on:
+    branch: master
+- provider: script
+  skip-cleanup: true
+  script: DEPLOY_BRANCH=latest yarn deploy
+  on:
+    branch: prod
+- provider: script
+  skip-cleanup: true
+  script: DEPLOY_BRANCH=build yarn deploy && yarn cozyPublish
+  on:
+    tags: true
+before_install:
+- openssl aes-256-cbc -K $encrypted_ffa15ab96b35_key -iv $encrypted_ffa15ab96b35_iv
+  -in github_deploy_key.enc -out /tmp/github_deploy_key -d
+- eval "$(ssh-agent -s)"
+- chmod 600 /tmp/github_deploy_key
+- ssh-add /tmp/github_deploy_key
