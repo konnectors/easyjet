@@ -10,7 +10,7 @@ env:
 cache:
   yarn: true
   directories:
-  - node_modules
+    - node_modules
 script:
 - yarn lint
 - yarn build
@@ -38,5 +38,4 @@ before_install:
 - ssh-add /tmp/github_deploy_key
 after_deploy:
 - rm /tmp/github_deploy_key
-- ssh-add -l
 - ssh-add -D
