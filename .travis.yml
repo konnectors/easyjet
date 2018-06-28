@@ -1,0 +1,40 @@
+language: node_js
+node_js:
+- '8'
+env:
+  global:
+  - GH_USER_EMAIL="travis@example.org"
+  - GH_USER_NAME="cozy-bot"
+  - DEPLOY_REPOSITORY="git@github.com:konnectors/easyjet.git"
+  - secure: WFeiBUBw+1R7H/+uPoYmYaYyoPqLuvVRlTdaq3QtCM0oKz7z0dTjnWVbifeKpqbj9HdE+l8nK6LG158iwitmP3FjpS0eghKZHWNDi015Gcgq4/KVPpA++2LD5VkHszZsKWtDDoNaNBzHtreMLNFPqhoHh0BETDA2KvfmlKhEFU2Ml6h0lBZAu3W9cAJ27i5Vh/6cz6BKJoGFOMO0mow6ZPMzQEYkFbn59FSSDV26jp1OjvZTYiNzMvoFGGPr69WiPEVFV8e9Rr6i6snQhwRXyE3hO7e+ldfMpCjKQvpT8t5R6C+H3TKt9szhQPPN25iUu8TDk8WhFGnzjZJ8QlF2fMqGCeYOwvtfzMB5pX/QKfVEOY1nW7e15+Ps9Vzj292gWsvajCkAqWwbcuzmP/DhtMJH6Dm8ed/pOIlk9dUXc9KBIWP/ePNrQnrnV95a40vDoq4eCWYg7crDiIRIt1OxNU9H1IkfVFSzn2HoPAkaFrqwoKR8p1yO5A4eZ9+z/norj0KxqBhxl6jF5DMUJ3zFdgtk28DuPVoO0i2l0zyFXrQxEnV+hyRVGMeBvYI5S6N/zSc+lZDBXULkU7/WxStOqkUhYELlihHeaVRQQdQ9CEueVFmhYKN1KHSVw0yDyzoEcipptbYR8lE30OCYPP5YrRct00DHeAYVbzolBs/hdfw=
+cache:
+  yarn: true
+  directories:
+  - node_modules
+branches:
+  except:
+  - build
+  - latest
+script:
+- yarn lint
+- yarn build
+deploy:
+- provider: script
+  skip-cleanup: true
+  script: DEPLOY_BRANCH=build yarn deploy && yarn cozyPublish
+  on:
+    branch: master
+- provider: script
+  skip-cleanup: true
+  script: DEPLOY_BRANCH=build yarn deploy && yarn cozyPublish
+  on:
+    tags: true
+before_install:
+- openssl aes-256-cbc -K $encrypted_ffa15ab96b35_key -iv $encrypted_ffa15ab96b35_iv
+  -in github_deploy_key.enc -out /tmp/github_deploy_key -d
+- eval "$(ssh-agent -s)"
+- chmod 600 /tmp/github_deploy_key
+- ssh-add /tmp/github_deploy_key
+after_deploy:
+- rm /tmp/github_deploy_key
+- ssh-add -D
