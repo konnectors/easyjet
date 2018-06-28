@@ -10,7 +10,8 @@ const {
   scrape,
   saveBills,
   errors,
-  log
+  log,
+  htmlToPDF
 } = require('cozy-konnector-libs')
 const request = requestFactory({
   // debug: true
@@ -20,11 +21,8 @@ const request = requestFactory({
 })
 const moment = require('moment')
 const pdf = require('pdfjs')
-const html2pdf = require('./html2pdf')
-const helveticaFont = new pdf.Font(require('pdfjs/font/Helvetica.json'))
-const helveticaBoldFont = new pdf.Font(
-  require('pdfjs/font/Helvetica-Bold.json')
-)
+const helveticaFont = require('pdfjs/font/Helvetica.json')
+const helveticaBoldFont = require('pdfjs/font/Helvetica-Bold.json')
 
 const baseUrl = 'https://www.easyjet.com'
 
@@ -111,7 +109,7 @@ async function authenticate(login, password) {
   try {
     await request({
       method: 'POST',
-      url: `${baseUrl}/ejrebooking/api/v17/account/login`,
+      url: `${baseUrl}/ejrebooking/api/v18/account/login`,
       form: {
         Username: login,
         Password: password,
@@ -148,7 +146,7 @@ async function makePDF(item) {
     color: '0x0000FF'
   })
 
-  html2pdf($, doc, $('.print'), {
+  htmlToPDF($, doc, $('.print'), {
     baseURL: baseUrl,
     filter: $el => {
       return !$el.is('h1')
