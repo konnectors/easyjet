@@ -21,8 +21,8 @@ const request = requestFactory({
 })
 const moment = require('moment')
 const pdf = require('pdfjs')
-const helveticaFont = require('pdfjs/font/Helvetica.json')
-const helveticaBoldFont = require('pdfjs/font/Helvetica-Bold.json')
+const helveticaFont = require('pdfjs/font/Helvetica')
+const helveticaBoldFont = require('pdfjs/font/Helvetica-Bold')
 
 const baseUrl = 'https://www.easyjet.com'
 
