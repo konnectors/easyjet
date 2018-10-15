@@ -1,5 +1,5 @@
 {
-  "version": "1.0.4",
+  "version": "1.1.0",
   "name": "easyJet",
   "type": "konnector",
   "language": "node",
