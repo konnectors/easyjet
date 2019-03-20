@@ -5,7 +5,7 @@
   "language": "node",
   "icon": "icon.svg",
   "slug": "easyjet",
-  "source": "git://github.com/konnectors/easyjet.git",
+  "source": "git@github.com:konnectors/easyjet.git",
   "editor": "Cozy",
   "vendor_link": "https://www.easyjet.com",
   "categories": [
