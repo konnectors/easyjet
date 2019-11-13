@@ -54,9 +54,7 @@ async function start(fields) {
 async function fetchAndParseDetails(reservation) {
   const $ = await request({
     method: 'POST',
-    url: `${baseUrl}/FR/secure/MyEasyJet.mvc/ViewBooking?bookingReference=${
-      reservation.bookingRef
-    }`,
+    url: `${baseUrl}/FR/secure/MyEasyJet.mvc/ViewBooking?bookingReference=${reservation.bookingRef}`,
     timeout: 1000
   })
   const details = scrape($('article'), {
@@ -129,9 +127,7 @@ async function authenticate(login, password) {
 }
 
 async function makePDF(item) {
-  const url = `${baseUrl}/FR/secure/BookingConfirmationPrint.mvc/BookingConfirmationPrintReference?bookingNumber=${
-    item.bookingRef
-  }`
+  const url = `${baseUrl}/FR/secure/BookingConfirmationPrint.mvc/BookingConfirmationPrintReference?bookingNumber=${item.bookingRef}`
   const $ = await request({
     url,
     timeout: 1000
